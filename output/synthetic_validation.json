@@ -1,0 +1,1115 @@
+{
+  "kind": "synthetic_domain_validation",
+  "truth_boundary": "Synthetic domains have ground truth; live webcam diagnostics do not.",
+  "domain_count": 4,
+  "repetitions": 5,
+  "domains": [
+    {
+      "domain": "clean_desktop",
+      "label": "Clean desktop",
+      "repetitions": 5,
+      "runs": [
+        {
+          "domain": "clean_desktop",
+          "label": "Clean desktop",
+          "seed": 0,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 9,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 2.0,
+            "false_negative": 0.0,
+            "precision": 0.7777777777777778,
+            "recall": 1.0,
+            "f1": 0.8750000000000001
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 2.521265845932039,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.02592802873827127,
+            "amplitude_bias_deg": -0.01571907627170477,
+            "direction_mae_deg": 0.06339474245619872,
+            "peak_velocity_rmse_deg_s": 70.74038312355792,
+            "duration_mae_s": 0.0725714285714286
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.24443937810382854,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.3404,
+            "dilation_auc": 0.4976041237515012
+          }
+        },
+        {
+          "domain": "clean_desktop",
+          "label": "Clean desktop",
+          "seed": 1,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 9,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 2.0,
+            "false_negative": 0.0,
+            "precision": 0.7777777777777778,
+            "recall": 1.0,
+            "f1": 0.8750000000000001
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 2.5620805773678255,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.06404716818994403,
+            "amplitude_bias_deg": -0.06373398877343193,
+            "direction_mae_deg": 0.1253483463326331,
+            "peak_velocity_rmse_deg_s": 60.77347136700438,
+            "duration_mae_s": 0.06685714285714275
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.21400797684372952,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.2923999999999998,
+            "dilation_auc": 0.4333223064637396
+          }
+        },
+        {
+          "domain": "clean_desktop",
+          "label": "Clean desktop",
+          "seed": 2,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 13,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 6.0,
+            "false_negative": 0.0,
+            "precision": 0.5384615384615384,
+            "recall": 1.0,
+            "f1": 0.7000000000000001
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 2.7546162537093895,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.08220335452890078,
+            "amplitude_bias_deg": 0.02143477867955314,
+            "direction_mae_deg": 0.07611031629491956,
+            "peak_velocity_rmse_deg_s": 56.79021298800102,
+            "duration_mae_s": 0.05771428571428567
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.25477330436396084,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.2723999999999998,
+            "dilation_auc": 0.5501764425090633
+          }
+        },
+        {
+          "domain": "clean_desktop",
+          "label": "Clean desktop",
+          "seed": 3,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 15,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 8.0,
+            "false_negative": 0.0,
+            "precision": 0.4666666666666667,
+            "recall": 1.0,
+            "f1": 0.6363636363636364
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 2.778818757060362,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.1015468566806396,
+            "amplitude_bias_deg": -0.003820599518536432,
+            "direction_mae_deg": 0.14455751917257334,
+            "peak_velocity_rmse_deg_s": 56.874554033610735,
+            "duration_mae_s": 0.05200000000000001
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.2190680321881544,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.3044,
+            "dilation_auc": 0.4668640942335001
+          }
+        },
+        {
+          "domain": "clean_desktop",
+          "label": "Clean desktop",
+          "seed": 4,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 7,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 0.0,
+            "false_negative": 0.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 2.4419805893006434,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.021938013772065595,
+            "amplitude_bias_deg": -0.005666776144093484,
+            "direction_mae_deg": 0.03863117037414148,
+            "peak_velocity_rmse_deg_s": 83.11553076768337,
+            "duration_mae_s": 0.07828571428571426
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.29113799638427107,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.2603999999999997,
+            "dilation_auc": 0.6394030244494249
+          }
+        }
+      ],
+      "summary": {
+        "saccade_f1": {
+          "n": 5.0,
+          "mean": 0.8172727272727272,
+          "std": 0.13155616592690908,
+          "ci_low": 0.6968181818181819,
+          "ci_high": 0.925
+        },
+        "saccade_precision": {
+          "n": 5.0,
+          "mean": 0.7121367521367522,
+          "std": 0.19073614270536743,
+          "ci_low": 0.5432478632478632,
+          "ci_high": 0.8666666666666666
+        },
+        "saccade_recall": {
+          "n": 5.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "amplitude_mae_deg": {
+          "n": 5.0,
+          "mean": 0.059132684381964264,
+          "std": 0.031117077825864224,
+          "ci_low": 0.03195585064212355,
+          "ci_high": 0.08630951812180496
+        },
+        "direction_mae_deg": {
+          "n": 5.0,
+          "mean": 0.08960841892609325,
+          "std": 0.03940756655151374,
+          "ci_low": 0.05603242839111999,
+          "ci_high": 0.12448312926131036
+        },
+        "peak_velocity_rmse_deg_s": {
+          "n": 5.0,
+          "mean": 65.65883045597147,
+          "std": 10.101892741186315,
+          "ci_low": 57.620601082045575,
+          "ci_high": 75.37585938814986
+        },
+        "pupil_valid_fraction": {
+          "n": 5.0,
+          "mean": 0.9782857142857143,
+          "std": 0.0,
+          "ci_low": 0.9782857142857143,
+          "ci_high": 0.9782857142857143
+        },
+        "gaze_finite_fraction": {
+          "n": 5.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    {
+      "domain": "webcam_jitter",
+      "label": "Webcam jitter",
+      "repetitions": 5,
+      "runs": [
+        {
+          "domain": "webcam_jitter",
+          "label": "Webcam jitter",
+          "seed": 0,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 15,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 8.0,
+            "false_negative": 0.0,
+            "precision": 0.4666666666666667,
+            "recall": 1.0,
+            "f1": 0.6363636363636364
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.18204011653867,
+            "detection_threshold_deg_s": 19.34239124598858,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.2873456006638803,
+            "amplitude_bias_deg": 0.2819697611920326,
+            "direction_mae_deg": 0.554602059775131,
+            "peak_velocity_rmse_deg_s": 66.66373299980867,
+            "duration_mae_s": 0.007466343692138452
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9788571428571429,
+            "dynamic_range": 0.3670131158346157,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.3586155636499466,
+            "dilation_auc": 0.48754272037981344
+          }
+        },
+        {
+          "domain": "webcam_jitter",
+          "label": "Webcam jitter",
+          "seed": 1,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 16,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 9.0,
+            "false_negative": 0.0,
+            "precision": 0.4375,
+            "recall": 1.0,
+            "f1": 0.6086956521739131
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 248.44426144974315,
+            "detection_threshold_deg_s": 18.53648675115728,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.3860778046056036,
+            "amplitude_bias_deg": 0.36512372055364356,
+            "direction_mae_deg": 0.5158761386096964,
+            "peak_velocity_rmse_deg_s": 70.85924472283826,
+            "duration_mae_s": 0.009640875471254584
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.42531396901565,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.3714836266284416,
+            "dilation_auc": 0.6046378790636295
+          }
+        },
+        {
+          "domain": "webcam_jitter",
+          "label": "Webcam jitter",
+          "seed": 2,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 15,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 8.0,
+            "false_negative": 0.0,
+            "precision": 0.4666666666666667,
+            "recall": 1.0,
+            "f1": 0.6363636363636364
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.21499079411362,
+            "detection_threshold_deg_s": 20.15394124200243,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.18257883266167876,
+            "amplitude_bias_deg": 0.1396214717234816,
+            "direction_mae_deg": 0.34108735068089197,
+            "peak_velocity_rmse_deg_s": 60.47362831775495,
+            "duration_mae_s": 0.007901591586397123
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9794285714285714,
+            "dynamic_range": 0.3770881292363186,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.364456274900205,
+            "dilation_auc": 0.4472183538020036
+          }
+        },
+        {
+          "domain": "webcam_jitter",
+          "label": "Webcam jitter",
+          "seed": 3,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 17,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 10.0,
+            "false_negative": 0.0,
+            "precision": 0.4117647058823529,
+            "recall": 1.0,
+            "f1": 0.5833333333333334
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.9509318318839,
+            "detection_threshold_deg_s": 19.177562480548424,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.3847743808670917,
+            "amplitude_bias_deg": 0.3570138588969982,
+            "direction_mae_deg": 0.5153347022390165,
+            "peak_velocity_rmse_deg_s": 66.99889504151187,
+            "duration_mae_s": 0.007273666004952122
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9788571428571429,
+            "dynamic_range": 0.34690428286269315,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.3081107842318636,
+            "dilation_auc": 0.3998802938793222
+          }
+        },
+        {
+          "domain": "webcam_jitter",
+          "label": "Webcam jitter",
+          "seed": 4,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 11,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 4.0,
+            "false_negative": 0.0,
+            "precision": 0.6363636363636364,
+            "recall": 1.0,
+            "f1": 0.7777777777777778
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 247.96118551459438,
+            "detection_threshold_deg_s": 19.93687616415854,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.0647073582386143,
+            "amplitude_bias_deg": 0.03240636441462349,
+            "direction_mae_deg": 0.7057718052587469,
+            "peak_velocity_rmse_deg_s": 46.59360222458858,
+            "duration_mae_s": 0.005030837788141562
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.3831387297022588,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.357242047006247,
+            "dilation_auc": 0.4469753683706085
+          }
+        }
+      ],
+      "summary": {
+        "saccade_f1": {
+          "n": 5.0,
+          "mean": 0.6485068072024593,
+          "std": 0.06758462368083899,
+          "ci_low": 0.59901185770751,
+          "ci_high": 0.7156785243741766
+        },
+        "saccade_precision": {
+          "n": 5.0,
+          "mean": 0.4837923351158645,
+          "std": 0.07898802272190608,
+          "ci_low": 0.4278921568627451,
+          "ci_high": 0.5626515151515151
+        },
+        "saccade_recall": {
+          "n": 5.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "amplitude_mae_deg": {
+          "n": 5.0,
+          "mean": 0.26109679540737374,
+          "std": 0.12356316529447141,
+          "ci_low": 0.15229505764892268,
+          "ci_high": 0.3658099943218541
+        },
+        "direction_mae_deg": {
+          "n": 5.0,
+          "mean": 0.5265344113126965,
+          "std": 0.1162269167070221,
+          "ci_low": 0.41874805008550064,
+          "ci_high": 0.6298135385991268
+        },
+        "peak_velocity_rmse_deg_s": {
+          "n": 5.0,
+          "mean": 62.31782066130047,
+          "std": 8.537065388662642,
+          "ci_low": 54.22273594287179,
+          "ci_high": 68.47600250570179
+        },
+        "pupil_valid_fraction": {
+          "n": 5.0,
+          "mean": 0.9787428571428572,
+          "std": 0.00042761798705986747,
+          "ci_low": 0.9784,
+          "ci_high": 0.9790857142857143
+        },
+        "gaze_finite_fraction": {
+          "n": 5.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    {
+      "domain": "head_drift",
+      "label": "Head-pose drift",
+      "repetitions": 5,
+      "runs": [
+        {
+          "domain": "head_drift",
+          "label": "Head-pose drift",
+          "seed": 0,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 18,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 11.0,
+            "false_negative": 0.0,
+            "precision": 0.3888888888888889,
+            "recall": 1.0,
+            "f1": 0.56
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 20.262961201633175,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.3568860432190368,
+            "amplitude_bias_deg": 0.3189789404179965,
+            "direction_mae_deg": 0.5039593472758546,
+            "peak_velocity_rmse_deg_s": 68.5019771345203,
+            "duration_mae_s": 0.009142857142857024
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.33736953685995585,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.3164,
+            "dilation_auc": 0.5138852395216289
+          }
+        },
+        {
+          "domain": "head_drift",
+          "label": "Head-pose drift",
+          "seed": 1,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 16,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 9.0,
+            "false_negative": 0.0,
+            "precision": 0.4375,
+            "recall": 1.0,
+            "f1": 0.6086956521739131
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 20.230373202304584,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.15968049686885546,
+            "amplitude_bias_deg": 0.09990291846349132,
+            "direction_mae_deg": 0.2876349930638306,
+            "peak_velocity_rmse_deg_s": 62.40755785931945,
+            "duration_mae_s": 0.006857142857142736
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.28301589222568957,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.2403999999999997,
+            "dilation_auc": 0.4464319776702712
+          }
+        },
+        {
+          "domain": "head_drift",
+          "label": "Head-pose drift",
+          "seed": 2,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 12,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 5.0,
+            "false_negative": 0.0,
+            "precision": 0.5833333333333334,
+            "recall": 1.0,
+            "f1": 0.7368421052631579
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 21.47341969323575,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.1899976365942083,
+            "amplitude_bias_deg": 0.13179467401382702,
+            "direction_mae_deg": 0.6575922355440257,
+            "peak_velocity_rmse_deg_s": 54.95148631484151,
+            "duration_mae_s": 0.00628571428571426
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.335411721625007,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.2043999999999997,
+            "dilation_auc": 0.5255810982443001
+          }
+        },
+        {
+          "domain": "head_drift",
+          "label": "Head-pose drift",
+          "seed": 3,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 13,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 6.0,
+            "false_negative": 0.0,
+            "precision": 0.5384615384615384,
+            "recall": 1.0,
+            "f1": 0.7000000000000001
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 21.23279953848907,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.09682784884360622,
+            "amplitude_bias_deg": -0.05230553940754661,
+            "direction_mae_deg": 0.416753612735172,
+            "peak_velocity_rmse_deg_s": 57.388777586718525,
+            "duration_mae_s": 0.00514285714285702
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.31789428669958975,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 1.3443999999999998,
+            "dilation_auc": 0.483130187355738
+          }
+        },
+        {
+          "domain": "head_drift",
+          "label": "Head-pose drift",
+          "seed": 4,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 19,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 12.0,
+            "false_negative": 0.0,
+            "precision": 0.3684210526315789,
+            "recall": 1.0,
+            "f1": 0.5384615384615384
+          },
+          "gaze": {
+            "finite_sample_fraction": 1.0,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 20.451873114287082,
+            "dropout_fraction": 0.0,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.4811024448751634,
+            "amplitude_bias_deg": 0.44922747407327535,
+            "direction_mae_deg": 0.19849316974851863,
+            "peak_velocity_rmse_deg_s": 81.33084847740977,
+            "duration_mae_s": 0.009714285714285691
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 0.0,
+            "valid_sample_fraction": 0.9782857142857143,
+            "dynamic_range": 0.3516908190558117,
+            "detected_blinks": 1.0,
+            "latency_to_peak_s": 2.2163999999999997,
+            "dilation_auc": 0.6464473423477997
+          }
+        }
+      ],
+      "summary": {
+        "saccade_f1": {
+          "n": 5.0,
+          "mean": 0.6287998591797219,
+          "std": 0.07751283628437876,
+          "ci_low": 0.561123745819398,
+          "ci_high": 0.6964759725400459
+        },
+        "saccade_precision": {
+          "n": 5.0,
+          "mean": 0.4633209626630679,
+          "std": 0.08397847806239402,
+          "ci_low": 0.3904239766081871,
+          "ci_high": 0.5362179487179487
+        },
+        "saccade_recall": {
+          "n": 5.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        "amplitude_mae_deg": {
+          "n": 5.0,
+          "mean": 0.2568988940801741,
+          "std": 0.14129019549471017,
+          "ci_low": 0.14060286560382634,
+          "ci_high": 0.3794623722929423
+        },
+        "direction_mae_deg": {
+          "n": 5.0,
+          "mean": 0.41288667167348037,
+          "std": 0.16114748221795772,
+          "ci_low": 0.2774147699170482,
+          "ci_high": 0.5528742093943524
+        },
+        "peak_velocity_rmse_deg_s": {
+          "n": 5.0,
+          "mean": 64.91612947456193,
+          "std": 9.429203303308991,
+          "ci_low": 57.417617132487905,
+          "ci_high": 73.76153223017363
+        },
+        "pupil_valid_fraction": {
+          "n": 5.0,
+          "mean": 0.9782857142857143,
+          "std": 0.0,
+          "ci_low": 0.9782857142857143,
+          "ci_high": 0.9782857142857143
+        },
+        "gaze_finite_fraction": {
+          "n": 5.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        }
+      }
+    },
+    {
+      "domain": "low_light_dropout",
+      "label": "Low-light dropout",
+      "repetitions": 5,
+      "runs": [
+        {
+          "domain": "low_light_dropout",
+          "label": "Low-light dropout",
+          "seed": 0,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 14,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 7.0,
+            "false_negative": 0.0,
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666
+          },
+          "gaze": {
+            "finite_sample_fraction": 0.9645714285714285,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 16.821038145266158,
+            "dropout_fraction": 0.035428571428571476,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 3.1219502881135903,
+            "amplitude_bias_deg": -2.7546894915153937,
+            "direction_mae_deg": 1.0891534301517984,
+            "peak_velocity_rmse_deg_s": 87.9257522685483,
+            "duration_mae_s": 0.010857142857142867
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 2.0,
+            "valid_sample_fraction": 0.92,
+            "dynamic_range": 0.49045023201870697,
+            "detected_blinks": 3.0,
+            "latency_to_peak_s": 2.2723999999999998,
+            "dilation_auc": 0.5276283354960933
+          }
+        },
+        {
+          "domain": "low_light_dropout",
+          "label": "Low-light dropout",
+          "seed": 1,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 11,
+          "n_matched_saccades": 5,
+          "saccade_recovery": {
+            "true_positive": 5.0,
+            "false_positive": 6.0,
+            "false_negative": 2.0,
+            "precision": 0.45454545454545453,
+            "recall": 0.7142857142857143,
+            "f1": 0.5555555555555556
+          },
+          "gaze": {
+            "finite_sample_fraction": 0.9605714285714285,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 18.011475504408445,
+            "dropout_fraction": 0.03942857142857148,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.5112678377522529,
+            "amplitude_bias_deg": 0.06661815415454608,
+            "direction_mae_deg": 0.2352142885499518,
+            "peak_velocity_rmse_deg_s": 63.75409519696551,
+            "duration_mae_s": 0.008799999999999919
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 2.0,
+            "valid_sample_fraction": 0.92,
+            "dynamic_range": 0.44269232015308546,
+            "detected_blinks": 3.0,
+            "latency_to_peak_s": 2.4244,
+            "dilation_auc": 0.4359455499752205
+          }
+        },
+        {
+          "domain": "low_light_dropout",
+          "label": "Low-light dropout",
+          "seed": 2,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 17,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 10.0,
+            "false_negative": 0.0,
+            "precision": 0.4117647058823529,
+            "recall": 1.0,
+            "f1": 0.5833333333333334
+          },
+          "gaze": {
+            "finite_sample_fraction": 0.9611428571428572,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 18.19867603300189,
+            "dropout_fraction": 0.03885714285714281,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 1.0,
+            "invalid_sample_drop_used": 1.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.18818359349307087,
+            "amplitude_bias_deg": 0.1788922664201738,
+            "direction_mae_deg": 0.3987730058714395,
+            "peak_velocity_rmse_deg_s": 56.29635391393324,
+            "duration_mae_s": 0.007428571428571277
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 2.0,
+            "valid_sample_fraction": 0.92,
+            "dynamic_range": 0.5402976986135872,
+            "detected_blinks": 3.0,
+            "latency_to_peak_s": 1.9964,
+            "dilation_auc": 0.5667271340911253
+          }
+        },
+        {
+          "domain": "low_light_dropout",
+          "label": "Low-light dropout",
+          "seed": 3,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 9,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 2.0,
+            "false_negative": 0.0,
+            "precision": 0.7777777777777778,
+            "recall": 1.0,
+            "f1": 0.8750000000000001
+          },
+          "gaze": {
+            "finite_sample_fraction": 0.9474285714285714,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 17.605823401881736,
+            "dropout_fraction": 0.0525714285714286,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 0.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.47111336120474867,
+            "amplitude_bias_deg": -0.46601892201507084,
+            "direction_mae_deg": 0.4855244521404529,
+            "peak_velocity_rmse_deg_s": 55.63355824094862,
+            "duration_mae_s": 0.005714285714285394
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 2.0,
+            "valid_sample_fraction": 0.92,
+            "dynamic_range": 0.5517752236519771,
+            "detected_blinks": 3.0,
+            "latency_to_peak_s": 1.4364,
+            "dilation_auc": 0.4732173231933431
+          }
+        },
+        {
+          "domain": "low_light_dropout",
+          "label": "Low-light dropout",
+          "seed": 4,
+          "n_truth_saccades": 7,
+          "n_detected_saccades": 18,
+          "n_matched_saccades": 7,
+          "saccade_recovery": {
+            "true_positive": 7.0,
+            "false_positive": 11.0,
+            "false_negative": 0.0,
+            "precision": 0.3888888888888889,
+            "recall": 1.0,
+            "f1": 0.56
+          },
+          "gaze": {
+            "finite_sample_fraction": 0.9514285714285714,
+            "sampling_rate_hz": 249.99999999999977,
+            "detection_threshold_deg_s": 18.18292661029768,
+            "dropout_fraction": 0.0485714285714286,
+            "large_gap_count": 0.0,
+            "short_gap_interpolation_used": 1.0,
+            "invalid_sample_drop_used": 0.0
+          },
+          "saccade_error": {
+            "amplitude_mae_deg": 0.39595750102101973,
+            "amplitude_bias_deg": 0.1811888056188748,
+            "direction_mae_deg": 0.32213262451911157,
+            "peak_velocity_rmse_deg_s": 81.34090155262382,
+            "duration_mae_s": 0.012571428571428487
+          },
+          "pupil": {
+            "truth_event_count": 3.0,
+            "truth_blink_count": 1.0,
+            "truth_lighting_dropout_count": 2.0,
+            "valid_sample_fraction": 0.92,
+            "dynamic_range": 0.4952167329800172,
+            "detected_blinks": 3.0,
+            "latency_to_peak_s": 2.2883999999999998,
+            "dilation_auc": 0.6783358168220734
+          }
+        }
+      ],
+      "summary": {
+        "saccade_f1": {
+          "n": 5.0,
+          "mean": 0.6481111111111112,
+          "std": 0.12029059464685439,
+          "ci_low": 0.562888888888889,
+          "ci_high": 0.7694444444444445
+        },
+        "saccade_precision": {
+          "n": 5.0,
+          "mean": 0.5065953654188948,
+          "std": 0.14081211698214713,
+          "ci_low": 0.41117052881758764,
+          "ci_high": 0.6490196078431372
+        },
+        "saccade_recall": {
+          "n": 5.0,
+          "mean": 0.9428571428571428,
+          "std": 0.11428571428571428,
+          "ci_low": 0.8285714285714286,
+          "ci_high": 1.0
+        },
+        "amplitude_mae_deg": {
+          "n": 5.0,
+          "mean": 0.9376945163169363,
+          "std": 1.097793840418003,
+          "ci_low": 0.3093863958872428,
+          "ci_high": 2.0546152406228084
+        },
+        "direction_mae_deg": {
+          "n": 5.0,
+          "mean": 0.5061595602465508,
+          "std": 0.3030236906323269,
+          "ci_low": 0.30260943313730065,
+          "ci_high": 0.8130012604396548
+        },
+        "peak_velocity_rmse_deg_s": {
+          "n": 5.0,
+          "mean": 68.9901322346039,
+          "std": 13.251757389710216,
+          "ci_low": 57.52278390134584,
+          "ci_high": 80.45748056786195
+        },
+        "pupil_valid_fraction": {
+          "n": 5.0,
+          "mean": 0.9200000000000002,
+          "std": 1.1102230246251565e-16,
+          "ci_low": 0.9200000000000002,
+          "ci_high": 0.9200000000000002
+        },
+        "gaze_finite_fraction": {
+          "n": 5.0,
+          "mean": 0.9570285714285713,
+          "std": 0.006479102986540971,
+          "ci_low": 0.9509685714285714,
+          "ci_high": 0.9622857142857143
+        }
+      }
+    }
+  ],
+  "cross_domain": {
+    "macro_saccade_f1": 0.6856726261915048,
+    "min_saccade_f1": 0.6287998591797219,
+    "max_saccade_f1": 0.8172727272727272,
+    "stability_gap_f1": 0.18847286809300523,
+    "worst_domain": "head_drift"
+  }
+}

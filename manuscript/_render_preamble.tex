@@ -1,0 +1,25 @@
+% Standalone-render preamble: load the same packages the template's
+% manuscript/preamble.md declares (siunitx for \SI, booktabs for tables) and map
+% the Unicode glyphs used in prose to LaTeX so the default Latin Modern font
+% renders them. (The template pipeline uses a Unicode-font engine; this keeps the
+% working/ standalone render faithful.)
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{newunicodechar}
+\newunicodechar{σ}{\ensuremath{\sigma}}
+\newunicodechar{λ}{\ensuremath{\lambda}}
+\newunicodechar{θ}{\ensuremath{\theta}}
+\newunicodechar{η}{\ensuremath{\eta}}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{±}{\ensuremath{\pm}}
+\newunicodechar{×}{\ensuremath{\times}}
+\newunicodechar{°}{\ensuremath{^\circ}}
+\newunicodechar{→}{\ensuremath{\rightarrow}}
+\newunicodechar{↔}{\ensuremath{\leftrightarrow}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∘}{\ensuremath{\circ}}
+\newunicodechar{–}{--}
+\newunicodechar{—}{---}
+\newunicodechar{≠}{\ensuremath{\neq}}

@@ -1,0 +1,43 @@
+{
+  "n_samples": 162,
+  "duration_s": 0.644,
+  "n_fixations": 2,
+  "n_saccades": 1,
+  "n_microsaccades": 0,
+  "scanpath": "R",
+  "main_sequence": {},
+  "pupil": {
+    "mean_size": 2.9991326924793023,
+    "min_size": 2.500114647845022,
+    "max_size": 3.500279566332611,
+    "n_peaks": 5.0,
+    "n_troughs": 5.0,
+    "n_blinks": 1.0
+  },
+  "saccades": [
+    {
+      "onset_t": 0.3,
+      "offset_t": 0.344,
+      "amplitude_deg": 10.0,
+      "direction_deg": -0.0,
+      "peak_velocity_deg_s": 360.2940328573822,
+      "duration_s": 0.043999999999999984
+    }
+  ],
+  "fixations": [
+    {
+      "onset_t": 0.0,
+      "offset_t": 0.296,
+      "duration_s": 0.296,
+      "centroid_x": 0.0,
+      "centroid_y": 0.0
+    },
+    {
+      "onset_t": 0.348,
+      "offset_t": 0.644,
+      "duration_s": 0.29600000000000004,
+      "centroid_x": 10.0,
+      "centroid_y": 0.0
+    }
+  ]
+}

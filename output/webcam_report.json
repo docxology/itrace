@@ -1,0 +1,57 @@
+{
+  "n_samples": 29,
+  "duration_s": 0.9277985419612377,
+  "n_fixations": 1,
+  "n_saccades": 0,
+  "n_microsaccades": 0,
+  "n_psos": 0,
+  "scanpath": "",
+  "main_sequence": {},
+  "pupil": {
+    "mean_size": 0.5298796995394137,
+    "min_size": 0.5026637037999041,
+    "max_size": 0.5370752387491002,
+    "n_peaks": 3.0,
+    "n_troughs": 2.0,
+    "n_blinks": 0.0
+  },
+  "quality": {
+    "finite_sample_fraction": 1.0,
+    "sampling_rate_hz": 30.001518675167272,
+    "detection_threshold_deg_s": 30.0,
+    "adaptive_lambda_factor": 0.0,
+    "fixation_rate_hz": 1.077820189161042,
+    "saccade_rate_hz": 0.0,
+    "microsaccade_rate_hz": 0.0,
+    "pso_rate_hz": 0.0
+  },
+  "config": {
+    "detection": {
+      "method": "ivt",
+      "velocity_threshold_deg_s": 30.0,
+      "adaptive_lambda_factor": 6.0,
+      "min_saccade_duration_s": 0.006,
+      "long_saccade_deg": 5.0,
+      "include_microsaccades": true,
+      "include_pso": false,
+      "pso_window_s": 0.04,
+      "pso_peak_fraction": 0.2
+    },
+    "pupil": {
+      "enabled": true,
+      "smooth_window": 5,
+      "blink_threshold": 0.0
+    }
+  },
+  "saccades": [],
+  "psos": [],
+  "fixations": [
+    {
+      "onset_t": 0.0627790830330923,
+      "offset_t": 0.99057762499433,
+      "duration_s": 0.9277985419612377,
+      "centroid_x": -3.4480344127393128,
+      "centroid_y": 7.611196310315075
+    }
+  ]
+}

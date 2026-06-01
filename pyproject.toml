@@ -1,0 +1,156 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "itrace"
+version = "0.4.0"
+description = "Open-source webcam eye-movement analysis: gaze geometry, saccade/fixation/microsaccade detection, main-sequence dynamics, and pupillometry — a pure, algorithmically verified NumPy/SciPy core with an optional thin webcam/MediaPipe capture shell."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Daniel Ari Friedman" },
+]
+keywords = [
+    "eye-tracking",
+    "gaze",
+    "saccade",
+    "microsaccade",
+    "pupillometry",
+    "main-sequence",
+    "webcam",
+    "i-vt",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "pandas>=2.0.0",
+    "typer>=0.12.0",
+]
+
+[project.optional-dependencies]
+# Hardware capture backend. Deliberately separated: import itrace and the whole
+# test suite must succeed with NONE of these installed.
+capture = [
+    "opencv-python>=4.8.0",
+    "mediapipe>=0.10.21,<0.10.22",
+]
+# Live dashboard + publication figures.
+dashboard = [
+    "streamlit>=1.30.0",
+    "plotly>=5.15.0",
+]
+figures = [
+    "matplotlib>=3.7.0",
+]
+web = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "httpx2>=0.28.0",
+]
+all = [
+    "opencv-python>=4.8.0",
+    "mediapipe>=0.10.21,<0.10.22",
+    "streamlit>=1.30.0",
+    "plotly>=5.15.0",
+    "matplotlib>=3.7.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "httpx2>=0.28.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "pytest-timeout>=2.0.0",
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "matplotlib>=3.7.0",
+    "fastapi>=0.115.0",
+    "httpx>=0.27.0",
+    "httpx2>=0.28.0",
+    "uvicorn[standard]>=0.30.0",
+]
+
+[project.scripts]
+itrace = "itrace.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/docxology/template"
+Brief = "https://github.com/docxology/template"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["itrace*"]
+
+[tool.setuptools.package-data]
+itrace = ["py.typed", "web_static/*"]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["itrace"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 90
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "\\.\\.\\.",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B", "UP", "SIM", "C4", "PIE", "PT", "RUF", "NPY"]
+ignore = [
+    # Scientific docstrings use Greek/math punctuation (λ, σ, °, –).
+    "RUF001",
+    "RUF002",
+    "RUF003",
+]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src/itrace"]
+warn_unused_ignores = false
+
+[[tool.mypy.overrides]]
+module = [
+    "scipy.*",
+    "cv2.*",
+    "mediapipe.*",
+    "streamlit.*",
+    "plotly.*",
+    "pandas.*",
+    "matplotlib.*",
+    "fastapi.*",
+    "uvicorn.*",
+]
+ignore_missing_imports = true

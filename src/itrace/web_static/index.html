@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>iTrace Live</title>
+    <link rel="stylesheet" href="/static/app.css?v=live-ui-refresh-6" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="eye-stage" aria-label="Live eye crop">
+        <div class="status-row">
+          <strong>iTrace Live</strong>
+          <span class="chip" id="connectionStatus">idle</span>
+          <span class="chip" id="cameraStatus">camera: --</span>
+          <span class="chip" id="faceStatus">face: --</span>
+          <span class="chip" id="fpsStatus">fps: --</span>
+          <span class="chip" id="sampleStatus">samples: 0</span>
+          <span class="chip" id="qualityStatus">quality: --</span>
+          <span class="chip" id="calibrationStatus">calibration: off</span>
+        </div>
+        <div class="eye-frame">
+          <img id="eyeCrop" alt="Live zoomed crop of both eyes" />
+          <div class="eye-box-overlay" id="eyeOverlay" aria-hidden="true"></div>
+          <div class="eye-placeholder" id="eyePlaceholder">Start camera</div>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="Controls">
+        <label>Camera <input id="cameraInput" type="number" min="0" value="0" /></label>
+        <label>
+          Method
+          <select id="methodInput">
+            <option value="ivt">Fixed I-VT</option>
+            <option value="adaptive_ivt">Adaptive I-VT</option>
+          </select>
+        </label>
+        <label>Velocity <input id="thresholdInput" type="number" value="30" min="0" step="5" /></label>
+        <label>Window <input id="windowInput" type="number" value="10" min="1" step="1" /></label>
+        <label class="check"><input id="psoInput" type="checkbox" /> PSO</label>
+        <button id="startButton" type="button">Start</button>
+        <button id="stopButton" type="button">Stop</button>
+        <button id="clearSessionButton" type="button">Clear Session</button>
+        <button id="fitCalibrationButton" type="button">Fit Calibration</button>
+        <button id="resetCalibrationButton" type="button">Reset Calibration</button>
+        <button id="resetAllButton" type="button">Reset All</button>
+        <button id="exportButton" type="button">Export</button>
+        <span id="outputStatus">output: memory</span>
+      </section>
+
+      <section class="metrics" aria-label="Diagnostics">
+        <div><span>Gaze X</span><strong id="gazeX">--</strong></div>
+        <div><span>Gaze Y</span><strong id="gazeY">--</strong></div>
+        <div><span>Cal X</span><strong id="calGazeX">--</strong></div>
+        <div><span>Cal Y</span><strong id="calGazeY">--</strong></div>
+        <div><span>Pupil</span><strong id="pupilSize">--</strong></div>
+        <div><span>Samples</span><strong id="sampleCount">0</strong></div>
+        <div><span>Duration</span><strong id="duration">0.00</strong></div>
+        <div><span>Finite</span><strong id="finiteFraction">--</strong></div>
+        <div><span>Threshold</span><strong id="detectionThreshold">--</strong></div>
+        <div><span>Saccades</span><strong id="saccadeCount">0</strong></div>
+        <div><span>Fixations</span><strong id="fixationCount">0</strong></div>
+        <div><span>Micros</span><strong id="microCount">0</strong></div>
+        <div><span>Pursuits</span><strong id="pursuitCount">0</strong></div>
+        <div><span>PSO</span><strong id="psoCount">0</strong></div>
+        <div><span>Live Q</span><strong id="qualityIndex">--</strong></div>
+        <div><span>Sampling CV</span><strong id="samplingCv">--</strong></div>
+        <div><span>Gaze Path</span><strong id="gazePath">--</strong></div>
+        <div><span>Pupil Valid</span><strong id="pupilValid">--</strong></div>
+      </section>
+
+      <section class="validation-panel" aria-label="Validation and domain diagnostics">
+        <div class="validation-header">
+          <div>
+            <h2>Validation & Domain Diagnostics</h2>
+            <p id="truthBoundary">Live webcam diagnostics are plausibility checks, not reference-device truth.</p>
+          </div>
+          <div class="validation-actions">
+            <label>Repeats <input id="validationRepeatsInput" type="number" value="5" min="1" max="25" /></label>
+            <button id="runSyntheticValidationButton" type="button">Run Synthetic Validation</button>
+            <button id="clearValidationButton" type="button">Clear Validation</button>
+          </div>
+        </div>
+        <div class="validation-summary">
+          <div><span>Macro F1</span><strong id="macroF1">--</strong></div>
+          <div><span>Worst Domain</span><strong id="worstDomain">--</strong></div>
+          <div><span>Stability Gap</span><strong id="stabilityGap">--</strong></div>
+          <div><span>Live Warnings</span><strong id="liveWarnings">--</strong></div>
+        </div>
+        <div class="validation-grid">
+          <article>
+            <h2>Synthetic Domain Recovery</h2>
+            <canvas id="domainValidationPlot"></canvas>
+          </article>
+          <article>
+            <h2>Domain Summary</h2>
+            <table id="domainValidationTable">
+              <thead>
+                <tr>
+                  <th>Domain</th>
+                  <th>F1</th>
+                  <th>Amp MAE</th>
+                  <th>Pupil valid</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4">Run synthetic validation</td></tr>
+              </tbody>
+            </table>
+          </article>
+        </div>
+      </section>
+
+      <section class="statistics-panel" id="statistics-panel" aria-label="Live statistics summary">
+        <div class="section-header">
+          <h2>Live Statistics</h2>
+          <span id="statsWindow">rolling window: --</span>
+        </div>
+        <div class="stat-grid">
+          <div><span>Sample Hz</span><strong id="sampleRate">--</strong></div>
+          <div><span>Median Δt</span><strong id="medianDt">--</strong></div>
+          <div><span>Sacc/min</span><strong id="saccadeRate">--</strong></div>
+          <div><span>Fix dwell</span><strong id="fixationDwell">--</strong></div>
+          <div><span>Path eff.</span><strong id="pathEfficiency">--</strong></div>
+          <div><span>Dispersion</span><strong id="dispersion">--</strong></div>
+          <div><span>BCEA</span><strong id="bcea">--</strong></div>
+          <div><span>Entropy</span><strong id="transitionEntropy">--</strong></div>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="Live analysis plots">
+        <article><h2>Gaze XY</h2><canvas id="gazeXY"></canvas></article>
+        <article><h2>Gaze Time Series</h2><canvas id="gazeTime"></canvas></article>
+        <article><h2>Speed / Threshold</h2><canvas id="speedTrace"></canvas></article>
+        <article><h2>Pupil Trace</h2><canvas id="pupilTrace"></canvas></article>
+        <article><h2>Event Raster</h2><canvas id="eventRaster"></canvas></article>
+        <article><h2>Scanpath</h2><canvas id="scanpath"></canvas></article>
+        <article><h2>Saccade Directions</h2><canvas id="directionPolar"></canvas></article>
+        <article><h2>Amplitude Histogram</h2><canvas id="amplitudeHist"></canvas></article>
+        <article><h2>Main Sequence</h2><canvas id="mainSequence"></canvas></article>
+      </section>
+    </main>
+    <script src="/static/app.js?v=live-ui-refresh-6"></script>
+  </body>
+</html>
