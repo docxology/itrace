@@ -38,7 +38,7 @@ plt.rcParams.update(
     {
         "axes.titleweight": "bold",
         "figure.dpi": 120,
-        "font.size": 10,
+        "font.size": 12,
     }
 )
 
@@ -115,7 +115,7 @@ def _layout(res: ClosedLoopResult):
         "orange rays = true gaze\niris/pupil size = scripted state",
         transform=ax3d.transAxes,
         color="0.86",
-        fontsize=8,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.35", "fc": "#17171f", "ec": "#3a3a46", "alpha": 0.92},
     )
 
@@ -143,17 +143,17 @@ def _layout(res: ClosedLoopResult):
     )
     ax_g.plot(g.t, g.x, color=GAZE_C, lw=1.4, label="recovered yaw")
     ax_g.plot(g.t, g.y, color=RAY, lw=1.4, label="recovered pitch")
-    ax_g.set_title("B. recovered gaze (deg)", color="w", fontsize=10)
+    ax_g.set_title("B. recovered gaze (deg)", color="w", fontsize=13)
     ax_g.set_ylabel("deg", color="w")
     ax_g.grid(True, color="white", alpha=0.12)
-    ax_g.legend(fontsize=6.5, facecolor=BG, labelcolor="w", edgecolor="#555", ncol=2)
+    ax_g.legend(fontsize=11, facecolor=BG, labelcolor="w", edgecolor="#555", ncol=2)
     ax_g.text(
         0.72,
         0.08,
         f"RMS {res.metrics['gaze_rms_deg']:.2f} deg",
         transform=ax_g.transAxes,
         color="w",
-        fontsize=8,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.3", "fc": "#17171f", "ec": "#3a3a46", "alpha": 0.92},
     )
     cur_g = ax_g.axvline(g.t[0], color="w", lw=1)
@@ -163,18 +163,18 @@ def _layout(res: ClosedLoopResult):
         res.scene.t, _norm01(res.scene.true_pupil_mm), color="0.78", lw=0.9, ls="--", label="true"
     )
     ax_p.plot(p.t, _norm01(p.size), color=PUPIL_C, lw=1.5, label="recovered")
-    ax_p.set_title("C. recovered pupil (normalised)", color="w", fontsize=10)
+    ax_p.set_title("C. recovered pupil (normalised)", color="w", fontsize=13)
     ax_p.set_xlabel("time (s)", color="w")
     ax_p.set_ylabel("0-1", color="w")
     ax_p.grid(True, color="white", alpha=0.12)
-    ax_p.legend(fontsize=7, facecolor=BG, labelcolor="w", edgecolor="#555")
+    ax_p.legend(fontsize=11, facecolor=BG, labelcolor="w", edgecolor="#555")
     ax_p.text(
         0.02,
         0.08,
         f"r {res.metrics['pupil_corr']:.2f}",
         transform=ax_p.transAxes,
         color="w",
-        fontsize=8,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.3", "fc": "#17171f", "ec": "#3a3a46", "alpha": 0.92},
     )
     cur_p = ax_p.axvline(p.t[0], color="w", lw=1)

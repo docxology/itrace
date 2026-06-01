@@ -30,8 +30,7 @@ from matplotlib.figure import Figure
 
 from ..types import Fixation, FloatArray, Microsaccade, Saccade, SessionReport
 
-# Wong 2011 colour-blind-safe palette.
-WONG: list[str] = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9"]
+from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
 
 # Marker-area scaling for fixation dwell time (points^2 per second).
 _FIXATION_AREA_PER_S = 1200.0

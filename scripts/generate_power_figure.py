@@ -23,13 +23,18 @@ import matplotlib.pyplot as plt
 
 from itrace import power
 from itrace.power import MetricCurve, NoiseSweepResult
+from itrace.viz.palette import FONT_FLOOR, WONG, apply_house_style
+
+# Single-source palette + house style (readable font floor, white bg, clean
+# spines) shared with every iTrace figure.
+apply_house_style()
 
 # Per-metric visual encoding — colour PLUS marker PLUS linestyle (redundant, so
 # the figure reads in greyscale and for colour-blind viewers).
 STYLE: dict[str, dict[str, str]] = {
-    "gaze_rms_deg": {"color": "#0072B2", "marker": "o", "ls": "-", "label": "gaze RMS error"},
-    "saccade_f1": {"color": "#D55E00", "marker": "s", "ls": "--", "label": "saccade detection F1"},
-    "pupil_corr": {"color": "#009E73", "marker": "^", "ls": ":", "label": "pupil correlation"},
+    "gaze_rms_deg": {"color": WONG[0], "marker": "o", "ls": "-", "label": "gaze RMS error"},
+    "saccade_f1": {"color": WONG[3], "marker": "s", "ls": "--", "label": "saccade detection F1"},
+    "pupil_corr": {"color": WONG[2], "marker": "^", "ls": ":", "label": "pupil correlation"},
 }
 BOUND = {"gaze_rms_deg": 2.0, "saccade_f1": 0.8, "pupil_corr": 0.9}
 Y_LABEL = {
@@ -68,19 +73,19 @@ def _panel(ax, curve: MetricCurve, style: dict[str, str], bound: float, panel_la
             textcoords="axes fraction",
             ha="left",
             va="top",
-            fontsize=8,
+            fontsize=FONT_FLOOR,
             bbox={"boxstyle": "round,pad=0.3", "fc": "white", "ec": "0.75", "alpha": 0.92},
             arrowprops={"arrowstyle": "->", "color": "0.35", "lw": 1.0},
         )
-    ax.set_title(title, fontsize=11)
-    ax.set_xlabel("landmark noise σ (normalised image units)", fontsize=10)
-    ax.set_ylabel(Y_LABEL[curve.name], fontsize=10)
+    ax.set_title(title)
+    ax.set_xlabel("landmark noise σ (normalised image units)")
+    ax.set_ylabel(Y_LABEL[curve.name])
     if curve.higher_is_better:
         ax.set_ylim(0.0, 1.06)
     else:
         ax.set_ylim(bottom=0.0)
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=8, loc="best", frameon=False)
+    ax.legend(loc="best", frameon=False)
     # secondary top axis in pixels (physical grounding)
     sec = ax.secondary_xaxis(
         "top",
@@ -89,7 +94,7 @@ def _panel(ax, curve: MetricCurve, style: dict[str, str], bound: float, panel_la
             lambda p: p / IMAGE_WIDTH_PX,
         ),
     )
-    sec.set_xlabel(f"≈ pixels @ {int(IMAGE_WIDTH_PX)} px width", fontsize=9)
+    sec.set_xlabel(f"≈ pixels @ {int(IMAGE_WIDTH_PX)} px width")
 
 
 def generate_power_figure(
@@ -104,7 +109,6 @@ def generate_power_figure(
         f"Recovery vs idealised landmark noise (n={res.n_trials} seeded trials/level; "
         "mean and 95% bootstrap CI)",
         y=1.03,
-        fontsize=12,
     )
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / "noise_power.png"

@@ -36,8 +36,7 @@ from matplotlib.figure import Figure
 from ..types import Fixation, FloatArray
 from .scanpath import plot_scanpath
 
-# Wong (2011) colour-blind-safe palette.
-WONG: list[str] = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9"]
+from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
 
 # Bucket label for fixations that fall in no AOI rectangle.
 OUTSIDE_LABEL = "outside"

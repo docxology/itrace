@@ -40,8 +40,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
-# Wong (2011) colour-blind-safe qualitative palette.
-WONG: list[str] = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9"]
+from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
 
 # Welch segment ceiling; the effective ``nperseg`` is clamped to the signal
 # length so short traces still yield a (coarse) spectrum.

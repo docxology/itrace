@@ -32,6 +32,7 @@ from .quality import (
 from .scanpath import figure_microsaccades, figure_scanpath
 from .spatial import figure_aoi, figure_fixation_heatmap, figure_gaze_density
 from .timeline import figure_event_raster, figure_pupil_psd, figure_rate
+from .palette import apply_house_style
 from .traces import figure_pupil_trace, figure_velocity_trace
 
 
@@ -89,6 +90,7 @@ def render_gallery(
     dpi: int = 300,
 ) -> list[Path]:
     """Render the standard static gallery and optional animation."""
+    apply_house_style()  # readable font floor + clean print defaults for every figure
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     gaze, pupil, _truth = synthetic_session(SyntheticSessionSpec(seed=seed))

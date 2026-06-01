@@ -32,8 +32,7 @@ from .distributions import plot_amplitude_histogram, plot_main_sequence
 from .scanpath import plot_scanpath
 from .traces import plot_velocity_trace
 
-# Wong (2011) colour-blind-safe palette.
-WONG: list[str] = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9"]
+from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
 
 
 def _plot_direction_polar(saccs: list[Saccade], ax: Axes) -> None:

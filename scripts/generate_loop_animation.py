@@ -22,17 +22,11 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 from itrace import capture, saccades, scene
 from itrace.scene import ClosedLoopResult
 
-WONG = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7"]
+from itrace.viz.palette import WONG, apply_house_style
 
-plt.rcParams.update(
-    {
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-        "axes.titleweight": "bold",
-        "figure.dpi": 120,
-        "font.size": 10,
-    }
-)
+# Single-source palette + house style (readable font floor, white bg, clean
+# spines) shared with every iTrace figure.
+apply_house_style()
 
 
 def _iris_center(landmarks: np.ndarray, idx: tuple[int, ...]) -> tuple[float, float]:
@@ -120,13 +114,13 @@ def _layout(res: ClosedLoopResult) -> tuple[plt.Figure, dict[str, object]]:
     ax_gaze.set_xlabel("time (s)")
     ax_gaze.set_ylabel("degrees of visual angle")
     ax_gaze.grid(True, alpha=0.25)
-    ax_gaze.legend(loc="upper right", fontsize=7, ncol=2, frameon=False)
+    ax_gaze.legend(loc="upper right", ncol=2, frameon=False)
     ax_gaze.text(
         0.02,
         0.04,
         f"RMS={res.metrics['gaze_rms_deg']:.2f} deg\nF1={res.metrics['saccade_f1']:.2f}",
         transform=ax_gaze.transAxes,
-        fontsize=8,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.3", "fc": "white", "ec": "0.82", "alpha": 0.9},
     )
     cursor_g = ax_gaze.axvline(g.t[0], color="0.3", lw=1)
@@ -142,13 +136,13 @@ def _layout(res: ClosedLoopResult) -> tuple[plt.Figure, dict[str, object]]:
     ax_pupil.set_xlabel("time (s)")
     ax_pupil.set_ylabel("normalised pupil signal")
     ax_pupil.grid(True, alpha=0.25)
-    ax_pupil.legend(loc="upper right", fontsize=8, frameon=False)
+    ax_pupil.legend(loc="upper right", frameon=False)
     ax_pupil.text(
         0.03,
         0.04,
         f"pupil r={res.metrics['pupil_corr']:.2f}",
         transform=ax_pupil.transAxes,
-        fontsize=8,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.3", "fc": "white", "ec": "0.82", "alpha": 0.9},
     )
     cursor_p = ax_pupil.axvline(p.t[0], color="0.3", lw=1)

@@ -25,15 +25,7 @@ from .. import saccades as saccades_mod
 from ..pupilphase import Phase, PhaseDetector
 from ..types import GazeStream, PupilStream
 
-# Wong (2011) colour-blind-safe palette.
-WONG: list[str] = [
-    "#0072B2",  # blue
-    "#E69F00",  # orange
-    "#009E73",  # green
-    "#D55E00",  # vermillion
-    "#CC79A7",  # reddish purple
-    "#56B4E9",  # sky blue
-]
+from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
 
 
 def _ensure_ax(ax: Axes | None) -> Axes:

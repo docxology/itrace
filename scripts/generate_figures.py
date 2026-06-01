@@ -22,19 +22,11 @@ from itrace import mainsequence, saccades
 from itrace.synthetic import gaze_with_saccade
 from itrace.types import GazeStream
 from itrace.viz.gallery import render_gallery
+from itrace.viz.palette import WONG, apply_house_style
 
-# Wong 2011 colour-blind-safe palette.
-WONG = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9"]
-
-plt.rcParams.update(
-    {
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-        "axes.titleweight": "bold",
-        "figure.dpi": 120,
-        "font.size": 10,
-    }
-)
+# Single-source palette + house style (readable font floor, white bg, clean
+# spines) shared with the CLI gallery so every manuscript figure matches.
+apply_house_style()
 
 
 def _multi_saccade_stream(seed: int = 0) -> GazeStream:
@@ -97,7 +89,7 @@ def generate_main_sequence(out_dir: Path) -> Path:
         transform=ax_lin.transAxes,
         va="top",
         ha="left",
-        fontsize=9,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.35", "fc": "white", "ec": "0.82", "alpha": 0.92},
     )
     cbar = fig.colorbar(scatter, ax=ax_lin, pad=0.01, fraction=0.05)
@@ -128,7 +120,7 @@ def generate_main_sequence(out_dir: Path) -> Path:
         transform=ax_log.transAxes,
         va="top",
         ha="left",
-        fontsize=9,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.35", "fc": "white", "ec": "0.82", "alpha": 0.92},
     )
     path = out_dir / "main_sequence.png"
@@ -178,7 +170,7 @@ def generate_direction_polar(out_dir: Path) -> Path:
         transform=ax.transAxes,
         ha="center",
         va="center",
-        fontsize=9,
+        fontsize=11,
         bbox={"boxstyle": "round,pad=0.35", "fc": "white", "ec": "0.82", "alpha": 0.92},
     )
     fig.tight_layout()
