@@ -2,7 +2,26 @@
 
 ## Executive Summary
 
-A rich and rapidly maturing open-source ecosystem now supports all three target signals — saccade direction and dynamics, gaze trajectory inference, and pupil diameter estimation — using nothing but a standard consumer webcam. The landscape divides naturally into four interoperating layers: (1) **low-level capture and landmark detection** (OpenCV, MediaPipe), (2) **mid-level event classification** (REMoDNaV, pymovements, gazeclassifier), (3) **pupillometry pipelines** (PupilEXT, jeelizPupillometry, PupEyes, pypillometry), and (4) **live dashboard and reporting frameworks** (Streamlit + streamlit-webrtc, Plotly Dash, Panel). By composing tools from these layers, research teams can construct a fully open, reproducible eye-tracking platform that rivals commercial systems at a fraction of the cost, though important accuracy constraints on consumer hardware must be understood.
+A rich open-source ecosystem now covers the component tasks needed for webcam-facing eye-movement work: saccade direction and dynamics, gaze trajectory inference, pupil-size estimation, and live reporting. The landscape divides naturally into four interoperating layers: (1) **low-level capture and landmark detection** (OpenCV, MediaPipe), (2) **mid-level event classification** (REMoDNaV, pymovements, gazeclassifier), (3) **pupillometry pipelines** (PupilEXT, jeelizPupillometry, PupEyes, pypillometry), and (4) **live dashboard and reporting frameworks** (Streamlit + streamlit-webrtc, Plotly Dash, Panel). By composing tools from these layers, research teams can build open and reproducible pipelines for selected webcam protocols, while recognizing that consumer-camera accuracy, calibration, lighting, and head-pose limits remain protocol-specific.
+
+**2026-06-04 source and implementation note.** This brief is an ecosystem map,
+not the validation record for iTrace. Manuscript and README claims now use the
+primary-source ledger in `docs/SCHOLARSHIP_AUDIT.md` as the authority, and
+volatile or protocol-specific performance numbers are not treated as universal
+webcam constants. The current iTrace implementation takes the conservative
+subset of this map: a pure NumPy/SciPy analysis core, a lazy MediaPipe/OpenCV
+capture shell, backend-owned live calibration sessions, per-eye/binocular
+landmark diagnostics, a deterministic eye-crop `pupilseg` helper that reports
+pixels or pupil/iris-relative values only, and an external benchmark harness for
+caller-supplied truth/comparator files. The added guided live experiment module
+records derived gaze/pupil/capture streams across fixed-gaze, reading, and
+center/four-corner target trials to estimate session quality, drift, jitter, and
+held-out target residuals. A generated synthetic-to-empirical range bridge now
+uses that N=1 summary to contextualize synthetic defaults and stress domains,
+while keeping non-comparable fields visually labelled, and a generated
+statistical interpretation ledger maps reported diagnostics to estimands and
+explicit non-claims. None of those additions closes the device-validation gap
+without real frames plus reference annotations or a reference eye tracker.
 
 ***
 
@@ -10,7 +29,7 @@ A rich and rapidly maturing open-source ecosystem now supports all three target 
 
 ### OpenCV as the Capture Substrate
 
-OpenCV (`opencv-python`) is the universal entry point for all Python-based webcam eye tracking. It provides `cv2.VideoCapture`, which abstracts hardware access for USB and built-in webcams, and offers a comprehensive suite of classical image processing functions including Canny edge detection, Hough transforms, and thresholding — all useful for iris segmentation and pupil boundary detection. OpenCV is available under the Apache 2.0 license, runs cross-platform, and is a dependency for virtually every Python-based eye tracker described below. On consumer hardware, frame capture typically runs at 30 fps (720p or 1080p), which is sufficient for fixation and coarse saccade detection but falls short of the millisecond precision achievable with dedicated IR cameras.[^1][^2]
+OpenCV (`opencv-python`) is a common capture substrate for Python webcam eye-tracking prototypes. It provides `cv2.VideoCapture`, which abstracts hardware access for USB and built-in webcams, and offers classical image-processing functions including Canny edge detection, Hough transforms, and thresholding — all useful for iris segmentation and pupil boundary detection. OpenCV is available under the Apache 2.0 license and runs cross-platform. On many consumer webcams, frame capture is commonly near 30 fps at typical video resolutions, which is adequate for fixation and coarse gaze-state demonstrations but not a substitute for the temporal precision of dedicated eye-tracking hardware.[^1][^2]
 
 ### MediaPipe Face Mesh: 468 Landmark Real-Time Tracking
 
@@ -20,7 +39,7 @@ A key limitation of MediaPipe for precise pupillometry is that the iris radius e
 
 ### Dlib: Active Shape Models for Pupil Center Estimation
 
-The Dlib library provides a 68-point facial landmark detector trained with ensemble of regression trees. The GazeTracking library by Antoine Lamé uses Dlib's eye-region landmarks to define a region of interest (ROI), then applies gradient-based pupil detection within that ROI to locate the pupil center with sub-pixel accuracy. The library exposes methods such as `gaze.is_right()`, `gaze.is_left()`, `gaze.is_center()`, and `gaze.pupil_left_coords()` / `gaze.pupil_right_coords()`, making it the most immediately accessible Python library for coarse gaze direction inference. It requires Python 3.10+ and is installable via `pip install -e .`.[^6][^7]
+The Dlib library provides a 68-point facial landmark detector trained with ensemble of regression trees. The GazeTracking library by Antoine Lamé uses Dlib's eye-region landmarks to define a region of interest (ROI), then applies gradient-based pupil detection within that ROI to locate the pupil center. The library exposes methods such as `gaze.is_right()`, `gaze.is_left()`, `gaze.is_center()`, and `gaze.pupil_left_coords()` / `gaze.pupil_right_coords()`, making it a compact Python example for coarse gaze direction inference rather than a calibrated gaze-estimation benchmark. It requires Python 3.10+ and is installable via `pip install -e .`.[^6][^7]
 
 ***
 
@@ -34,19 +53,19 @@ The pitch/yaw output of L2CS-Net can be differentiated temporally to infer sacca
 
 ### EyeGestures: Webcam-Native Gaze Tracking with Saccade Events
 
-EyeGestures (`pip install eyeGestures`) is a Python library that combines MediaPipe facial landmarks with a calibration-based regression model to predict on-screen gaze coordinates. The V3 engine exposes a `gestures.step(frame, calibrate, width, height)` call that returns an `event` object containing `event.point` (gaze coordinates), `event.fixation` (fixation status), and `event.saccadess` (saccade list for the current frame). This makes EyeGestures one of the most directly usable libraries for saccade direction logging in a live pipeline without additional post-processing. The library is available in both Python and JavaScript variants, supporting desktop and browser deployment respectively.[^12][^13]
+EyeGestures (`pip install eyeGestures`) is a Python library that combines MediaPipe facial landmarks with a calibration-based regression model to predict on-screen gaze coordinates. The V3 engine exposes a `gestures.step(frame, calibrate, width, height)` call that returns an `event` object containing `event.point` (gaze coordinates), `event.fixation` (fixation status), and `event.saccadess` (saccade list for the current frame). This makes EyeGestures a live-pipeline example for calibrated screen-coordinate logging, with any downstream saccade analysis still dependent on the session, calibration, and event definitions. The library is available in both Python and JavaScript variants, supporting desktop and browser deployment respectively.[^12][^13]
 
-A calibration phase of approximately 20 seconds is required before prediction begins, during which the model learns the mapping from eye landmarks to screen coordinates. After calibration, gaze point accuracy on consumer hardware is typically 2–4° RMS, which is sufficient for coarse saccade direction classification (e.g., leftward vs. rightward vs. upward) but not for fine-grained amplitude measurements below 3–5°.[^14]
+A calibration phase of approximately 20 seconds is required before prediction begins, during which the model learns the mapping from eye landmarks to screen coordinates. Reported gaze errors for calibrated consumer-camera pipelines are protocol-, dataset-, camera-, and calibration-dependent rather than universal constants; this is adequate context for coarse direction logging but not evidence that iTrace can make fine-grained real-device amplitude or accuracy claims without its own dataset or reference-device study.[^14]
 
 ### WebGazer.js: Browser-Based Self-Calibrating Gaze Tracker
 
-WebGazer.js is a JavaScript library that performs webcam-based gaze estimation entirely in the browser, requiring no server-side processing. It self-calibrates by observing mouse clicks and cursor movements to train a mapping between eye appearance features and screen positions. WebGazer has been open source since 2016 and remains the canonical tool for web-based UX studies. As of February 2026, the library is fully functional but is no longer actively maintained, with community support continuing via GitHub Issues. For research requiring saccade direction detection in web contexts, WebGazer outputs gaze coordinates at approximately 30 fps, and temporal differencing can be applied post-hoc to identify saccade-like ballistic movements.[^15][^16]
+WebGazer.js is a JavaScript library that performs webcam-based gaze estimation entirely in the browser, requiring no server-side processing. It self-calibrates by observing mouse clicks and cursor movements to train a mapping between eye appearance features and screen positions. WebGazer is a widely cited browser-based webcam gaze tracker and a useful design comparator for web-deployed studies. It produces browser-side gaze estimates; sampling cadence and usable event timing should be measured per browser, device, and session rather than treated as a fixed constant.[^15][^16]
 
 ### REMoDNaV: Robust Saccade/Fixation/Pursuit Classification
 
 REMoDNaV (Robust Eye Movement Detection for Natural Viewing) is a velocity-based event classification algorithm that extends the adaptive Nyström & Holmqvist (2010) algorithm. It classifies eye movement traces into four event types: **saccades**, **post-saccadic oscillations (PSO)**, **fixations**, and **smooth pursuit**. Unlike simpler threshold algorithms, REMoDNaV adapts its noise model to temporally varying signal quality, making it particularly robust for webcam data where lighting and head position fluctuate.[^17][^18]
 
-The algorithm is available as `pip install remodnav`, takes tab-separated x/y coordinate files as input, and writes annotated event files as output. It was validated on three public datasets including manually annotated data for static images, moving dots, and short video clips. REMoDNaV is especially appropriate when gaze coordinates have been obtained from a preceding pipeline (e.g., L2CS-Net or EyeGestures) and need classification into oculomotor event categories prior to statistical analysis. The algorithm outperforms fixed-threshold I-VT and I-DT methods on data with variable noise, which is the norm for webcam-based systems.[^19][^20][^18][^17]
+The algorithm is available as `pip install remodnav`, takes tab-separated x/y coordinate files as input, and writes annotated event files as output. It was evaluated on three public datasets including manually annotated data for static images, moving dots, and short video clips. REMoDNaV is especially appropriate when gaze coordinates have been obtained from a preceding pipeline (e.g., L2CS-Net or EyeGestures) and need classification into oculomotor event categories prior to statistical analysis. Its adaptive velocity logic is the relevant comparator for variable-noise traces; iTrace does not treat agreement with REMoDNaV as biological ground truth without reference annotations.[^19][^20][^18][^17]
 
 ### pymovements: Full Eye-Movement Processing Pipeline
 
@@ -59,7 +78,7 @@ pymovements is a well-maintained Python package (installable via `pip install py
 - Detecting saccades and microsaccades (`detect('microsaccades')`)
 - Computing event properties including saccade amplitude, direction, duration, and peak velocity[^23][^24][^25]
 
-pymovements stores data internally as polars DataFrames for high performance and integrates with the broader Python data science stack. When used downstream of a webcam gaze pipeline, it provides the richest suite of saccade metrics including the main sequence relationship between amplitude and peak velocity, which is a hallmark of normal oculomotor function.[^25][^21]
+pymovements stores data internally as polars DataFrames for high performance and integrates with the broader Python data science stack. When used downstream of a webcam gaze pipeline, it provides a broad suite of saccade metrics including the main sequence relationship between amplitude and peak velocity, which is a hallmark of normal oculomotor function.[^25][^21]
 
 ### gazeclassifier: Lightweight Saccade/Fixation Discriminator
 
@@ -75,15 +94,15 @@ Estimating absolute pupil diameter in millimeters from a standard webcam is sign
 
 ### PupilEXT (Open-PupilEXT): High-Resolution Offline Pupillometry
 
-PupilEXT is a C++-based open-source platform developed for high-resolution pupillometry in vision research. It supports both real-time webcam streams and offline video processing, and implements six pupil detection algorithms including PuRe, PuReST, ElSe, ExCuSe, Starburst, and Swirski. A Python interface (`PyPupilEXT`) enables integration with Python pipelines. PupilEXT is the most rigorously validated open-source pupillometry tool and is particularly suited for offline analysis where frame rate constraints are relaxed. The software outputs pupil diameter time series, confidence values, and quality metrics.[^31][^32][^27]
+PupilEXT is a C++-based open-source platform developed for high-resolution pupillometry in vision research. It supports both real-time webcam streams and offline video processing, and implements six pupil detection algorithms including PuRe, PuReST, ElSe, ExCuSe, Starburst, and Swirski. A Python interface (`PyPupilEXT`) enables integration with Python pipelines. In this survey it is best treated as a well-documented, validation-oriented pupillometry platform whose suitability still depends on camera, illumination, protocol, and whether the analysis is online or offline. The software outputs pupil diameter time series, confidence values, and quality metrics.[^31][^32][^27]
 
 ### jeelizPupillometry: Real-Time WebGL Pupillometry
 
-jeelizPupillometry is a JavaScript/WebGL library that runs entirely in the browser, using a 4K webcam feed to detect and measure the radius of both pupils in real time. The pipeline includes head detection via a deep neural network, iris segmentation via Circle Hough Transform, and pupil segmentation via a custom ray-tracing algorithm — all GPU-accelerated through WebGL. The output is a relative pupil radius (ratio of pupil radius to iris radius), which normalizes out head distance effects. This library enables web-based pupillometry studies without any server infrastructure and is the primary option for browser-deployed real-time dashboards requiring pupil data.[^33][^34]
+jeelizPupillometry is a JavaScript/WebGL library that runs entirely in the browser, using a 4K webcam feed to detect and measure the radius of both pupils in real time. The pipeline includes head detection via a deep neural network, iris segmentation via Circle Hough Transform, and pupil segmentation via a custom ray-tracing algorithm — all GPU-accelerated through WebGL. The output is a relative pupil radius (ratio of pupil radius to iris radius), which normalizes out head distance effects. This library is a browser-deployed real-time pupillometry option for dashboards that need relative pupil data without server infrastructure.[^33][^34]
 
 ### PupilSense / EyeDentify: Deep Learning Webcam Pupil Diameter
 
-EyeDentify, developed at DFKI and RPTU Kaiserslautern-Landau, provides the first large-scale publicly available dataset (212,073 images from 51 participants) specifically designed for pupil diameter estimation from standard webcam images, with ground-truth measurements from a Tobii eye-tracker. Associated ResNet-based models achieve validation MAE of 0.0837 mm on the left eye using ResNet-18, with test MAE of 0.1340 mm. The EyeDentify dataset enables researchers to train or fine-tune models for webcam-based absolute pupil diameter estimation, moving beyond the relative-radius limitation of classical approaches.[^29][^35]
+EyeDentify, developed at DFKI and RPTU Kaiserslautern-Landau, provides an open webcam-image pupil-diameter dataset (212,073 images from 51 participants) with paired measurements from a Tobii eye-tracker. Associated ResNet-based models achieve validation MAE of 0.0837 mm on the left eye using ResNet-18, with test MAE of 0.1340 mm. The EyeDentify dataset enables researchers to train or fine-tune models for webcam-based absolute pupil diameter estimation, moving beyond the relative-radius limitation of classical approaches.[^29][^35]
 
 PupilSense, from Carnegie Mellon University, builds on EyeDentify and provides a complete application for webcam-based pupil diameter estimation, including class activation maps, graphs of predicted left and right pupil diameters, and eye aspect ratios during blinks. It is published on GitHub and supports batch video processing as well as frame-by-frame analysis.[^28]
 
@@ -104,11 +123,11 @@ PupEyes is particularly well-suited as the analysis layer in a research pipeline
 
 ### pypillometry: Statistical Pupillometry and Modeling
 
-pypillometry (published in the Journal of Open Source Software) is a Python package for comprehensive pupillometric analyses including preprocessing, blink handling, event-related pupil dilation modeling, and signal decomposition. It provides plotting functions, baseline correction routines, and a general linear deconvolution model for estimating the canonical pupil impulse response to cognitive events — directly relevant for applications coupling eye tracking with cognitive experiments. It is installable from PyPI and is the standard choice for hypothesis-driven statistical analyses of pupil time series.[^43][^44]
+pypillometry (published in the Journal of Open Source Software) is a Python package for pupillometric analyses including preprocessing, blink handling, event-related pupil dilation modeling, and signal decomposition. It provides plotting functions, baseline correction routines, and a general linear deconvolution model for estimating pupil impulse responses to cognitive events — directly relevant for applications coupling eye tracking with cognitive experiments. It is installable from PyPI and is a relevant option for hypothesis-driven statistical analyses of pupil time series.[^43][^44]
 
 ### rtPupilPhase: Real-Time Pupil Phase Detection
 
-rtPupilPhase (NIH/NIMH, 2024) is the first open-source tool specifically designed for **online detection of trends in pupil size fluctuation** (dilation phase, constriction phase, peak, trough) in real time. Validated on human, rodent, and monkey pupil data, it enables closed-loop experimental designs where stimuli are presented at specific phases of the pupil cycle. The implementation uses PsychoPy for stimulus delivery and connects to an EyeLink eye tracker for high-precision pupil input; the statistical detection logic is portable to webcam-based input streams.[^45][^46][^47][^48]
+rtPupilPhase (NIH/NIMH, 2025) is an open-source tool for **online detection of trends in pupil size fluctuation** (dilation phase, constriction phase, peak, trough) in real time. It was evaluated on human, rodent, and monkey pupil traces and enables closed-loop experimental designs where stimuli are presented at specific phases of the pupil cycle. The implementation uses PsychoPy for stimulus delivery and connects to an EyeLink eye tracker for high-precision pupil input; its phase logic can inform webcam pipelines only after a valid pupil-size stream exists and is not evidence that webcam pupil input is calibrated.[^45][^46][^47][^48]
 
 ***
 
@@ -155,7 +174,7 @@ rtPupilPhase (NIH/NIMH, 2024) is the first open-source tool specifically designe
 
 ### Streamlit + streamlit-webrtc: Rapid Real-Time Dashboard Prototyping
 
-Streamlit is widely regarded as the fastest path from Python code to interactive web application, requiring no frontend development experience. The `streamlit-webrtc` library extends Streamlit to handle real-time video streams from webcams via WebRTC, enabling browser-side webcam access with server-side Python processing. A minimal streaming eye-tracking dashboard requires only:[^55][^56][^57][^58]
+Streamlit is a compact path from Python code to interactive web application, requiring little frontend code. The `streamlit-webrtc` library extends Streamlit to handle real-time video streams from webcams via WebRTC, enabling browser-side webcam access with server-side Python processing. A minimal streaming eye-tracking dashboard requires only:[^55][^56][^57][^58]
 
 ```python
 import streamlit as st
@@ -176,7 +195,7 @@ Streamlit is best for rapid prototyping and small-scale deployments; its primary
 
 ### Plotly Dash: Production-Grade Interactive Dashboards
 
-Plotly Dash is the most capable option for building fully interactive, production-ready eye-tracking dashboards in Python. Dash applications are React-based under the hood, enabling rich client-side interactivity including real-time graph updates via `dcc.Interval`, synchronized multi-plot brushing, and custom callback logic. PupEyes uses Plotly Dash as its visualization backend for its Pupil Viewer, Fixation Viewer, and AOI Drawing Tool components, demonstrating a well-designed architecture for this use case.[^60][^42][^55][^41]
+Plotly Dash is a mature option for building interactive eye-tracking dashboards in Python. Dash applications are React-based under the hood, enabling rich client-side interactivity including real-time graph updates via `dcc.Interval`, synchronized multi-plot brushing, and custom callback logic. PupEyes uses Plotly Dash as its visualization backend for its Pupil Viewer, Fixation Viewer, and AOI Drawing Tool components, demonstrating a relevant architecture for this use case.[^60][^42][^55][^41]
 
 A comprehensive eye-tracking dashboard built on Dash would include:
 - **Raw signal panel**: Real-time scrolling time series of pupil diameter (left/right), gaze x/y coordinates, and blink flags
@@ -214,7 +233,19 @@ All four layers should share a common timestamp (Unix epoch or monotonic clock i
 
 ### Accuracy Expectations and Limitations
 
-Consumer webcam-based eye tracking operates under significant constraints compared to dedicated IR systems. Angular accuracy for gaze direction using calibrated approaches (EyeGestures, WebGazer) is typically 2–5° RMS, sufficient for detecting saccades >5° in amplitude but not microsaccades (<1°). Pupil diameter estimation from visible-light webcams introduces additional error due to lighting-dependent pupil appearance changes, perspective distortion, and partial occlusion by eyelashes. EyeDentify models achieve test MAE of approximately 0.13 mm using ResNet-18, which is adequate for pharmacological pupillometry and cognitive load studies but falls short of the <0.05 mm precision of dedicated pupillometers. These limitations should inform study design and data interpretation, particularly when comparing results to literature using IR-based systems.[^62][^63][^29]
+Consumer webcam-based eye tracking operates under significant constraints
+compared to dedicated IR systems. Real-frame gaze error depends on the dataset,
+camera, face/eye pose, lighting, calibration protocol, and model class; public
+datasets and appearance models should therefore be compared under their own
+published splits and metrics rather than compressed into one universal webcam
+constant. Pupil diameter estimation from visible-light webcams introduces
+additional error due to lighting-dependent pupil appearance, perspective
+distortion, eyelashes, and partial occlusion. Learned webcam pupil-diameter
+models and high-resolution pupillometry platforms are relevant comparison
+points, but iTrace's present segmentation path reports only pixel or
+pupil/iris-relative values unless the caller supplies calibration evidence.
+These limitations should inform study design and data interpretation,
+particularly when comparing results to literature using IR-based systems.[^62][^63][^29]
 
 ***
 
@@ -255,11 +286,26 @@ For applications specifically interested in saccade direction patterns (e.g., Ac
 
 ## Conclusion
 
-The open-source ecosystem for webcam-based eye tracking is now mature enough to support rigorous research on saccade dynamics, gaze trajectory, and pupil diameter from consumer hardware alone. The most effective approach integrates MediaPipe or L2CS-Net for per-frame signal extraction, EyeGestures or REMoDNaV/pymovements for event classification, MEYE or PupEyes for pupillometry, and Streamlit+webrtc or Plotly Dash for live dashboards. Each layer is independently replaceable, allowing iterative improvement as the field advances. Critical accuracy caveats must be acknowledged: webcam-based systems operate at 2–5° gaze accuracy and ~0.1 mm pupil diameter precision, which constrains but does not preclude meaningful research on fixation patterns, coarse saccade dynamics, cognitive load, and attention.[^19][^28][^29]
+The open-source ecosystem for webcam-based eye tracking is mature enough to
+support reproducible prototyping and bounded research workflows, but every layer
+needs its own validation boundary. A defensible stack keeps signal extraction,
+event classification, pupillometry, dashboarding, and benchmarking replaceable
+and auditable; it does not turn software agreement into physical accuracy.
+iTrace's current contribution is that separation: the verified Python core can
+be tested headless, the optional capture/live layers remain thin, and benchmark
+or guided-session reports can be generated against user-supplied truth or
+prompted targets without implying that detector agreement or screen-target
+residuals are biological ground truth.[^19][^28][^29]
 
 ---
 
 ## References
+
+References 1-68 preserve the original survey trail. Evidence-bearing claims in
+the refreshed README/manuscript should rely on primary, peer-reviewed, official
+project, or official documentation sources; community tutorials, blogs, Reddit,
+StackOverflow, YouTube, and package-directory mirrors are retained only as
+discovery/non-evidence context.
 
 1. [Part 1. Eye Tracking with Mediapipe and OpenCV (In ...](https://kh-monib.medium.com/title-gaze-tracking-with-opencv-and-mediapipe-318ac0c9c2c3) - In short these are the topics that will be covered in the article
 
@@ -327,7 +373,7 @@ The open-source ecosystem for webcam-based eye tracking is now mature enough to 
 
 33. [GitHub - jeeliz/jeelizPupillometry: Real time pupillometry in the web ...](https://github.com/jeeliz/jeelizPupillometry) - This JavaScript library detects, tracks and measures the radius of the 2 pupils of the eyes of the u...
 
-34. [https://github.com/jeeliz/jeelizpupillometry](https://awesome.ecosyste.ms/projects/github.com%2Fjeeliz%2Fjeelizpupillometry) - Real-time pupillometry in the web browser using a 4K webcam video feed processed by this WebGL/Javas...
+34. [ecosyste.ms project mirror for jeelizPupillometry](https://awesome.ecosyste.ms/projects/github.com%2Fjeeliz%2Fjeelizpupillometry) - Real-time pupillometry in the web browser using a 4K webcam video feed processed by this WebGL/Javas...
 
 35. [A Dataset for Pupil Diameter Estimation based on Webcam Images](https://arxiv.org/html/2407.11204v1) - In this work, we introduce EyeDentify, a dataset specifically designed for pupil diameter estimation...
 
@@ -396,4 +442,3 @@ The open-source ecosystem for webcam-based eye tracking is now mature enough to 
 67. [GazeParser: an open-source and multiplatform library for ...](https://pubmed.ncbi.nlm.nih.gov/23239074/) - Eye movement analysis is an effective method for research on visual perception and cognition. Howeve...
 
 68. [eye_movements_personality/featureExtraction/gaze_analysis.py at 0403f2ce555ea70b98f52d833c4e5200077403c9](https://git.hcics.simtech.uni-stuttgart.de/public-projects/eye_movements_personality/src/commit/0403f2ce555ea70b98f52d833c4e5200077403c9/featureExtraction/gaze_analysis.py) - eye_movements_personality - Official code for "Eye movements during everyday behavior predict person...
-

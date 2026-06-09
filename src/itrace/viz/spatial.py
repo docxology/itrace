@@ -34,9 +34,8 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from ..types import Fixation, FloatArray
+from .palette import FONT_FLOOR, WONG  # single-source Wong (2011) colour-blind-safe palette
 from .scanpath import plot_scanpath
-
-from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
 
 # Bucket label for fixations that fall in no AOI rectangle.
 OUTSIDE_LABEL = "outside"
@@ -365,27 +364,53 @@ def _draw_aoi_rectangles(ax: Axes, aois: list[dict[str, Any]]) -> None:
     """Overlay each AOI as a labelled outlined rectangle on ``ax``."""
     from matplotlib.patches import Rectangle
 
+    x_bounds: list[float] = []
+    y_bounds: list[float] = []
     for i, aoi in enumerate(aois):
         colour = WONG[i % len(WONG)]
+        x0 = float(aoi["x"])
+        y0 = float(aoi["y"])
+        width = float(aoi["w"])
+        height = float(aoi["h"])
+        x1 = x0 + width
+        y1 = y0 + height
+        x_bounds.extend([x0, x1])
+        y_bounds.extend([y0, y1])
         rect = Rectangle(
-            (float(aoi["x"]), float(aoi["y"])),
-            float(aoi["w"]),
-            float(aoi["h"]),
+            (x0, y0),
+            width,
+            height,
             fill=False,
             edgecolor=colour,
             lw=1.5,
             zorder=4,
         )
         ax.add_patch(rect)
+        y_label = y0 + 0.08 * height
         ax.text(
-            float(aoi["x"]),
-            float(aoi["y"]),
+            x0 + 0.04 * width,
+            y_label,
             str(aoi["name"]),
             color=colour,
-            fontsize=8,
-            va="bottom",
+            fontsize=FONT_FLOOR,
+            va="top",
             zorder=5,
+            bbox={"boxstyle": "round,pad=0.15", "fc": "white", "ec": "none", "alpha": 0.82},
         )
+    if x_bounds and y_bounds:
+        current_xlim = ax.get_xlim()
+        current_ylim = ax.get_ylim()
+        x_min = min(min(current_xlim), min(x_bounds))
+        x_max = max(max(current_xlim), max(x_bounds))
+        y_min = min(min(current_ylim), min(y_bounds))
+        y_max = max(max(current_ylim), max(y_bounds))
+        x_pad = max((x_max - x_min) * 0.04, 1.0)
+        y_pad = max((y_max - y_min) * 0.04, 1.0)
+        ax.set_xlim(x_min - x_pad, x_max + x_pad)
+        if current_ylim[0] > current_ylim[1]:
+            ax.set_ylim(y_max + y_pad, y_min - y_pad)
+        else:
+            ax.set_ylim(y_min - y_pad, y_max + y_pad)
 
 
 def figure_aoi(fixations: list[Fixation], aois: list[dict[str, Any]]) -> Figure:

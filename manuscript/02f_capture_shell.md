@@ -33,12 +33,43 @@ coverage; the dependency-absent error path, landmark conversion, capture-sample
 shape, split gaze/pupil CSV writers, and full capture-record CSV writer are all
 tested headless.
 
+The additive binocular path keeps the existing public `iris_landmarks_to_sample`
+API intact while exposing `iris_landmarks_to_binocular_sample` for callers that
+need per-eye diagnostics. It returns the binocular mean gaze plus right/left
+`EyeGazeDiagnostic` records, horizontal vergence, vertical disparity, asymmetry,
+and the averaged relative pupil proxy. These quantities are quality and
+confidence signals derived from the same landmark frame; they are not a
+binocular calibration or stereoscopic validation study.
+
 The separate `itrace live-html` command adds a local single-user FastAPI
 orchestrator around the same verified Python path. The browser page receives
 WebSocket messages containing the eye crop, the latest capture sample, rolling
 `pipeline.analyze_session` summaries, event records, and plot-ready series; the
-browser itself only draws controls and native Canvas/SVG diagnostics. It is
-configured as the `web` extra and remains import-safe: `fastapi`, `uvicorn`,
-OpenCV, and MediaPipe are imported only inside server or capture entry points.
-Persistence is explicit: without `--output-dir` the app is in-memory, and with
-`--output-dir` it writes CSV/JSON artifacts only when export is requested.
+browser itself only draws controls and native Canvas/SVG diagnostics. The eye
+crop is therefore a transient local-display payload, not a persisted artifact in
+the default workflow. It is configured as the `web` extra and remains
+import-safe: `fastapi`, `uvicorn`, OpenCV, and MediaPipe are imported only inside
+server or capture entry points. Persistence is explicit: without `--output-dir`
+the app is in-memory, and with `--output-dir` it writes CSV/JSON artifacts only
+when live export is requested or a guided empirical protocol completes.
+Calibration follows the same ownership rule. The HTML controls call
+start/sample/fit/reset endpoints, but `LiveState` owns the session points:
+for each displayed target the backend aggregates recent finite gaze samples,
+stores the median raw point with a sample count, and fits `AffineCalibration`
+only after enough target points exist. The browser draws the result; it never
+implements a competing calibration estimator.
+
+The same backend-owned pattern now supports a guided empirical-session workflow.
+`itrace.experiments` defines a default derived-record protocol: fixed-center
+gaze, natural reading, and center/four-corner target prompting, each 30 s by
+default. The browser displays targets and countdowns, while the server records
+absolute trial windows in `LiveState`, slices the derived `CaptureSample` stream,
+and automatically writes per-trial gaze, pupil, and capture-record CSV files
+plus a protocol manifest and JSON report after the final required trial. The
+report estimates session-specific sampling
+regularity, finite-gaze fraction, pupil-valid fraction, fixed-gaze dispersion,
+drift slope, calibration residuals on held-out target intervals, and target
+acquisition latency. It deliberately persists derived records only: no raw eye
+video or eye-crop image sequence is written by the default workflow, and the
+target residuals are labelled as prompted-session diagnostics rather than
+reference-device accuracy.

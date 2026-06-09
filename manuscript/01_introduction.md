@@ -6,8 +6,11 @@ trajectory** (where the eyes point over time), **saccades** (the fast ballistic
 movements between fixations, with characteristic direction, amplitude, and
 peak-velocity dynamics), and **pupil diameter** (a marker of arousal and
 cognitive load). Dedicated infrared eye-trackers measure all three at high
-precision, but their cost restricts access. A maturing open-source ecosystem now
-estimates related signals from commodity cameras: browser trackers such as
+precision, but their cost restricts access; commodity cameras offer reach but
+force software to confront poorer optics, lower frame rates, browser/camera
+permission boundaries, illumination changes, and weaker calibration. A maturing
+open-source ecosystem now estimates related signals from these imperfect inputs:
+browser trackers such as
 WebGazer [@papoutsaki2016webgazer], large webcam and mobile gaze datasets such as
 GazeCapture [@krafka2016gazecapture] and MPIIGaze [@zhang2017mpiigaze],
 appearance-based gaze estimators such as L2CS-Net [@hempel2022l2cs],
@@ -16,8 +19,9 @@ velocity- and dispersion-threshold event classifiers
 [@salvucci2000identifying; @nystrom2010adaptive; @dar2021remodnav],
 microsaccade detectors [@engbert2003microsaccades], file-oriented processing and
 quality-reporting pipelines [@krause2023pymovements; @jakobi2024quality], and
-webcam or offline pupillometry tools [@shah2024eyedentify; @zhang2026pupeyes;
-@mittner2020pypillometry; @cai2024opendpsm].
+webcam or offline pupillometry tools [@shah2024eyedentify; @zandi2021pupilext;
+@fuhl2015else; @santini2018pure; @zhang2026pupeyes; @mittner2020pypillometry;
+@cai2024opendpsm].
 
 Two problems recur across these tools. First, the *capture* layer (camera
 drivers, MediaPipe, browser WebRTC [@papoutsaki2016webgazer], integrated
@@ -43,26 +47,34 @@ four-class fixation / saccade / smooth-pursuit / post-saccadic-oscillation outpu
 is richer than ours, but it classifies an input signal rather than reasoning
 about how that signal was estimated from a camera. PupilSense/EyeDentify
 [@shah2024eyedentify] addresses webcam pupil diameter with learned models and a
-dataset; PupEyes and pypillometry focus on reproducible pupil preprocessing and
-analysis after samples have been recorded [@zhang2026pupeyes;
-@mittner2020pypillometry]; Open-DPSM models luminance-driven pupil responses in
-dynamic stimuli [@cai2024opendpsm]. iTrace does not try to out-measure any of
-these on real eyes. It occupies a narrower gap: a *verification-first*,
-hardware-decoupled implementation of canonical gaze, saccade, microsaccade, and
-pupil algorithms whose correctness is pinned to constructed ground truth and
-whose outputs can later be compared against these datasets and packages.
+dataset; PupilEXT, ElSe, and PuRe represent mature pupil-detection platform and
+algorithm lines [@zandi2021pupilext; @fuhl2015else; @santini2018pure]; PupEyes
+and pypillometry focus on reproducible pupil preprocessing and analysis after
+samples have been recorded [@zhang2026pupeyes; @mittner2020pypillometry];
+Open-DPSM models luminance-driven pupil responses in dynamic stimuli
+[@cai2024opendpsm]. iTrace does not try to out-measure any of these on real eyes.
+It occupies a narrower gap: a *verification-first*, hardware-decoupled
+implementation of established gaze, saccade, microsaccade, pupil, and descriptive
+scanpath algorithms whose correctness is pinned to constructed ground truth and
+whose outputs can later be compared against public datasets, reference devices,
+or other packages when the caller supplies truth.
 
-iTrace addresses both problems. We implement the canonical algorithms in a pure
-NumPy/SciPy core with no hardware dependency, and we algorithmically verify every
-detector against *synthetic signals whose events are known by construction*. The
-capture of webcam frames and MediaPipe iris landmarks is an optional, thin shell
-whose landmark-to-gaze mathematics is itself testable without a camera. Layered
-on the verified core is an analysis surface — descriptive event statistics,
-maximum-likelihood distribution fitting and model comparison, scanpath spread and
-entropy metrics, a bootstrap confidence interval on the main-sequence exponent,
-and a deterministic publication-figure gallery — that operates on whatever gaze
-it is given, synthetic or recorded, without ever reaching for the camera. The
-result is a toolkit whose scientific methods are auditable precisely because they
-are decoupled from the fragile hardware. [@sec:methods] describes the architecture
-and algorithms; [@sec:results] reports the ground-truth verification;
-[@sec:discussion] states the accuracy limits that constrain webcam eye tracking.
+iTrace makes three contributions. First, it implements established algorithms
+in a pure NumPy/SciPy core with no hardware dependency, then verifies every
+detector against synthetic signals whose events are known by construction. Second,
+it keeps webcam frames, MediaPipe iris landmarks, live HTML rendering, and
+dashboard/figure backends in optional shells whose outputs are ordinary typed
+gaze/pupil/capture records. The landmark-to-gaze mathematics is therefore
+testable without a camera, and the browser never becomes a second analysis
+implementation. Third, it adds bounded interfaces around that verified core:
+descriptive event statistics, maximum-likelihood distribution fitting, scanpath
+spread and entropy metrics, a bootstrap interval on the main-sequence exponent,
+a deterministic publication-figure gallery, a pure eye-crop pupil-segmentation
+helper that reports pixels or pupil/iris-relative units only, a benchmark report
+for caller-supplied truth files, and a guided live empirical workflow that writes
+derived records rather than raw eye video. The graphical summary in
+[@fig:graphical-abstract] shows the same separation visually. [@sec:methods]
+describes the architecture and algorithms; [@sec:results] reports the
+ground-truth verification, N=1 local empirical diagnostics, and figure gallery;
+[@sec:discussion] and [@sec:limitations] state the accuracy boundaries that still
+constrain webcam eye tracking.

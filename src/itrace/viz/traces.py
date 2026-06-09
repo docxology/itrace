@@ -24,8 +24,7 @@ from .. import pupil as pupil_mod
 from .. import saccades as saccades_mod
 from ..pupilphase import Phase, PhaseDetector
 from ..types import GazeStream, PupilStream
-
-from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
+from .palette import FONT_FLOOR, WONG  # single-source Wong (2011) colour-blind-safe palette
 
 
 def _ensure_ax(ax: Axes | None) -> Axes:
@@ -99,7 +98,7 @@ def plot_velocity_trace(
 
     ax.set_xlabel("time (s)")
     ax.set_ylabel("speed (deg/s)")
-    ax.legend(loc="upper right", fontsize="small")
+    ax.legend(loc="upper right", fontsize=FONT_FLOOR)
     return ax
 
 
@@ -181,7 +180,7 @@ def plot_pupil_trace(stream: PupilStream, *, ax: Axes | None = None) -> Axes:
 
     ax.set_xlabel("time (s)")
     ax.set_ylabel(f"pupil size ({stream.unit.value})")
-    ax.legend(loc="upper right", fontsize="small")
+    ax.legend(loc="upper right", fontsize=FONT_FLOOR)
     return ax
 
 

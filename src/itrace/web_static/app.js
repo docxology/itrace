@@ -22,6 +22,50 @@ const ui = {
   resetAll: document.getElementById("resetAllButton"),
   export: document.getElementById("exportButton"),
   output: document.getElementById("outputStatus"),
+  experimentBoundary: document.getElementById("experimentBoundary"),
+  experimentSessionId: document.getElementById("experimentSessionId"),
+  experimentManifestPath: document.getElementById("experimentManifestPath"),
+  experimentConditionStatus: document.getElementById("experimentConditionStatus"),
+  experimentReferenceStatus: document.getElementById("experimentReferenceStatus"),
+  experimentSaveStatus: document.getElementById("experimentSaveStatus"),
+  experimentReportPath: document.getElementById("experimentReportPath"),
+  experimentCondition: document.getElementById("experimentConditionInput"),
+  experimentParticipant: document.getElementById("experimentParticipantInput"),
+  experimentDevice: document.getElementById("experimentDeviceInput"),
+  experimentSessionGroup: document.getElementById("experimentSessionGroupInput"),
+  experimentReferenceKind: document.getElementById("experimentReferenceKindInput"),
+  experimentDuration: document.getElementById("experimentDurationInput"),
+  experimentRange: document.getElementById("experimentRangeInput"),
+  experimentNextAction: document.getElementById("experimentNextActionButton"),
+  startExperiment: document.getElementById("startExperimentButton"),
+  experimentTrial: document.getElementById("experimentTrialSelect"),
+  startExperimentTrial: document.getElementById("startExperimentTrialButton"),
+  finishExperimentTrial: document.getElementById("finishExperimentTrialButton"),
+  reportExperiment: document.getElementById("reportExperimentButton"),
+  exportExperiment: document.getElementById("exportExperimentButton"),
+  resetExperiment: document.getElementById("resetExperimentButton"),
+  experimentStage: document.getElementById("experimentStage"),
+  experimentTarget: document.getElementById("experimentTargetDot"),
+  experimentPrompt: document.getElementById("experimentPrompt"),
+  experimentCountdown: document.getElementById("experimentCountdown"),
+  experimentTimerLabel: document.getElementById("experimentTimerLabel"),
+  experimentTimerValue: document.getElementById("experimentTimerValue"),
+  experimentTimerBar: document.getElementById("experimentTimerBar"),
+  experimentTimerDetail: document.getElementById("experimentTimerDetail"),
+  experimentStatus: document.getElementById("experimentStatus"),
+  experimentCompleted: document.getElementById("experimentCompleted"),
+  experimentHeldout: document.getElementById("experimentHeldout"),
+  experimentLatency: document.getElementById("experimentLatency"),
+  experimentSampleCount: document.getElementById("experimentSampleCount"),
+  experimentFiniteSamples: document.getElementById("experimentFiniteSamples"),
+  experimentProtocolSummary: document.getElementById("experimentProtocolSummary"),
+  experimentTrialPlan: document.getElementById("experimentTrialPlan"),
+  experimentCompletedNames: document.getElementById("experimentCompletedNames"),
+  experimentProgress: document.getElementById("experimentProgress"),
+  experimentExportReady: document.getElementById("experimentExportReady"),
+  experimentExportFiles: document.getElementById("experimentExportFiles"),
+  experimentStepper: document.getElementById("experimentStepper"),
+  experimentTrialTable: document.getElementById("experimentTrialTable"),
   gazeX: document.getElementById("gazeX"),
   gazeY: document.getElementById("gazeY"),
   calGazeX: document.getElementById("calGazeX"),
@@ -86,13 +130,23 @@ const state = {
   latest: null,
   calibrationRangeDeg: 15,
   calibrationActive: false,
+  calibrationTargetIndex: 0,
+  calibrationSessionPoints: 0,
   hasSamples: false,
   finiteSampleCount: 0,
   isConnecting: false,
   isLive: false,
   outputConfigured: false,
+  empiricalManifestPath: null,
   validationBusy: false,
   syntheticValidation: null,
+  experiment: null,
+  experimentBusy: false,
+  experimentReport: null,
+  experimentSavedPaths: null,
+  experimentSavedSessionId: null,
+  experimentSaveError: "",
+  autoFinishTrialId: null,
 };
 
 function fmt(value, digits = 2) {
@@ -127,22 +181,164 @@ function setOutput(message, tone = "") {
   ui.output.dataset.tone = tone;
 }
 
+function setToneText(element, text, tone = "") {
+  element.textContent = text;
+  element.dataset.tone = tone;
+}
+
+function cleanValue(element) {
+  return String(element?.value || "").trim();
+}
+
+function setInputValue(element, value, { force = false } = {}) {
+  if (!element || value === null || value === undefined || value === "") return;
+  if (force || !element.value) {
+    element.value = String(value);
+  }
+}
+
+function hydrateExperimentMetadata(experiment = {}, { force = false } = {}) {
+  const metadata = experiment?.metadata || {};
+  setInputValue(ui.experimentCondition, metadata.condition, { force });
+  setInputValue(ui.experimentParticipant, metadata.participant_id, { force });
+  setInputValue(ui.experimentDevice, metadata.device_id, { force });
+  setInputValue(ui.experimentSessionGroup, metadata.session_group, { force });
+  setInputValue(ui.experimentReferenceKind, metadata.reference_kind, { force });
+}
+
+function experimentMetadataPayload() {
+  const payload = {
+    condition: cleanValue(ui.experimentCondition),
+    participant_id: cleanValue(ui.experimentParticipant),
+    device_id: cleanValue(ui.experimentDevice),
+    reference_kind: cleanValue(ui.experimentReferenceKind) || "none",
+  };
+  const group = cleanValue(ui.experimentSessionGroup);
+  if (group) payload.session_group = group;
+  Object.keys(payload).forEach((key) => {
+    if (!payload[key]) delete payload[key];
+  });
+  return payload;
+}
+
+function renderExperimentBanner() {
+  const experiment = state.experiment || {};
+  const metadata = experiment.metadata || {};
+  const saved = experimentIsSaved();
+  const reportPath = state.experimentSavedPaths?.report_json || "";
+  const sessionOutput = experiment.session_output_dir || "";
+  const condition = metadata.condition || cleanValue(ui.experimentCondition) || "--";
+  const reference = metadata.reference_kind || cleanValue(ui.experimentReferenceKind) || "none";
+  const nextLabel =
+    experiment.next_session_id && experiment.next_replicate_id
+      ? `next ${experiment.next_session_id} / ${experiment.next_replicate_id}`
+      : "next session pending";
+  ui.experimentSessionId.textContent = experiment.session_id || nextLabel;
+  ui.experimentManifestPath.textContent = state.empiricalManifestPath || "not configured";
+  ui.experimentConditionStatus.textContent = condition;
+  ui.experimentReferenceStatus.textContent = reference;
+  setToneText(
+    ui.experimentSaveStatus,
+    saved ? "saved" : experiment.export_ready ? "ready" : "not ready",
+    saved || experiment.export_ready ? "ok" : "warn",
+  );
+  ui.experimentReportPath.textContent = saved
+    ? experimentSaveLabel(state.experimentSavedPaths)
+    : sessionOutput || (state.outputConfigured ? "auto-save pending" : "no output dir");
+  ui.experimentReportPath.title = reportPath || sessionOutput || "";
+}
+
+function clearExperimentSaveState() {
+  state.experimentSavedPaths = null;
+  state.experimentSavedSessionId = null;
+  state.experimentSaveError = "";
+}
+
+function rememberExperimentExport(paths = {}) {
+  state.experimentSavedPaths = paths;
+  state.experimentSavedSessionId = paths.session_id || state.experiment?.session_id || null;
+  state.experimentSaveError = "";
+}
+
+function experimentSaveLabel(paths = state.experimentSavedPaths) {
+  const report = paths?.report_json;
+  if (!report) return "saved";
+  const parts = String(report).split("/").filter(Boolean);
+  return parts.slice(-3).join("/");
+}
+
+function experimentIsSaved() {
+  return Boolean(
+    state.experimentSavedPaths &&
+      state.experimentSavedSessionId &&
+      state.experimentSavedSessionId === state.experiment?.session_id,
+  );
+}
+
 function updateButtons() {
   const busy = state.isConnecting || state.isLive;
+  const experimentActive = Boolean(state.experiment?.active);
+  const activeTrial = Boolean(state.experiment?.active_trial);
+  const completedTrials = state.experiment?.completed_trial_count || 0;
+  const protocolComplete = Boolean(state.experiment?.all_trials_completed);
+  const exportReady = Boolean(state.experiment?.export_ready);
+  const saved = experimentIsSaved();
+  const nextTrialId = state.experiment?.next_trial_id;
+  const trialRemaining = Number(state.experiment?.trial_remaining_s);
   ui.start.disabled = busy;
   ui.stop.disabled = !busy;
   ui.clearSession.disabled = !busy && !state.hasSamples;
-  ui.fitCalibration.disabled = state.finiteSampleCount < 4;
+  ui.fitCalibration.disabled = state.finiteSampleCount < 1;
   ui.resetCalibration.disabled = !state.calibrationActive;
   ui.resetAll.disabled = state.isConnecting;
   ui.export.disabled = !state.outputConfigured || !state.hasSamples;
   ui.runSyntheticValidation.disabled = state.validationBusy;
   ui.clearValidation.disabled = state.validationBusy || !state.syntheticValidation;
+  ui.startExperiment.disabled = state.experimentBusy;
+  ui.startExperimentTrial.disabled =
+    state.experimentBusy || !experimentActive || activeTrial || !nextTrialId;
+  ui.finishExperimentTrial.disabled = state.experimentBusy || !activeTrial;
+  ui.reportExperiment.disabled = state.experimentBusy || !experimentActive || activeTrial || !completedTrials;
+  ui.exportExperiment.disabled =
+    state.experimentBusy ||
+    !experimentActive ||
+    activeTrial ||
+    !protocolComplete ||
+    !exportReady;
+  ui.exportExperiment.textContent = saved ? "Save Again" : "Save Now";
+  ui.resetExperiment.disabled = state.experimentBusy || (!experimentActive && !state.experimentReport);
+  if (!experimentActive) {
+    ui.experimentNextAction.textContent = "Start Experiment";
+    ui.experimentNextAction.dataset.tone = "";
+    ui.experimentNextAction.disabled = state.experimentBusy;
+  } else if (activeTrial) {
+    const due = Number.isFinite(trialRemaining) && trialRemaining <= 0.05;
+    ui.experimentNextAction.textContent = due ? "Finish Trial" : "Recording...";
+    ui.experimentNextAction.dataset.tone = due ? "warn" : "";
+    ui.experimentNextAction.disabled = state.experimentBusy || !due;
+  } else if (protocolComplete) {
+    ui.experimentNextAction.textContent = saved
+      ? "Start Next Session"
+      : exportReady
+        ? "Save Now"
+        : "Report";
+    ui.experimentNextAction.dataset.tone = exportReady || saved ? "" : "warn";
+    ui.experimentNextAction.disabled = state.experimentBusy || !completedTrials;
+  } else {
+    ui.experimentNextAction.textContent = nextTrialId ? `Start ${trialLabel(nextTrialId)}` : "Start Trial";
+    ui.experimentNextAction.dataset.tone = "";
+    ui.experimentNextAction.disabled = state.experimentBusy || !nextTrialId;
+  }
   ui.export.title = state.outputConfigured
     ? state.hasSamples
       ? "Export current live session"
       : "Capture samples before export"
     : "Start live-html with --output-dir to enable export";
+  ui.exportExperiment.title = state.outputConfigured
+    ? protocolComplete
+      ? "Save derived experiment artifacts"
+      : "Complete all protocol trials before experiment save"
+    : "Start live-html with --output-dir to enable experiment save";
 }
 
 function canvasContext(id) {
@@ -572,6 +768,334 @@ function resetValidation() {
   updateButtons();
 }
 
+function trialById(trialId) {
+  const trials = state.experiment?.protocol?.trials || [];
+  return trials.find((trial) => trial.trial_id === trialId) || null;
+}
+
+function trialLabel(trialId) {
+  return String(trialId || "--").replaceAll("_", " ");
+}
+
+function updateTrialOptions() {
+  const trials = state.experiment?.protocol?.trials || [];
+  const current = ui.experimentTrial.value;
+  const nextTrial = state.experiment?.next_trial_id;
+  ui.experimentTrial.innerHTML = "";
+  if (!trials.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "No protocol";
+    ui.experimentTrial.appendChild(option);
+    return;
+  }
+  const completed = new Set(state.experiment?.completed_trial_ids || []);
+  trials.forEach((trial) => {
+    const option = document.createElement("option");
+    option.value = trial.trial_id;
+    const suffix = completed.has(trial.trial_id)
+      ? " complete"
+      : trial.trial_id === nextTrial
+        ? " next"
+        : "";
+    option.textContent = `${trial.kind}: ${trialLabel(trial.trial_id)}${suffix}`;
+    ui.experimentTrial.appendChild(option);
+  });
+  if (nextTrial && trials.some((trial) => trial.trial_id === nextTrial)) {
+    ui.experimentTrial.value = nextTrial;
+  } else if (trials.some((trial) => trial.trial_id === current)) {
+    ui.experimentTrial.value = current;
+  }
+}
+
+function renderExperimentOverview() {
+  const protocol = state.experiment?.protocol;
+  const required = state.experiment?.required_trial_count || protocol?.trials?.length || 0;
+  const completedIds = state.experiment?.completed_trial_ids || [];
+  const completed = state.experiment?.completed_trial_count || completedIds.length || 0;
+  const activeTrial = state.experiment?.active_trial;
+  const rawSampleCount = state.experiment?.experiment_sample_count
+    ?? state.experiment?.sample_count
+    ?? Number(ui.sampleCount.textContent);
+  const sampleCount = Number.isFinite(rawSampleCount) ? rawSampleCount : 0;
+  const finiteText = state.finiteSampleCount
+    ? `finite ${state.finiteSampleCount}/${sampleCount || state.finiteSampleCount}`
+    : "finite --";
+  ui.experimentSampleCount.textContent = sampleCount || 0;
+  ui.experimentFiniteSamples.textContent = finiteText;
+
+  if (!protocol) {
+    setToneText(ui.experimentProtocolSummary, "not started", "warn");
+    ui.experimentTrialPlan.textContent = "--";
+  } else {
+    const duration = Number(protocol.trials?.[0]?.duration_s);
+    const sessionId = state.experiment?.session_id || "session pending";
+    setToneText(ui.experimentProtocolSummary, sessionId, "ok");
+    ui.experimentTrialPlan.textContent = Number.isFinite(duration)
+      ? `${required} trials, ${fmt(duration, 0)} s each, ±${fmt(protocol.target_range_deg, 0)}°`
+      : `${required} trials, ±${fmt(protocol.target_range_deg, 0)}°`;
+  }
+
+  ui.experimentCompletedNames.textContent = completedIds.length
+    ? completedIds.map(trialLabel).join(", ")
+    : "none";
+  ui.experimentProgress.textContent = `${completed}/${required} required`;
+
+  const ready = Boolean(state.experiment?.export_ready);
+  const complete = Boolean(state.experiment?.all_trials_completed);
+  const saved = experimentIsSaved();
+  const blockers = state.experiment?.export_blockers || [];
+  if (activeTrial) {
+    setToneText(ui.experimentExportReady, "trial active", "warn");
+  } else if (saved) {
+    setToneText(ui.experimentExportReady, "saved", "ok");
+  } else if (ready) {
+    setToneText(ui.experimentExportReady, "ready to save", "ok");
+  } else if (complete && !state.outputConfigured) {
+    setToneText(ui.experimentExportReady, "no output dir", "bad");
+  } else if (state.experimentSaveError) {
+    setToneText(ui.experimentExportReady, "save failed", "bad");
+  } else {
+    setToneText(ui.experimentExportReady, "not ready", "warn");
+  }
+  const liveExport = state.outputConfigured && state.hasSamples
+    ? "live export ready"
+    : "live export pending";
+  const experimentExport = saved
+    ? `auto-saved: ${experimentSaveLabel()}`
+    : state.experimentSaveError
+      ? state.experimentSaveError
+      : ready
+        ? "auto-save ready"
+        : blockers.length
+          ? blockers.join("; ")
+          : "complete all trials";
+  ui.experimentExportFiles.textContent = `${liveExport}; ${experimentExport}`;
+}
+
+function renderExperimentTrialTable() {
+  const tbody = ui.experimentTrialTable.querySelector("tbody");
+  tbody.innerHTML = "";
+  const rows = state.experiment?.trial_statuses || [];
+  if (!rows.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.textContent = "Start an experiment session";
+    row.appendChild(cell);
+    tbody.appendChild(row);
+    return;
+  }
+  rows.forEach((trial) => {
+    const row = document.createElement("tr");
+    const status = String(trial.status || "pending");
+    const finite = Number(trial.finite_gaze_fraction);
+    const duration = Number(trial.observed_duration_s);
+    const expected = Number(trial.expected_duration_s);
+    const cells = [
+      `${trial.kind}: ${trialLabel(trial.trial_id)}`,
+      status,
+      String(trial.sample_count || 0),
+      Number.isFinite(finite) ? fmt(finite, 3) : "--",
+      `${fmt(duration, 1)} / ${fmt(expected, 0)}s`,
+    ];
+    cells.forEach((text, index) => {
+      const cell = document.createElement("td");
+      if (index === 1) {
+        const badge = document.createElement("span");
+        badge.className = `experiment-state ${status}`;
+        badge.textContent = text;
+        cell.appendChild(badge);
+      } else {
+        cell.textContent = text;
+      }
+      row.appendChild(cell);
+    });
+    tbody.appendChild(row);
+  });
+}
+
+function renderExperimentStepper() {
+  const rows = state.experiment?.trial_statuses || [];
+  ui.experimentStepper.innerHTML = "";
+  if (!rows.length) {
+    const item = document.createElement("li");
+    item.textContent = "Start an experiment session";
+    ui.experimentStepper.appendChild(item);
+    return;
+  }
+  const nextTrial = state.experiment?.next_trial_id;
+  rows.forEach((trial, index) => {
+    const status = String(trial.status || "pending");
+    const item = document.createElement("li");
+    item.className = status;
+    if (trial.trial_id === nextTrial) item.classList.add("next");
+    const title = document.createElement("strong");
+    title.textContent = `${index + 1}. ${trialLabel(trial.trial_id)}`;
+    const detail = document.createElement("small");
+    const finite = Number(trial.finite_gaze_fraction);
+    const samples = Number(trial.sample_count) || 0;
+    const observed = Number(trial.observed_duration_s);
+    const expected = Number(trial.expected_duration_s);
+    const finiteText = Number.isFinite(finite) ? `finite ${fmt(finite, 3)}` : "finite --";
+    detail.textContent = `${status}; ${samples} samples; ${finiteText}; ${fmt(observed, 1)}/${fmt(expected, 0)}s`;
+    item.appendChild(title);
+    item.appendChild(detail);
+    ui.experimentStepper.appendChild(item);
+  });
+}
+
+function renderExperimentStage() {
+  const active = state.experiment?.active_trial;
+  const protocol = state.experiment?.protocol;
+  if (!active || !protocol) {
+    const complete = Boolean(state.experiment?.all_trials_completed);
+    const saved = experimentIsSaved();
+    ui.experimentStage.dataset.state = complete ? "complete" : "idle";
+    ui.experimentTarget.style.opacity = "0.35";
+    ui.experimentTarget.style.left = "50%";
+    ui.experimentTarget.style.top = "50%";
+    ui.experimentPrompt.textContent = complete
+      ? saved
+        ? "Session saved. Start the next session when ready."
+        : "All required trials are complete. Save is ready."
+      : protocol
+        ? "Select and start the next pending trial"
+        : "Start an experiment session";
+    ui.experimentCountdown.textContent = complete ? "done" : "--";
+    ui.experimentTimerLabel.textContent = complete ? "Protocol complete" : "Timer";
+    ui.experimentTimerValue.textContent = complete ? "done" : "--";
+    ui.experimentTimerBar.style.width = complete ? "100%" : "0%";
+    ui.experimentTimerDetail.textContent = complete
+      ? saved
+        ? experimentSaveLabel()
+        : "Ready to save"
+      : "No active trial";
+    return;
+  }
+  const trial = trialById(active.trial_id);
+  if (!trial) return;
+  const elapsed = Number(state.experiment?.trial_elapsed_s);
+  const fallbackElapsed = Number.isFinite(Number(state.latest?.capture?.timestamp_s))
+    ? Math.max(0, Number(state.latest.capture.timestamp_s) - active.started_at_s)
+    : 0;
+  const elapsedS = Number.isFinite(elapsed) ? elapsed : fallbackElapsed;
+  const durationS = Number(state.experiment?.trial_duration_s || trial.duration_s || 0);
+  const remainingRaw = Number(state.experiment?.trial_remaining_s);
+  const remaining = Number.isFinite(remainingRaw)
+    ? remainingRaw
+    : Math.max(0, durationS - elapsedS);
+  const progressRaw = Number(state.experiment?.trial_progress);
+  const progress = Number.isFinite(progressRaw)
+    ? progressRaw
+    : durationS > 0
+      ? Math.min(1, elapsedS / durationS)
+      : 0;
+  const cue = state.experiment?.current_target;
+  const due = remaining <= 0.05;
+  ui.experimentStage.dataset.state = due ? "due" : "recording";
+  ui.experimentPrompt.textContent = cue
+    ? `${trial.prompt} Target: ${cue.label}.`
+    : trial.display_text || trial.prompt;
+  ui.experimentCountdown.textContent = `${fmt(remaining, 1)}s`;
+  ui.experimentTimerLabel.textContent = `Recording ${trialLabel(active.trial_id)}`;
+  ui.experimentTimerValue.textContent = due ? "0.0s" : `${fmt(remaining, 1)}s`;
+  ui.experimentTimerBar.style.width = `${Math.max(0, Math.min(100, progress * 100)).toFixed(1)}%`;
+  const cueRemaining = Number(state.experiment?.current_target_remaining_s);
+  ui.experimentTimerDetail.textContent = cue && Number.isFinite(cueRemaining)
+    ? `${fmt(elapsedS, 1)} / ${fmt(durationS, 0)}s; target ${cue.label}, ${fmt(cueRemaining, 1)}s left`
+    : `${fmt(elapsedS, 1)} / ${fmt(durationS, 0)}s elapsed`;
+  if (cue) {
+    const range = Math.max(1, Number(protocol.target_range_deg) || 15);
+    const left = Math.max(8, Math.min(92, 50 + (cue.x_deg / range) * 42));
+    const top = Math.max(8, Math.min(92, 50 - (cue.y_deg / range) * 42));
+    ui.experimentTarget.style.left = `${left}%`;
+    ui.experimentTarget.style.top = `${top}%`;
+    ui.experimentTarget.style.opacity = "1";
+  } else {
+    ui.experimentTarget.style.opacity = trial.kind === "reading" ? "0" : "0.35";
+    ui.experimentTarget.style.left = "50%";
+    ui.experimentTarget.style.top = "50%";
+  }
+  maybeAutoFinishExperimentTrial();
+}
+
+function renderExperimentStatus(payload = {}) {
+  const nextExperiment = payload.experiment || payload;
+  if (isStaleExperimentStatus(nextExperiment)) {
+    updateButtons();
+    return;
+  }
+  const nextSessionId = nextExperiment?.session_id || null;
+  if (state.experimentSavedSessionId && state.experimentSavedSessionId !== nextSessionId) {
+    clearExperimentSaveState();
+  }
+  state.experiment = nextExperiment;
+  if (nextExperiment?.active && !nextExperiment?.all_trials_completed) {
+    hydrateExperimentMetadata(nextExperiment, { force: true });
+  }
+  updateTrialOptions();
+  const active = Boolean(state.experiment?.active);
+  const activeTrial = state.experiment?.active_trial;
+  ui.experimentStatus.textContent = activeTrial
+    ? `active: ${activeTrial.trial_id}`
+    : active
+      ? "ready"
+      : "idle";
+  ui.experimentCompleted.textContent = state.experiment?.completed_trial_count || 0;
+  ui.experimentBoundary.textContent =
+    "derived records only; session estimates, not reference-device validation";
+  renderExperimentBanner();
+  renderExperimentStage();
+  renderExperimentOverview();
+  renderExperimentStepper();
+  renderExperimentTrialTable();
+  updateButtons();
+}
+
+function maybeAutoFinishExperimentTrial() {
+  const active = state.experiment?.active_trial;
+  const remaining = Number(state.experiment?.trial_remaining_s);
+  if (
+    !active ||
+    state.experimentBusy ||
+    !Number.isFinite(remaining) ||
+    remaining > 0.05 ||
+    state.autoFinishTrialId === active.trial_id
+  ) {
+    return;
+  }
+  state.autoFinishTrialId = active.trial_id;
+  window.setTimeout(() => {
+    if (state.experiment?.active_trial?.trial_id === active.trial_id) {
+      finishExperimentTrial({ automatic: true });
+    }
+  }, 200);
+}
+
+function isStaleExperimentStatus(nextExperiment) {
+  const current = state.experiment;
+  if (!current || !nextExperiment) return false;
+  const currentSession = current.session_id;
+  const nextSession = nextExperiment.session_id;
+  if (!currentSession || !nextSession || currentSession !== nextSession) return false;
+  const currentCompleted = Number(current.completed_trial_count) || 0;
+  const nextCompleted = Number(nextExperiment.completed_trial_count) || 0;
+  if (currentCompleted > nextCompleted) return true;
+  if (current.all_trials_completed && !nextExperiment.all_trials_completed) return true;
+  return experimentIsSaved() && !nextExperiment.all_trials_completed;
+}
+
+function renderExperimentReport(report) {
+  state.experimentReport = report;
+  const heldout = report.heldout_target_error || {};
+  ui.experimentHeldout.textContent = heldout.available
+    ? `${fmt(heldout.rms_error_deg, 2)}°`
+    : "--";
+  const latency = report.target_acquisition_latency_s || {};
+  ui.experimentLatency.textContent = latency.available ? `${fmt(latency.median_latency_s, 2)}s` : "--";
+}
+
 function renderDiagnostics(diagnostics = {}) {
   const q = Number(diagnostics.quality_index);
   ui.qualityIndex.textContent = Number.isFinite(q) ? `${fmt(q, 0)}/100` : "--";
@@ -612,14 +1136,19 @@ function renderStatistics(statistics = {}, method = {}) {
 
 function calibrationLabel(active = state.calibrationActive) {
   const status = active ? "on" : "off";
-  return `calibration: ${status} (±${fmt(state.calibrationRangeDeg, 0)}°)`;
+  const sampled = state.calibrationSessionPoints ? `, sampled ${state.calibrationSessionPoints}/4` : "";
+  return `calibration: ${status} (±${fmt(state.calibrationRangeDeg, 0)}°${sampled})`;
 }
 
 function resetDisplay({ keepCalibration = false } = {}) {
   state.latest = null;
   state.hasSamples = false;
   state.finiteSampleCount = 0;
-  if (!keepCalibration) state.calibrationActive = false;
+  if (!keepCalibration) {
+    state.calibrationActive = false;
+    state.calibrationTargetIndex = 0;
+    state.calibrationSessionPoints = 0;
+  }
   ui.eyeCrop.removeAttribute("src");
   ui.eyeCrop.style.display = "none";
   ui.eyeOverlay.style.display = "none";
@@ -664,6 +1193,9 @@ function resetDisplay({ keepCalibration = false } = {}) {
   ui.calibrationStatus.textContent = calibrationLabel();
   setChipTone(ui.calibrationStatus, state.calibrationActive ? "ok" : "");
   resetPlots();
+  renderExperimentOverview();
+  renderExperimentStepper();
+  renderExperimentTrialTable();
   updateButtons();
 }
 
@@ -691,6 +1223,7 @@ function render(data) {
   );
   state.calibrationActive = Boolean(data.calibration?.active);
   state.calibrationRangeDeg = data.calibration?.target_range_deg || state.calibrationRangeDeg;
+  state.calibrationSessionPoints = data.calibration?.session_points || state.calibrationSessionPoints;
 
   if (data.frame?.eye_crop_jpeg) {
     ui.eyeCrop.src = data.frame.eye_crop_jpeg;
@@ -761,7 +1294,13 @@ function render(data) {
   drawPolar(data);
   drawHistogram(data);
   drawMainSequence(data);
-  updateButtons();
+  if (data.experiment) {
+    renderExperimentStatus(data.experiment);
+  } else {
+    renderExperimentStage();
+    renderExperimentOverview();
+    updateButtons();
+  }
 }
 
 function liveUrl() {
@@ -874,16 +1413,37 @@ function calibrationTargets() {
 }
 
 async function fitCalibration() {
-  if (!state.latest || state.finiteSampleCount < 4) {
-    ui.calibrationStatus.textContent = "calibration: need at least 4 finite gaze samples";
+  if (!state.latest || state.finiteSampleCount < 1) {
+    ui.calibrationStatus.textContent = "calibration: need a finite gaze sample";
     setChipTone(ui.calibrationStatus, "warn");
     return;
   }
   try {
-    const body = await postJson("/api/calibration/fit", { targets: calibrationTargets() });
-    state.calibrationActive = Boolean(body.calibration);
-    ui.calibrationStatus.textContent = calibrationLabel(true);
-    setChipTone(ui.calibrationStatus, "ok");
+    const targets = calibrationTargets();
+    if (state.calibrationTargetIndex === 0) {
+      await postJson("/api/calibration/session/start", {
+        target_range_deg: state.calibrationRangeDeg,
+      });
+      state.calibrationSessionPoints = 0;
+    }
+    const sampled = await postJson("/api/calibration/session/sample", {
+      target: targets[state.calibrationTargetIndex],
+      window_s: 0.35,
+      min_samples: 1,
+    });
+    state.calibrationSessionPoints = sampled.session_points || state.calibrationSessionPoints + 1;
+    state.calibrationTargetIndex += 1;
+    if (state.calibrationTargetIndex < targets.length) {
+      ui.calibrationStatus.textContent = calibrationLabel(false);
+      setChipTone(ui.calibrationStatus, "warn");
+    } else {
+      const body = await postJson("/api/calibration/session/fit");
+      state.calibrationActive = Boolean(body.calibration);
+      state.calibrationSessionPoints = body.session_points || state.calibrationSessionPoints;
+      state.calibrationTargetIndex = 0;
+      ui.calibrationStatus.textContent = calibrationLabel(true);
+      setChipTone(ui.calibrationStatus, "ok");
+    }
     updateButtons();
   } catch (error) {
     ui.calibrationStatus.textContent = error.message || "calibration fit failed";
@@ -895,6 +1455,8 @@ async function resetCalibration() {
   try {
     await postJson("/api/calibration/reset");
     state.calibrationActive = false;
+    state.calibrationTargetIndex = 0;
+    state.calibrationSessionPoints = 0;
     ui.calibrationStatus.textContent = calibrationLabel(false);
     setChipTone(ui.calibrationStatus);
     ui.calGazeX.textContent = "--";
@@ -963,6 +1525,187 @@ async function runSyntheticValidation() {
   }
 }
 
+async function refreshExperimentStatus() {
+  try {
+    const payload = await fetch("/api/experiment/session/status").then((response) => {
+      if (!response.ok) throw new Error(`experiment status failed (${response.status})`);
+      return response.json();
+    });
+    renderExperimentStatus(payload);
+  } catch {
+    ui.experimentStatus.textContent = "unavailable";
+    updateButtons();
+  }
+}
+
+async function startExperimentSession() {
+  state.experimentBusy = true;
+  clearExperimentSaveState();
+  updateButtons();
+  try {
+    const payload = await postJson("/api/experiment/session/start", {
+      trial_duration_s: Number(ui.experimentDuration.value || 30),
+      target_range_deg: Number(ui.experimentRange.value || 15),
+      ...experimentMetadataPayload(),
+    });
+    renderExperimentStatus(payload);
+    renderExperimentReport({});
+    state.autoFinishTrialId = null;
+    const sessionId = payload.experiment?.session_id;
+    setOutput(sessionId ? `experiment session ready: ${sessionId}` : "experiment session ready", "ok");
+  } catch (error) {
+    setOutput(error.message || "experiment start failed", "bad");
+  } finally {
+    state.experimentBusy = false;
+    updateButtons();
+  }
+}
+
+async function startExperimentTrial() {
+  const trialId = state.experiment?.next_trial_id || ui.experimentTrial.value;
+  if (!trialId) return;
+  state.experimentBusy = true;
+  updateButtons();
+  try {
+    const payload = await postJson("/api/experiment/trial/start", { trial_id: trialId });
+    state.autoFinishTrialId = null;
+    renderExperimentStatus(payload);
+    setOutput(`experiment trial started: ${trialId}`, "ok");
+  } catch (error) {
+    setOutput(error.message || "trial start failed", "bad");
+  } finally {
+    state.experimentBusy = false;
+    updateButtons();
+  }
+}
+
+async function finishExperimentTrial(options = {}) {
+  state.experimentBusy = true;
+  updateButtons();
+  try {
+    const payload = await postJson("/api/experiment/trial/finish");
+    state.autoFinishTrialId = null;
+    if (payload.auto_export?.ok) {
+      rememberExperimentExport(payload.auto_export.paths || {});
+    } else if (payload.auto_export && !payload.auto_export.ok) {
+      state.experimentSaveError = payload.auto_export.detail || "auto-save failed";
+    }
+    if (payload.report) {
+      renderExperimentReport(payload.report);
+    }
+    renderExperimentStatus(payload);
+    const prefix = options.automatic ? "timer complete" : "experiment trial finished";
+    if (payload.auto_export?.ok) {
+      setOutput(`auto-saved ${experimentSaveLabel(payload.auto_export.paths)}`, "ok");
+    } else if (payload.auto_export && !payload.auto_export.ok) {
+      setOutput(`trial finished; auto-save failed: ${state.experimentSaveError}`, "bad");
+    } else {
+      setOutput(`${prefix}: ${payload.trial?.trial_id || "trial"}`, "ok");
+    }
+  } catch (error) {
+    setOutput(error.message || "trial finish failed", "bad");
+  } finally {
+    state.experimentBusy = false;
+    updateButtons();
+  }
+}
+
+async function reportExperimentSession() {
+  state.experimentBusy = true;
+  updateButtons();
+  try {
+    const payload = await postJson("/api/experiment/session/report");
+    renderExperimentReport(payload.report || {});
+    setOutput("experiment report ready", "ok");
+  } catch (error) {
+    setOutput(error.message || "experiment report failed", "bad");
+  } finally {
+    state.experimentBusy = false;
+    updateButtons();
+  }
+}
+
+async function exportExperimentSession() {
+  if (!state.outputConfigured) {
+    setOutput("output dir not configured; restart with --output-dir", "warn");
+    return;
+  }
+  if (!state.experiment?.export_ready) {
+    const blockers = state.experiment?.export_blockers || ["complete all trials"];
+    setOutput(`experiment save not ready: ${blockers.join("; ")}`, "warn");
+    return;
+  }
+  state.experimentBusy = true;
+  updateButtons();
+  try {
+    const payload = await postJson("/api/experiment/session/export");
+    rememberExperimentExport(payload.paths || {});
+    if (payload.report) {
+      renderExperimentReport(payload.report);
+    }
+    const paths = Object.keys(payload.paths || {}).length;
+    const sessionId = payload.paths?.session_id || state.experiment?.session_id;
+    renderExperimentStatus({ experiment: state.experiment });
+    setOutput(
+      paths
+        ? `saved ${sessionId || "experiment"} (${paths} files)`
+        : `saved ${sessionId || "experiment"}`,
+      "ok",
+    );
+  } catch (error) {
+    setOutput(error.message || "experiment save failed", "bad");
+  } finally {
+    state.experimentBusy = false;
+    updateButtons();
+  }
+}
+
+async function resetExperimentSession() {
+  state.experimentBusy = true;
+  updateButtons();
+  try {
+    const payload = await postJson("/api/experiment/session/reset");
+    state.autoFinishTrialId = null;
+    clearExperimentSaveState();
+    hydrateExperimentMetadata(payload.experiment || {}, { force: true });
+    renderExperimentStatus(payload);
+    renderExperimentReport({});
+    ui.experimentHeldout.textContent = "--";
+    ui.experimentLatency.textContent = "--";
+    setOutput("experiment reset", "ok");
+  } catch (error) {
+    setOutput(error.message || "experiment reset failed", "bad");
+  } finally {
+    state.experimentBusy = false;
+    updateButtons();
+  }
+}
+
+async function experimentNextAction() {
+  if (!state.experiment?.active) {
+    await startExperimentSession();
+    return;
+  }
+  if (state.experiment.active_trial) {
+    await finishExperimentTrial();
+    return;
+  }
+  if (state.experiment.all_trials_completed) {
+    if (experimentIsSaved()) {
+      await resetExperimentSession();
+      await startExperimentSession();
+    } else if (state.experiment.export_ready) {
+      await exportExperimentSession();
+    } else {
+      await reportExperimentSession();
+    }
+    return;
+  }
+  if (state.experiment.next_trial_id) {
+    await startExperimentTrial();
+  }
+}
+
 async function init() {
   resetPlots();
   resetValidation();
@@ -970,8 +1713,12 @@ async function init() {
     const status = await fetch("/api/status").then((r) => r.json());
     ui.camera.value = status.camera_index;
     state.outputConfigured = Boolean(status.output_dir);
+    state.empiricalManifestPath = status.empirical_manifest_path || null;
     state.calibrationRangeDeg = status.calibration?.target_range_deg || state.calibrationRangeDeg;
     state.calibrationActive = Boolean(status.calibration?.active);
+    state.calibrationSessionPoints = status.calibration?.session_points || 0;
+    hydrateExperimentMetadata(status.experiment || {}, { force: true });
+    renderExperimentStatus(status.experiment || {});
     const sampleCount = status.sample_count || 0;
     resetDisplay({ keepCalibration: state.calibrationActive });
     state.hasSamples = sampleCount > 0;
@@ -988,6 +1735,7 @@ async function init() {
     setOutput("backend status unavailable", "bad");
   }
   updateButtons();
+  refreshExperimentStatus();
 }
 
 ui.start.addEventListener("click", start);
@@ -999,6 +1747,16 @@ ui.resetAll.addEventListener("click", resetAll);
 ui.export.addEventListener("click", exportSession);
 ui.runSyntheticValidation.addEventListener("click", runSyntheticValidation);
 ui.clearValidation.addEventListener("click", resetValidation);
+ui.experimentNextAction.addEventListener("click", experimentNextAction);
+ui.startExperiment.addEventListener("click", startExperimentSession);
+ui.startExperimentTrial.addEventListener("click", startExperimentTrial);
+ui.finishExperimentTrial.addEventListener("click", finishExperimentTrial);
+ui.reportExperiment.addEventListener("click", reportExperimentSession);
+ui.exportExperiment.addEventListener("click", exportExperimentSession);
+ui.resetExperiment.addEventListener("click", resetExperimentSession);
+window.setInterval(() => {
+  if (state.experiment?.active && !state.experimentBusy) refreshExperimentStatus();
+}, 1500);
 window.addEventListener("resize", () => {
   if (state.latest) render(state.latest);
   else resetPlots();

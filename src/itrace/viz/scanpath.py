@@ -8,8 +8,8 @@ pipeline. Stats/analysis modules must never import this module.
 Two families of plots live here:
 
 * **Scanpath** -- fixation centroids drawn in screen coordinates (y down),
-  sized by dwell time and joined in temporal order, with saccades overlaid as
-  arrows from one fixation to the next.
+  sized by dwell time and joined in temporal order, with fixation-transition
+  arrows drawn from one centroid to the next.
 * **Microsaccades** -- a polar histogram of microsaccade directions and an
   amplitude-vs-peak-velocity (main-sequence) scatter.
 
@@ -29,8 +29,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from ..types import Fixation, FloatArray, Microsaccade, Saccade, SessionReport
-
-from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
+from .palette import FONT_FLOOR, WONG  # single-source Wong (2011) colour-blind-safe palette
 
 # Marker-area scaling for fixation dwell time (points^2 per second).
 _FIXATION_AREA_PER_S = 1200.0
@@ -64,7 +63,7 @@ def plot_scanpath(
 
     Fixation centroids are scattered with marker area proportional to dwell
     time, connected by a line in temporal order, and each consecutive transition
-    is overlaid with an arrow (a visual saccade). The y-axis is inverted because
+    is overlaid with an arrow. The y-axis is inverted because
     the centroids live in screen coordinates (y increases downward).
 
     Parameters
@@ -114,7 +113,8 @@ def plot_scanpath(
 
     if xs.size > 1:
         ax.plot(xs, ys, color=WONG[5], lw=1.0, alpha=0.6, zorder=1)
-        # One arrow per consecutive fixation transition.
+        # One arrow per consecutive fixation transition; the saccade count is
+        # reported separately in the legend when the caller has detections.
         for i in range(xs.size - 1):
             ax.annotate(
                 "",
@@ -124,6 +124,11 @@ def plot_scanpath(
                 zorder=2,
             )
 
+    if saccades:
+        label = f"{xs.size} fixations / {len(saccades)} detected saccades\narrows = transitions"
+    else:
+        label = f"{xs.size} fixations\narrows = fixation transitions"
+
     ax.scatter(
         xs,
         ys,
@@ -131,9 +136,9 @@ def plot_scanpath(
         color=WONG[0],
         edgecolor="white",
         zorder=3,
-        label=f"{xs.size} fixations / {len(saccades)} saccades",
+        label=label,
     )
-    ax.legend(loc="best")
+    ax.legend(loc="upper right", fontsize=FONT_FLOOR, framealpha=0.88)
     ax.invert_yaxis()
     return ax
 

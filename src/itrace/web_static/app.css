@@ -29,20 +29,30 @@ body {
 .app {
   width: min(1440px, 100%);
   margin: 0 auto;
-  padding: 16px;
+  padding: 0 16px 16px;
 }
 
 .eye-stage {
-  min-height: 48vh;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0 -16px;
+  padding: 10px 16px 12px;
+  min-height: 0;
   display: grid;
   grid-template-rows: auto 1fr;
   gap: 10px;
+  background: rgba(244, 247, 251, 0.96);
+  border-bottom: 1px solid rgba(215, 222, 232, 0.92);
+  box-shadow: 0 12px 30px rgba(24, 33, 47, 0.08);
+  backdrop-filter: blur(10px);
 }
 
 .status-row,
 .toolbar,
 .metrics,
 .validation-panel,
+.experiment-panel,
 article {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -99,8 +109,9 @@ article {
 .eye-frame {
   position: relative;
   width: min(960px, 100%);
-  min-height: 340px;
-  max-height: 560px;
+  height: clamp(190px, 26vh, 340px);
+  min-height: 190px;
+  max-height: 340px;
   margin: 0 auto;
   border: 2px solid var(--blue);
   border-radius: 8px;
@@ -114,7 +125,6 @@ article {
   display: none;
   width: 100%;
   height: 100%;
-  min-height: 340px;
   object-fit: cover;
   image-rendering: auto;
 }
@@ -171,6 +181,10 @@ input[type="number"] {
   width: 82px;
 }
 
+input[type="text"] {
+  width: 174px;
+}
+
 .check input {
   width: 16px;
   height: 16px;
@@ -211,11 +225,457 @@ button:disabled {
   color: #913d18;
 }
 
+#startExperimentButton,
+#startExperimentTrialButton,
+#experimentNextActionButton {
+  background: #eef8f4;
+  border-color: rgba(0, 158, 115, 0.35);
+  color: #17694f;
+}
+
+#experimentNextActionButton {
+  min-width: 148px;
+  font-weight: 700;
+}
+
+#experimentNextActionButton[data-tone="warn"] {
+  background: var(--warn-bg);
+  border-color: rgba(230, 159, 0, 0.45);
+  color: #805900;
+}
+
+#experimentNextActionButton[data-tone="bad"] {
+  background: var(--bad-bg);
+  border-color: rgba(213, 94, 0, 0.35);
+  color: #913d18;
+}
+
+#finishExperimentTrialButton {
+  background: var(--warn-bg);
+  border-color: rgba(230, 159, 0, 0.45);
+  color: #805900;
+}
+
 #outputStatus {
   color: var(--muted);
   min-width: 220px;
   max-width: 100%;
   font-variant-numeric: tabular-nums;
+}
+
+.experiment-panel {
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.experiment-status-banner {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.experiment-status-banner div {
+  min-height: 66px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 8px 10px;
+  min-width: 0;
+}
+
+.experiment-status-banner span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.experiment-status-banner strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.experiment-status-banner strong[data-tone="ok"] {
+  color: #17694f;
+}
+
+.experiment-status-banner strong[data-tone="warn"] {
+  color: #805900;
+}
+
+.experiment-status-banner strong[data-tone="bad"] {
+  color: #913d18;
+}
+
+.experiment-metadata-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.experiment-metadata-controls select {
+  min-width: 142px;
+}
+
+.experiment-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+#experimentTrialSelect {
+  min-width: 160px;
+}
+
+.experiment-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.experiment-overview div {
+  min-height: 82px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.experiment-overview span,
+.experiment-overview small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.experiment-overview strong {
+  display: block;
+  margin: 4px 0 2px;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.16;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.experiment-overview strong[data-tone="ok"] {
+  color: #17694f;
+}
+
+.experiment-overview strong[data-tone="warn"] {
+  color: #805900;
+}
+
+.experiment-overview strong[data-tone="bad"] {
+  color: #913d18;
+}
+
+.experiment-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(220px, 360px);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.experiment-stage {
+  position: relative;
+  min-height: 260px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(24, 33, 47, 0.05) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(24, 33, 47, 0.05) 1px, transparent 1px),
+    #fbfdff;
+  background-size: 25% 25%;
+  overflow: hidden;
+}
+
+.experiment-stage[data-state="recording"] {
+  border-color: rgba(0, 114, 178, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(0, 114, 178, 0.18);
+}
+
+.experiment-stage[data-state="due"] {
+  border-color: rgba(230, 159, 0, 0.55);
+  background:
+    linear-gradient(90deg, rgba(230, 159, 0, 0.07) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(230, 159, 0, 0.07) 1px, transparent 1px),
+    #fffaf0;
+  background-size: 25% 25%;
+}
+
+.experiment-stage[data-state="complete"] {
+  border-color: rgba(0, 158, 115, 0.42);
+  background:
+    linear-gradient(90deg, rgba(0, 158, 115, 0.06) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(0, 158, 115, 0.06) 1px, transparent 1px),
+    #f8fffc;
+  background-size: 25% 25%;
+}
+
+#experimentTargetDot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px rgba(213, 94, 0, 0.45);
+  transition:
+    left 160ms ease,
+    top 160ms ease,
+    opacity 120ms ease;
+  opacity: 0.35;
+}
+
+.experiment-centerline {
+  position: absolute;
+  background: rgba(0, 114, 178, 0.2);
+  pointer-events: none;
+}
+
+.experiment-centerline.horizontal {
+  left: 6%;
+  right: 6%;
+  top: 50%;
+  height: 1px;
+}
+
+.experiment-centerline.vertical {
+  top: 8%;
+  bottom: 8%;
+  left: 50%;
+  width: 1px;
+}
+
+#experimentPrompt {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 18px;
+  color: var(--ink);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+#experimentCountdown {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  min-width: 62px;
+  text-align: right;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment-timer-card {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  width: min(260px, calc(100% - 104px));
+  border: 1px solid rgba(215, 222, 232, 0.96);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 10px 12px;
+  box-shadow: 0 10px 22px rgba(24, 33, 47, 0.08);
+}
+
+.experiment-timer-card span,
+.experiment-timer-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.experiment-timer-card strong {
+  display: block;
+  margin-top: 2px;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment-progress-track {
+  height: 8px;
+  margin: 9px 0 6px;
+  border-radius: 999px;
+  background: #e8edf4;
+  overflow: hidden;
+}
+
+#experimentTimerBar {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+  transition:
+    width 160ms ease,
+    background-color 120ms ease;
+}
+
+.experiment-stage[data-state="due"] #experimentTimerBar {
+  background: var(--orange);
+}
+
+.experiment-stage[data-state="complete"] #experimentTimerBar {
+  background: var(--green);
+}
+
+.experiment-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.experiment-summary div {
+  min-height: 74px;
+  padding: 12px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.experiment-summary div:nth-child(2n) {
+  border-right: 0;
+}
+
+.experiment-summary div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.experiment-summary span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.experiment-summary strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment-trial-table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experiment-stepper li {
+  min-height: 68px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 10px 12px;
+  color: var(--muted);
+}
+
+.experiment-stepper strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.experiment-stepper small {
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment-stepper li.complete {
+  border-color: rgba(0, 158, 115, 0.35);
+  background: var(--ok-bg);
+}
+
+.experiment-stepper li.active {
+  border-color: rgba(230, 159, 0, 0.45);
+  background: var(--warn-bg);
+}
+
+.experiment-stepper li.next {
+  border-color: rgba(0, 114, 178, 0.35);
+  background: #edf7fb;
+}
+
+.experiment-trial-table th,
+.experiment-trial-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.experiment-trial-table th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  background: #f8fafc;
+}
+
+.experiment-trial-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.experiment-state {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.experiment-state.complete {
+  border-color: rgba(0, 158, 115, 0.35);
+  background: var(--ok-bg);
+  color: #17694f;
+}
+
+.experiment-state.active {
+  border-color: rgba(230, 159, 0, 0.45);
+  background: var(--warn-bg);
+  color: #805900;
+}
+
+.experiment-state.pending {
+  color: var(--muted);
+  background: #f8fafc;
 }
 
 .metrics {
@@ -282,6 +742,47 @@ button:disabled {
 #statsWindow {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .experiment-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .experiment-stepper {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .experiment-overview,
+  .experiment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .experiment-trial-table {
+    font-size: 12px;
+  }
+
+  .eye-stage {
+    padding-top: 8px;
+  }
+
+  .eye-frame {
+    height: clamp(150px, 22vh, 230px);
+    min-height: 150px;
+  }
+
+  .status-row {
+    justify-content: flex-start;
+    max-height: 96px;
+    overflow-y: auto;
+  }
+
+  .experiment-timer-card {
+    width: min(220px, calc(100% - 96px));
+    padding: 8px 10px;
+  }
 }
 
 .stat-grid {
@@ -450,6 +951,7 @@ canvas {
 
   .validation-grid,
   .validation-summary,
+  .experiment-status-banner,
   .stat-grid {
     grid-template-columns: 1fr;
   }
@@ -470,6 +972,6 @@ canvas {
   }
 
   .eye-stage {
-    min-height: 42vh;
+    min-height: 0;
   }
 }

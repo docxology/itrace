@@ -1,0 +1,22 @@
+{
+  "preprocessing": {
+    "short_gap_interpolation_used": true,
+    "short_gap_max_s": 0.05
+  },
+  "quality": {
+    "valid_sample_fraction": 0.80,
+    "dropout_fraction": 0.20
+  },
+  "pupil": {
+    "valid_sample_fraction": 0.40
+  },
+  "calibration": {
+    "available": true
+  },
+  "warnings": [
+    "gaze contains non-finite samples",
+    "low finite gaze fraction",
+    "pupil trace contains blink or invalid samples",
+    "low pupil-valid fraction"
+  ]
+}

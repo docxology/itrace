@@ -1,38 +1,37 @@
 # Abstract {#sec:abstract}
 
-Webcam-based eye tracking promises low-cost access to gaze, saccade, and pupil
-signals, but the open-source landscape is fragmented across browser gaze
-trackers, appearance models, event classifiers, pupillometry packages, and
-capture shells whose hardware dependencies make reproducible, headless
-validation difficult. We present **iTrace**, a Python toolkit that separates a
-pure NumPy/SciPy analysis core — gaze geometry,
-Savitzky–Golay velocity, I-VT and I-DT event identification
-[@salvucci2000identifying], Engbert–Kliegl microsaccade detection
-[@engbert2003microsaccades], saturating and power-law main-sequence fitting
-[@bahill1975main], causal real-time pupil-phase detection
-[@kronemer2024rtpupilphase], and scanpath direction encoding — from an
-optional, thin webcam/MediaPipe capture shell. Because the core never imports a
-hardware dependency, the entire test suite runs on a headless machine and
-algorithmically verifies each detector against synthetic signals whose ground
-truth is known by construction: the I-VT detector recovers a
-{{DEMO_AMPLITUDE}}° saccade's
-amplitude to within 5% and its peak velocity to within 10%, and a second,
-independently-formulated implementation cross-checks the event boundaries. A
-3-D eyeball forward model closes the loop — projecting a known gaze through a
-pinhole camera to landmarks and back through the estimator — recovering gaze to
-an RMS residual of 0.16°, an internal-consistency check that exercises the
-geometry path (not just the event algorithms) and bounds, but does not
-establish, real-world error. A Monte-Carlo noise-sensitivity sweep then varies
-an idealized landmark-localisation noise σ and quantifies how each signal
-degrades: gaze stays usable to σ≈0.005 (≈3 px at 640 px width) while saccade
-detection — resting on the noise-amplifying velocity — collapses first at
-σ≈0.0014 (≈0.9 px), implying that webcam saccade timing is theoretically
-marginal before real MediaPipe, lens, illumination, head-pose, and calibration
-errors are added. (The pupil
-channel's robustness is set by a modelling assumption, not measured, and is
-reported as conditional.) The
-package ships with a typer command-line interface, a Streamlit dashboard, a
-local HTML/WebSocket live orchestrator, and publication-figure scripts, all
-under a green test suite with {{TEST_COUNT}} tests at {{COVERAGE_PCT}} coverage.
-iTrace demonstrates that webcam eye-movement software becomes more auditable
-when the verifiable algorithms are decoupled from fragile hardware.
+Webcam eye tracking can make gaze, saccade, and pupil analysis broadly
+accessible, but commodity-camera software often entangles three concerns that
+need different evidence: camera capture, scientific signal processing, and
+claims about real-eye accuracy. We present **iTrace**, a Python toolkit that
+separates those concerns into (i) a pure NumPy/SciPy core for gaze geometry,
+Savitzky-Golay velocity, I-VT and I-DT event identification,
+Engbert-Kliegl microsaccade detection, main-sequence fitting, causal
+pupil-phase detection, pupil preprocessing, scanpath statistics, and benchmark
+scoring; (ii) an optional webcam/MediaPipe capture shell; and (iii) bounded
+diagnostic/export interfaces for live sessions and user-supplied truth files.
+The core never imports a hardware dependency, so its algorithms are exercised
+headlessly against constructed ground truth rather than camera availability.
+
+The resulting evidence is algorithmic, explicit, and reproducible. On synthetic
+traces, the I-VT detector recovers a {{DEMO_AMPLITUDE}} deg saccade's amplitude
+to within 5% and peak velocity to within 10%, and an independently formulated
+reference implementation cross-checks event boundaries. A 3-D eyeball forward
+model projects known gaze through a pinhole camera to landmarks and back through
+the estimator, recovering gaze to 0.16 deg RMS; this exercises the geometry path
+without claiming real-device accuracy. A seeded Monte-Carlo landmark-noise sweep
+then shows the expected ordering of fragility: gaze remains below a 2 deg RMS
+bound to sigma approximately 0.005 (about 3 px at 640 px width), while
+velocity-thresholded saccade recovery falls below F1 = 0.8 near sigma 0.0014
+(about 0.9 px). The pupil channel is reported conditionally because its
+noise-sweep robustness follows from the modelling assumption used to inject
+pupil noise. iTrace also ships a typer CLI, Streamlit dashboard, local
+HTML/WebSocket orchestrator, guided derived-record empirical workflow, and
+publication-figure scripts, all under {{TEST_COUNT}} tests at {{COVERAGE_PCT}}
+coverage. Its contribution is not a claim that webcams are validated eye
+trackers; it is a verification-first reference implementation whose evidence
+boundaries are visible in the code, figures, reports, and manuscript. iTrace is
+MIT-licensed and openly released at
+https://github.com/docxology/itrace, with this version archived at DOI
+10.5281/zenodo.20614027 (concept DOI 10.5281/zenodo.20614026 resolves to the
+latest version).

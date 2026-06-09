@@ -8,7 +8,7 @@ that compare and resolve scanpaths over time. Like the rest of the core they are
 pure NumPy/SciPy, take explicit seeds wherever they resample, and operate on
 whatever gaze they are given — synthetic streams with known ground truth
 ([@sec:forward]) or recorded ones. Nothing here measures real-eye accuracy; that
-remains the device-validation gap of [@sec:limitations].
+remains the device validation gap of [@sec:limitations].
 
 ## Adaptive detection and movement dynamics
 
@@ -67,9 +67,9 @@ provides three complementary ones over the cardinal direction strings of
 The **Levenshtein scanpath distance** is the minimum number of single-character
 insertions, deletions, and substitutions that turn one encoded direction string
 into another, computed by the standard dynamic-programming edit-distance recurrence
-over the two strings; it captures how much one scan *order* must be rewritten to
-match the other and is robust to small local insertions a fixed alignment would
-punish. We report both the raw edit count and a length-normalised version
+over the two strings [@levenshtein1966binary]; it captures how much one scan
+*order* must be rewritten to match the other and is robust to small local
+insertions a fixed alignment would punish. We report both the raw edit count and a length-normalised version
 (distance divided by the longer string's length) so paths of unequal length are
 comparable, and an empty-versus-empty comparison returns distance zero.
 
@@ -78,15 +78,16 @@ sub-patterns. Each scanpath is turned into a vector of n-gram counts over its
 direction string — reusing `encoding.ngram_counts` — and the two vectors are
 compared by cosine similarity over their shared vocabulary, giving a value in
 $[0, 1]$ that is high when two recordings share the same characteristic short
-sequences regardless of where they occur. Either vector being empty (a recording
-with fewer than $n$ saccades) yields a defined similarity of zero rather than a
-division by zero.
+sequences regardless of where they occur, following the vector-space comparison
+logic used in information retrieval [@salton1975vector]. Either vector being
+empty (a recording with fewer than $n$ saccades) yields a defined similarity of
+zero rather than a division by zero.
 
 The **transition matrix** is the raw material both similarities are built to
 summarise: the first-order count (or row-normalised probability) of moving from
 each direction symbol to each next one, the same construction that underlies the
 direction-transition entropy of [@sec:diststats] and the generative,
-information-theoretic view of scanpaths [@boccignone2011generative]. Exposing the
+information-theoretic view of scanpaths [@boccignone2004gaze]. Exposing the
 matrix directly lets an analyst inspect *which* transitions drive a similarity or
 entropy value rather than trusting the scalar, and the row-normalised form is
 guaranteed to be a proper stochastic matrix or an all-zero row for an unobserved

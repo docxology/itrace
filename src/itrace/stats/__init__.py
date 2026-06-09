@@ -9,8 +9,11 @@ from __future__ import annotations
 from . import (
     bootstrap,
     descriptive,
+    diagnostics,
     distributions,
     events,
+    evidence,
+    range_bridge,
     scanpath_metrics,
     similarity,
     timeseries,
@@ -24,6 +27,7 @@ from .descriptive import (
     session_statistics,
     summarize_report,
 )
+from .diagnostics import DEFAULT_DIAGNOSTIC_FAMILIES, session_statistical_diagnostics
 from .distributions import (
     FAMILIES,
     FitResult,
@@ -33,6 +37,14 @@ from .distributions import (
     frozen_from_result,
 )
 from .events import event_prf, interval_overlap_s
+from .evidence import (
+    build_statistical_interpretation_ledger,
+    load_statistical_interpretation_ledger,
+)
+from .range_bridge import (
+    build_synthetic_empirical_range_bridge,
+    load_synthetic_empirical_range_bridge,
+)
 from .scanpath_metrics import (
     bcea,
     convex_hull_area,
@@ -63,6 +75,7 @@ from .timeseries import (
 )
 
 __all__ = [
+    "DEFAULT_DIAGNOSTIC_FAMILIES",
     "FAMILIES",
     "FitResult",
     "bcea",
@@ -70,16 +83,20 @@ __all__ = [
     "blink_rate_hz",
     "bootstrap",
     "bootstrap_statistic",
+    "build_statistical_interpretation_ledger",
+    "build_synthetic_empirical_range_bridge",
     "coefficient_of_variation",
     "compare_distributions",
     "convex_hull_area",
     "describe",
     "descriptive",
+    "diagnostics",
     "direction_transition_entropy",
     "distributions",
     "event_prf",
     "event_rate",
     "events",
+    "evidence",
     "fit_distribution",
     "fixation_position_entropy",
     "fixation_rate_series",
@@ -90,17 +107,21 @@ __all__ = [
     "gaze_path_length",
     "interval_overlap_s",
     "levenshtein",
+    "load_statistical_interpretation_ledger",
+    "load_synthetic_empirical_range_bridge",
     "main_sequence_exponent_ci",
     "microsaccade_rate_hz",
     "ngram_cosine",
     "normalized_levenshtein",
     "percentile_interval",
+    "range_bridge",
     "raw_gaze_spatial_summary",
     "saccade_rate_series",
     "saccade_summary",
     "scanpath_metrics",
     "scanpath_similarity",
     "scanpath_summary",
+    "session_statistical_diagnostics",
     "session_statistics",
     "shannon_entropy",
     "similarity",

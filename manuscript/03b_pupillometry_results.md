@@ -6,7 +6,10 @@ underlying sine away from the blink window — the blink is bridged, not
 fabricated. A fully-invalid trace is reported as unusable rather than silently
 flattened, so a recording the camera never resolved cannot masquerade as a flat
 pupil. These are recovery checks against a known generator, not statements about
-pupil-size accuracy on a real eye ([@sec:limitations]).
+pupil-size accuracy on a real eye ([@sec:limitations]). That distinction matters
+because the pure pupil pipeline can verify blink handling, interpolation, phase
+causality, and unit propagation even when the live webcam pupil proxy remains a
+relative image-derived signal.
 
 The causal phase detector labels peaks within a two-sample window of the analytic
 sine maxima, and the online-equals-offline-prefix test confirms it consults no
@@ -17,4 +20,4 @@ match the number of sine cycles in the trace, the coarsest sanity bound on the
 detector. Saccade direction distributions over the same synthetic sessions are
 summarised as polar histograms ([@fig:polar]).
 
-![Saccade direction distribution over the synthetic multi-saccade recording. The polar convention is printed in the figure (0° = right, +90° = up), bars encode counts over 16 angular bins, and the orange resultant vector summarises directional balance.](../output/figures/direction_polar.png){#fig:polar width=75%}
+![Saccade direction distribution over the synthetic multi-saccade recording. The polar convention is printed in the figure (0° = right, +90° = up), bars encode counts over 16 angular bins, and the orange resultant vector summarises directional balance. The panel verifies the package-wide direction convention and recovered event directions on synthetic data; it does not infer natural viewing bias.](../output/figures/direction_polar.png){#fig:polar width=75%}

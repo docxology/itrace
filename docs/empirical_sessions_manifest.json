@@ -1,0 +1,105 @@
+{
+  "kind": "itrace_empirical_sessions_manifest",
+  "version": 1,
+  "truth_boundary": "Prompted webcam sessions estimate session-specific operating scale; v1 device-level accuracy requires reference-device, public-dataset, or manual-annotation evidence.",
+  "storage_boundary": "Derived gaze/pupil/capture records and summary reports only; raw eye video and persisted eye-crop images are not written by the default workflow.",
+  "design_scope": "single_participant_single_device_repeated_sessions",
+  "scope_boundary": "This empirical ledger is intentionally scoped to one participant and one device with repeated sessions across conditions. It can support within-participant/device repeatability claims, but not population generality, cross-device generality, or reference-device accuracy without independent reference-backed evidence.",
+  "v1_readiness_criteria": {
+    "min_available_sessions": 5,
+    "min_replicates": 5,
+    "min_participants": 1,
+    "min_devices": 1,
+    "min_conditions": 2,
+    "requires_reference_evidence": false
+  },
+  "future_validation_scope": {
+    "purpose": "Future validation expansion beyond the five-session diagnostic v1; not required for current diagnostic readiness.",
+    "target_available_sessions": 12,
+    "target_replicates": 12,
+    "target_conditions": 3,
+    "condition_targets": [
+      "indoor_office_daylight",
+      "indoor_office_dim",
+      "indoor_office_backlit"
+    ],
+    "requires_reference_evidence": true,
+    "reference_lanes": [
+      "manual_annotation",
+      "public_dataset",
+      "reference_device"
+    ]
+  },
+  "sessions": [
+    {
+      "session_id": "local_pilot_001",
+      "status": "available",
+      "participant_id": "P001",
+      "device_id": "macbook_builtin_webcam_001",
+      "session_group": "P001_macbook_builtin_webcam_001",
+      "replicate_id": "R001",
+      "condition": "indoor_office_daylight",
+      "protocol_id": "derived_eye_video_v1",
+      "consent_scope": "derived_records_only",
+      "reference_kind": "none",
+      "report": "output/empirical_pilot/local_pilot_001/experiment/experiment_report.json",
+      "notes": "N=1 prompted diagnostic session; no reference eye-tracker, public dataset, or manual annotation."
+    },
+    {
+      "session_id": "local_pilot_002",
+      "status": "available",
+      "participant_id": "P001",
+      "device_id": "macbook_builtin_webcam_001",
+      "session_group": "P001_macbook_builtin_webcam_001",
+      "replicate_id": "R002",
+      "condition": "indoor_office_daylight",
+      "protocol_id": "derived_eye_video_v1",
+      "consent_scope": "derived_records_only",
+      "reference_kind": "none",
+      "report": "output/empirical_pilot/local_pilot_002/experiment/experiment_report.json",
+      "notes": "N=1 prompted diagnostic replicate; no reference eye-tracker, public dataset, or manual annotation."
+    },
+    {
+      "session_id": "local_pilot_003",
+      "status": "available",
+      "participant_id": "P001",
+      "device_id": "macbook_builtin_webcam_001",
+      "session_group": "P001_macbook_builtin_webcam_001",
+      "replicate_id": "R003",
+      "condition": "indoor_office_dim",
+      "protocol_id": "derived_eye_video_v1",
+      "consent_scope": "derived_records_only",
+      "reference_kind": "none",
+      "report": "output/empirical_pilot/local_pilot_003/experiment/experiment_report.json",
+      "notes": "Auto-recorded prompted diagnostic session; no reference eye-tracker, public dataset, or manual annotation unless reference_kind says otherwise."
+    },
+    {
+      "session_id": "local_pilot_004",
+      "status": "available",
+      "participant_id": "P001",
+      "device_id": "macbook_builtin_webcam_001",
+      "session_group": "P001_macbook_builtin_webcam_001",
+      "replicate_id": "R004",
+      "condition": "indoor_office_dim",
+      "protocol_id": "derived_eye_video_v1",
+      "consent_scope": "derived_records_only",
+      "reference_kind": "none",
+      "report": "output/empirical_pilot/local_pilot_004/experiment/experiment_report.json",
+      "notes": "Auto-recorded prompted diagnostic session; no reference eye-tracker, public dataset, or manual annotation unless reference_kind says otherwise."
+    },
+    {
+      "session_id": "local_pilot_005",
+      "status": "available",
+      "participant_id": "P001",
+      "device_id": "macbook_builtin_webcam_001",
+      "session_group": "P001_macbook_builtin_webcam_001",
+      "replicate_id": "R005",
+      "condition": "indoor_office_dim",
+      "protocol_id": "derived_eye_video_v1",
+      "consent_scope": "derived_records_only",
+      "reference_kind": "none",
+      "report": "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json",
+      "notes": "Auto-recorded prompted diagnostic session; no reference eye-tracker, public dataset, or manual annotation unless reference_kind says otherwise."
+    }
+  ]
+}

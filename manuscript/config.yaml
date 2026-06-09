@@ -5,8 +5,7 @@ author:
     orcid: "0000-0001-6232-9096"
     affiliations:
       - "Active Inference Institute"
-      - "FractAI"
-date: "2026-05-29"
+date: "June 9, 2026"
 abstract-from-file: 00_abstract.md
 
 bibliography: references.bib
@@ -15,11 +14,11 @@ link-citations: true
 number-sections: true
 citation-style: natbib
 
-# Page + link styling (template conventions): tight 0.5in margins and red
+# Page + link styling (template conventions): tight 0.42in margins and red
 # hyperlinks / citations / cross-references. render_manuscript.py mirrors these
 # as pandoc -V flags for the working standalone render.
 geometry:
-  - margin=0.5in
+  - margin=0.42in
 colorlinks: true
 linkcolor: red
 citecolor: red

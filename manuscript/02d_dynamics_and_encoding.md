@@ -15,9 +15,9 @@ determination. A physiological oculomotor system gives an exponent $b$ of roughl
 
 ## Scanpath encoding
 
-Saccade sequences are encoded as direction characters following the
-eye-movements-as-biometrics convention: `R`/`L`/`U`/`D` for the nearest cardinal,
-upper-case for long saccades and lower-case for short ones relative to a length
-threshold. N-gram statistics over the resulting string characterise habitual scan
-patterns and support anomaly detection, connecting the low-level signal to
-higher-level behavioural analysis without leaving the pure core.
+Saccade sequences are encoded as direction characters as an implementation-level
+summary: `R`/`L`/`U`/`D` for the nearest cardinal, upper-case for long saccades
+and lower-case for short ones relative to a length threshold. N-gram statistics
+over the resulting string give a compact order-sensitive descriptor for package
+reports and tests without claiming biometric identification or anomaly-detection
+performance.

@@ -9,12 +9,15 @@ package never requires any optional (hardware/dashboard) dependency.
 from __future__ import annotations
 
 from . import (
+    benchmark,
     calibration,
     capture,
     config,
     dashboard,
     detection,
+    empirical,
     encoding,
+    experiments,
     eyemodel,
     geometry,
     io,
@@ -23,6 +26,7 @@ from . import (
     power,
     pupil,
     pupilphase,
+    pupilseg,
     reporting,
     saccades,
     scene,
@@ -34,7 +38,9 @@ from . import (
 from .pupilphase import Phase, PhaseDetector
 from .types import (
     PSO,
+    BinocularGazeSample,
     EventType,
+    EyeGazeDiagnostic,
     Fixation,
     GazeSample,
     GazeStream,
@@ -50,7 +56,9 @@ from .version import __version__
 
 __all__ = [
     "PSO",
+    "BinocularGazeSample",
     "EventType",
+    "EyeGazeDiagnostic",
     "Fixation",
     "GazeSample",
     "GazeStream",
@@ -64,12 +72,15 @@ __all__ = [
     "SessionReport",
     "SmoothPursuit",
     "__version__",
+    "benchmark",
     "calibration",
     "capture",
     "config",
     "dashboard",
     "detection",
+    "empirical",
     "encoding",
+    "experiments",
     "eyemodel",
     "geometry",
     "io",
@@ -78,6 +89,7 @@ __all__ = [
     "power",
     "pupil",
     "pupilphase",
+    "pupilseg",
     "reporting",
     "saccades",
     "scene",

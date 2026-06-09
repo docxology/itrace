@@ -15,7 +15,17 @@ rasters and pupil power-spectra.
 
 from __future__ import annotations
 
-from . import dashboard, distributions, gallery, scanpath, spatial, timeline, traces
+from . import (
+    dashboard,
+    distributions,
+    evidence,
+    gallery,
+    scanpath,
+    spatial,
+    statistics,
+    timeline,
+    traces,
+)
 from .dashboard import render_dashboard, session_dashboard
 from .distributions import (
     figure_amplitude_histogram,
@@ -26,6 +36,7 @@ from .distributions import (
     plot_main_sequence,
     plot_main_sequence_residuals,
 )
+from .evidence import figure_statistical_interpretation_ledger
 from .scanpath import (
     figure_microsaccades,
     figure_scanpath,
@@ -42,6 +53,7 @@ from .spatial import (
     gaze_density,
     plot_aoi_dwell,
 )
+from .statistics import figure_statistical_diagnostics
 from .timeline import (
     figure_event_raster,
     figure_pupil_psd,
@@ -61,6 +73,7 @@ __all__ = [
     "assign_aoi",
     "dashboard",
     "distributions",
+    "evidence",
     "figure_amplitude_histogram",
     "figure_aoi",
     "figure_duration_histogram",
@@ -73,6 +86,8 @@ __all__ = [
     "figure_pupil_trace",
     "figure_rate",
     "figure_scanpath",
+    "figure_statistical_diagnostics",
+    "figure_statistical_interpretation_ledger",
     "figure_velocity_trace",
     "fixation_heatmap",
     "gallery",
@@ -95,6 +110,7 @@ __all__ = [
     "scanpath",
     "session_dashboard",
     "spatial",
+    "statistics",
     "timeline",
     "traces",
 ]

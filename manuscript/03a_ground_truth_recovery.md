@@ -4,10 +4,13 @@ The first question for any detector is whether it recovers events it could not
 have peeked at. Every trace in this section is synthetic: a generator builds the
 signal *and* returns the parameters used to build it, so the recovered numbers
 are checked against truth held out by construction. None of these results speak
-to real-eye accuracy, which remains the device-validation gap of
-[@sec:limitations].
+to real-eye accuracy, which remains the device validation gap of
+[@sec:limitations]. They do, however, expose the kinds of implementation errors
+that matter before hardware is involved: time-unit mistakes, coordinate sign
+flips, threshold off-by-one boundaries, and accidental smoothing choices that
+move event onsets.
 
-On a synthetic fixation→saccade→fixation trace at \SI{250}{\hertz}, the I-VT
+On a synthetic fixation→saccade→fixation trace at 250 Hz, the I-VT
 detector [@salvucci2000identifying] recovers exactly one saccade bracketed by two
 fixations; the recovered amplitude matches the constructed {{DEMO_AMPLITUDE}}° to
 within 5% and peak velocity to within 10% across the test grid. The min-jerk
@@ -28,4 +31,4 @@ than a fitted claim. The main-sequence fit recovers the saturating $V_{\max}$ an
 $C$ of a synthetic relationship [@bahill1975main] to within 10% and returns a
 power-law exponent inside the physiological 0.4–0.9 range ([@fig:mainseq]).
 
-![Main-sequence recovery from a synthetic multi-amplitude recording. Panel A plots detected saccades by amplitude, peak velocity, and direction, with the fitted saturating curve and recovered parameters. Panel B repeats the same detections on log-log axes with the fitted power law, making the exponent and goodness-of-fit explicit.](../output/figures/main_sequence.png){#fig:mainseq width=100%}
+![Main-sequence recovery from a synthetic multi-amplitude recording. Panel A plots detected saccades by amplitude, peak velocity, and direction, with the fitted saturating curve and recovered parameters. Panel B repeats the same detections on log-log axes with the fitted power law, making the exponent and goodness-of-fit explicit. The evidence is recovery of a seeded synthetic relationship and detector property extraction; it is not a physiological population estimate or real-device validation.](../output/figures/main_sequence.png){#fig:mainseq width=100%}

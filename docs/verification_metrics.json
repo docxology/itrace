@@ -1,0 +1,18 @@
+{
+  "version": "0.4.1",
+  "gate_date": "2026-06-09",
+  "test_count": 528,
+  "coverage_pct": "90.23%",
+  "demo_amplitude": "10",
+  "repository": "https://github.com/docxology/itrace",
+  "license": "MIT",
+  "doi_version": "10.5281/zenodo.20614027",
+  "doi_concept": "10.5281/zenodo.20614026",
+  "pytest_summary": "528 passed, 2 warnings",
+  "coverage_summary": "Required test coverage of 90.0% reached. Total coverage: 90.23%",
+  "ruff_format_summary": "121 files already formatted",
+  "ruff_check_summary": "All checks passed!",
+  "mypy_summary": "Success: no issues found in 56 source files",
+  "lock_summary": "Resolved 105 packages",
+  "render_summary": "cover visual, graphical abstract, manuscript source, Markdown, text, LaTeX, and PDF are regenerated from current metrics"
+}

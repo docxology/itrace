@@ -12,11 +12,15 @@ import pytest
 
 from itrace import capture, cli, io
 from itrace.capture import CaptureSample
-from itrace.types import GazeSample, PupilUnit
+from itrace.types import BinocularGazeSample, GazeSample, PupilUnit
 
 
 def _landmarks_with_iris(offset_x: float) -> np.ndarray:
     """Build a (478, 3) normalised landmark array; right iris shifted by offset_x."""
+    return _landmarks_with_per_eye_iris(offset_x, offset_x)
+
+
+def _landmarks_with_per_eye_iris(right_offset_x: float, left_offset_x: float) -> np.ndarray:
     lm = np.full((478, 3), 0.5, dtype=np.float64)
     # right eye corners (33 outer, 133 inner) define the half-width
     lm[33] = (0.40, 0.50, 0.0)
@@ -26,9 +30,9 @@ def _landmarks_with_iris(offset_x: float) -> np.ndarray:
     eye_center_x = 0.45
     iris_offsets = [(0.0, 0.0), (0.01, 0.0), (-0.01, 0.0), (0.0, 0.01), (0.0, -0.01)]
     for idx, (dx, dy) in zip(capture.RIGHT_IRIS, iris_offsets, strict=True):
-        lm[idx] = (eye_center_x + offset_x + dx, 0.50 + dy, 0.0)
+        lm[idx] = (eye_center_x + right_offset_x + dx, 0.50 + dy, 0.0)
     for idx, (dx, dy) in zip(capture.LEFT_IRIS, iris_offsets, strict=True):
-        lm[idx] = (0.55 + offset_x + dx, 0.50 + dy, 0.0)
+        lm[idx] = (0.55 + left_offset_x + dx, 0.50 + dy, 0.0)
     return lm
 
 
@@ -51,6 +55,22 @@ def test_iris_landmarks_to_pupil_sample_is_relative_proxy() -> None:
     assert pupil.t == 0.2
     assert pupil.unit is PupilUnit.RELATIVE
     assert pupil.size > 0.0
+
+
+def test_iris_landmarks_to_binocular_sample_exposes_per_eye_diagnostics() -> None:
+    sample = capture.iris_landmarks_to_binocular_sample(
+        _landmarks_with_per_eye_iris(0.02, -0.01),
+        t=0.25,
+    )
+
+    assert isinstance(sample, BinocularGazeSample)
+    assert sample.t == sample.gaze.t == 0.25
+    assert sample.right.eye == "right"
+    assert sample.left.eye == "left"
+    assert sample.right.yaw_deg > sample.left.yaw_deg
+    assert sample.vergence_x_deg > 0.0
+    assert sample.asymmetry_deg > 0.0
+    assert sample.pupil_proxy_relative > 0.0
 
 
 def test_landmarks_to_capture_sample_carries_quality() -> None:
@@ -199,3 +219,4 @@ def test_webcam_source_construction_errors_without_deps() -> None:  # ISC-44
 def test_capture_exposes_frame_interface() -> None:  # ISC-45
     assert hasattr(capture.WebcamSource, "frames")
     assert callable(capture.iris_landmarks_to_sample)
+    assert callable(capture.iris_landmarks_to_binocular_sample)

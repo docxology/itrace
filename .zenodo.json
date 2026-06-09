@@ -1,0 +1,34 @@
+{
+  "upload_type": "software",
+  "title": "iTrace: verification-first webcam eye-movement analysis",
+  "creators": [
+    {
+      "name": "Friedman, Daniel Ari",
+      "affiliation": "Active Inference Institute",
+      "orcid": "0000-0001-6232-9096"
+    }
+  ],
+  "description": "iTrace is an MIT-licensed Python toolkit for webcam-derived gaze, saccade, pupil, and quality diagnostics. Version 0.4.1 is a diagnostic v1 release: the pure NumPy/SciPy core is algorithmically verified against synthetic and closed-loop oracles, the optional webcam shell exports derived records, and the empirical ledger covers a single-participant, single-device, five-session diagnostic pilot. This release does not claim reference-device accuracy, cross-device generality, population generality, or webcam-accuracy validation.",
+  "access_right": "open",
+  "license": "mit",
+  "version": "0.4.1",
+  "publication_date": "2026-06-09",
+  "language": "eng",
+  "keywords": [
+    "eye-tracking",
+    "webcam",
+    "gaze",
+    "saccades",
+    "pupillometry",
+    "open-source",
+    "diagnostic-pilot"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/docxology/itrace",
+      "relation": "isSupplementTo",
+      "scheme": "url",
+      "resource_type": "software"
+    }
+  ]
+}

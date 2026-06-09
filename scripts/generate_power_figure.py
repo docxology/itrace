@@ -14,6 +14,7 @@ and gridlines + larger fonts aid low-vision reading.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import matplotlib
@@ -23,7 +24,7 @@ import matplotlib.pyplot as plt
 
 from itrace import power
 from itrace.power import MetricCurve, NoiseSweepResult
-from itrace.viz.palette import FONT_FLOOR, WONG, apply_house_style
+from itrace.viz.palette import WONG, apply_house_style, result_box
 
 # Single-source palette + house style (readable font floor, white bg, clean
 # spines) shared with every iTrace figure.
@@ -43,6 +44,11 @@ Y_LABEL = {
     "pupil_corr": "Pearson r (higher is better)",
 }
 IMAGE_WIDTH_PX = 640.0
+THRESHOLD_BOUNDS = {
+    "gaze_rms_2deg": ("gaze_rms_deg", BOUND["gaze_rms_deg"]),
+    "saccade_f1_0_8": ("saccade_f1", BOUND["saccade_f1"]),
+    "pupil_corr_0_9": ("pupil_corr", BOUND["pupil_corr"]),
+}
 
 
 def _panel(ax, curve: MetricCurve, style: dict[str, str], bound: float, panel_label: str) -> None:
@@ -65,16 +71,18 @@ def _panel(ax, curve: MetricCurve, style: dict[str, str], bound: float, panel_la
     if thr is not None:
         ax.axvline(thr, color="0.35", ls=":", lw=1.2)
         px = power.sigma_to_pixels(thr, IMAGE_WIDTH_PX)
-        ax.annotate(
+        result_box(
+            ax,
             f"bound crossing\nsigma={thr:.4f}\n~{px:.1f} px",
+            xy=(0.54, 0.78),
+            color=str(style["color"]),
+        )
+        ax.annotate(
+            "",
             xy=(thr, bound),
             xycoords="data",
             xytext=(0.54, 0.78),
             textcoords="axes fraction",
-            ha="left",
-            va="top",
-            fontsize=FONT_FLOOR,
-            bbox={"boxstyle": "round,pad=0.3", "fc": "white", "ec": "0.75", "alpha": 0.92},
             arrowprops={"arrowstyle": "->", "color": "0.35", "lw": 1.0},
         )
     ax.set_title(title)
@@ -102,7 +110,7 @@ def generate_power_figure(
 ) -> Path:
     """Render the accessible 3-panel noise-sensitivity figure."""
     res = res or power.run_noise_sweep(n_trials=n_trials)
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4.9), constrained_layout=True)
+    fig, axes = plt.subplots(3, 1, figsize=(8.4, 11.0), constrained_layout=True)
     for ax, metric, label in zip(axes, STYLE, ("A", "B", "C"), strict=True):
         _panel(ax, res.curve(metric), STYLE[metric], BOUND[metric], label)
     fig.suptitle(
@@ -128,10 +136,44 @@ def write_summary_table(
     return path
 
 
+def write_noise_metrics(
+    out_dir: Path, res: NoiseSweepResult | None = None, n_trials: int = 25
+) -> Path:
+    """Write structured noise-sweep sidecar metrics used by figures and prose."""
+    res = res or power.run_noise_sweep(n_trials=n_trials)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    thresholds: dict[str, dict[str, float | None]] = {}
+    for key, (metric, bound) in THRESHOLD_BOUNDS.items():
+        crossing = power.recovery_threshold(res.curve(metric), bound)
+        thresholds[key] = {
+            "metric": metric,
+            "bound": float(bound),
+            "sigma_normalised": crossing,
+            "pixels_at_640": None
+            if crossing is None
+            else power.sigma_to_pixels(crossing, IMAGE_WIDTH_PX),
+        }
+    payload = {
+        "kind": "itrace_noise_sweep_metrics",
+        "image_width_px": IMAGE_WIDTH_PX,
+        "n_trials": res.n_trials,
+        "noise_levels": res.noise_levels,
+        "thresholds": thresholds,
+        "records": power.summary_records(res, IMAGE_WIDTH_PX),
+    }
+    path = out_dir / "noise_metrics.json"
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
 def main() -> list[Path]:
     out_dir = Path(__file__).resolve().parent.parent / "output" / "figures"
     res = power.run_noise_sweep(n_trials=25)
-    paths = [generate_power_figure(out_dir, res), write_summary_table(out_dir, res)]
+    paths = [
+        generate_power_figure(out_dir, res),
+        write_summary_table(out_dir, res),
+        write_noise_metrics(out_dir, res),
+    ]
     for p in paths:
         print(f"wrote {p}")
     return paths

@@ -105,3 +105,17 @@ def test_empty_and_short_streams() -> None:
     assert saccades.detect_ivt(empty) == ([], [])
     assert saccades.detect_idt(empty) == []
     assert saccades.detect_microsaccades(empty) == []
+
+
+def test_detect_ivt_rejects_invalid_threshold_and_duration_knobs() -> None:
+    stream, _ = gaze_with_saccade(amplitude_deg=8.0)
+    with pytest.raises(ValueError, match="velocity_threshold"):
+        saccades.detect_ivt(stream, velocity_threshold_deg_s=-1.0)
+    with pytest.raises(ValueError, match="min_saccade_duration"):
+        saccades.detect_ivt(stream, min_saccade_duration_s=-0.001)
+    with pytest.raises(ValueError, match="merge_gap"):
+        saccades.detect_ivt(stream, merge_gap_s=-0.001)
+    with pytest.raises(ValueError, match="min_inter_event_gap"):
+        saccades.detect_ivt(stream, min_inter_event_gap_s=-0.001)
+    with pytest.raises(ValueError, match="max_saccade_duration"):
+        saccades.detect_ivt(stream, max_saccade_duration_s=0.0)

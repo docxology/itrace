@@ -4,7 +4,7 @@ The geometry layer turns raw image measurements into calibrated quantities in
 degrees of visual angle (dva). Pixel offsets from screen centre are converted by
 the exact relation
 
-$$ \theta = \arctan\!\left(\frac{s_{\mathrm{cm}}}{d_{\mathrm{cm}}}\right) $$ {#eq:pix2deg}
+$$ \theta = \arctan(s_\text{cm} / d_\text{cm}) $$ {#eq:pix2deg}
 
 where $s_{\mathrm{cm}}$ is the offset in centimetres (pixels times the screen's
 cm-per-pixel) and $d_{\mathrm{cm}}$ the viewing distance. The inverse of

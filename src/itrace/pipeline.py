@@ -8,6 +8,7 @@ main-sequence parameters, an encoded scanpath, and pupil summary statistics.
 from __future__ import annotations
 
 from contextlib import suppress
+from dataclasses import replace
 
 import numpy as np
 
@@ -39,31 +40,23 @@ def _resolve_analysis_config(
 def _detect_events(
     stream: GazeStream, cfg: DetectionConfig
 ) -> tuple[list[Fixation], list[Saccade], float]:
-    if cfg.method == "adaptive_ivt":
-        threshold = detection.adaptive_ivt_threshold(
+    threshold = (
+        detection.adaptive_ivt_threshold(
             stream,
             lambda_factor=cfg.adaptive_lambda_factor,
         )
-        fixations, saccs = saccades.detect_ivt(
-            stream,
-            velocity_threshold_deg_s=threshold,
-            min_saccade_duration_s=cfg.min_saccade_duration_s,
-            merge_gap_s=cfg.merge_gap_s,
-            min_inter_event_gap_s=cfg.min_inter_event_gap_s,
-            max_saccade_duration_s=cfg.max_saccade_duration_s,
-            reject_edge_events=cfg.reject_edge_events,
-        )
-    else:
-        threshold = cfg.velocity_threshold_deg_s
-        fixations, saccs = saccades.detect_ivt(
-            stream,
-            velocity_threshold_deg_s=cfg.velocity_threshold_deg_s,
-            min_saccade_duration_s=cfg.min_saccade_duration_s,
-            merge_gap_s=cfg.merge_gap_s,
-            min_inter_event_gap_s=cfg.min_inter_event_gap_s,
-            max_saccade_duration_s=cfg.max_saccade_duration_s,
-            reject_edge_events=cfg.reject_edge_events,
-        )
+        if cfg.method == "adaptive_ivt"
+        else cfg.velocity_threshold_deg_s
+    )
+    fixations, saccs = saccades.detect_ivt(
+        stream,
+        velocity_threshold_deg_s=threshold,
+        min_saccade_duration_s=cfg.min_saccade_duration_s,
+        merge_gap_s=cfg.merge_gap_s,
+        min_inter_event_gap_s=cfg.min_inter_event_gap_s,
+        max_saccade_duration_s=cfg.max_saccade_duration_s,
+        reject_edge_events=cfg.reject_edge_events,
+    )
     return fixations, saccs, threshold
 
 
@@ -229,5 +222,5 @@ def analyze_session(
     )
     if pupil_stream is not None and len(pupil_stream) > 0:
         pupil_cfg = config.pupil if config is not None else None
-        object.__setattr__(report, "pupil", analyze_pupil(pupil_stream, pupil_cfg))
+        return replace(report, pupil=analyze_pupil(pupil_stream, pupil_cfg))
     return report

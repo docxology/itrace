@@ -12,7 +12,7 @@ replacement, take the mean of each, and read the 2.5th and 97.5th percentiles of
 the resampled means.
 
 We deliberately avoid a symmetric Student-$t$ interval
-$\bar{x} \pm t_{0.975,n-1}\,s/\sqrt{n}$ here because two of the three metrics are
+`xbar +/- t_(0.975,n-1) * s / sqrt(n)` here because two of the three metrics are
 **bounded** — saccade F1 $\in [0,1]$ and pupil correlation $\in [-1,1]$ — and at
 low noise both sit near 1.0, exactly where a symmetric interval can extend past
 the bound and report a nonsensical value above 1. A percentile of resampled means

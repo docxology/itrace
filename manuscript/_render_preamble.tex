@@ -5,6 +5,8 @@
 % working/ standalone render faithful.)
 \usepackage{siunitx}
 \usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
 \usepackage{newunicodechar}
 \newunicodechar{σ}{\ensuremath{\sigma}}
 \newunicodechar{λ}{\ensuremath{\lambda}}
@@ -23,3 +25,31 @@
 \newunicodechar{–}{--}
 \newunicodechar{—}{---}
 \newunicodechar{≠}{\ensuremath{\neq}}
+
+\AtBeginDocument{\fontsize{9.4pt}{11.2pt}\selectfont}
+
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+    \centering
+    \vspace*{0.02\textheight}
+    {\fontsize{25pt}{29pt}\selectfont\bfseries\@title\par}
+    \vspace{0.028\textheight}
+    {\fontsize{12.5pt}{15pt}\selectfont\@author\par}
+    \vspace{0.012\textheight}
+    {\fontsize{10.5pt}{12.5pt}\selectfont\color{gray}\@date\par}
+    \vfill
+    \IfFileExists{output/figures/cover_visual.png}{%
+      \includegraphics[width=0.92\linewidth,height=0.48\textheight,keepaspectratio]{output/figures/cover_visual.png}%
+    }{%
+      \fbox{\parbox[c][0.40\textheight][c]{0.86\linewidth}{\centering iTrace cover visual missing}}%
+    }
+    \vfill
+    {\fontsize{10pt}{12pt}\selectfont
+    Algorithmically verified gaze, saccade, and pupil analysis with a pure core,
+    optional webcam capture, and bounded live empirical diagnostics.\par}
+    \vspace*{0.03\textheight}
+  \end{titlepage}
+}
+\makeatother

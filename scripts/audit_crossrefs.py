@@ -3,18 +3,18 @@
 Oracle for the manuscript review pass: enumerates every label, cross-reference,
 and citation across the renderable modules and reports
   - cross-references with no matching label (would render as "??"),
-  - labels that are never referenced (dead anchors),
+  - figure labels that are never referenced (dead figure anchors),
   - citation keys used but absent from references.bib (build-fatal under
     fail_on_missing), and citation keys defined but never cited.
+  - manual Figure N / Table N prose that bypasses pandoc-crossref.
 
 Run:  uv run python scripts/audit_crossrefs.py
-Exit non-zero if any build-fatal problem (dangling ref or missing citation).
+Exit non-zero if any build-fatal problem is found.
 """
 
 from __future__ import annotations
 
 import re
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,9 +23,11 @@ RENDER_SKIP = {"README.md", "preamble.md"}
 
 LABEL_RE = re.compile(r"\{#((?:sec|fig|tbl|eq):[A-Za-z0-9_:+-]+)")
 XREF_RE = re.compile(r"(?<![A-Za-z0-9_])@((?:sec|fig|tbl|eq):[A-Za-z0-9_:+-]+)")
-# citation keys: @key not followed by a crossref prefix, allowing [@a; @b]
-CITE_RE = re.compile(r"(?<![A-Za-z0-9_])@([A-Za-z][A-Za-z0-9_+-]*[0-9][A-Za-z0-9_+-]*)")
+# citation keys: @key not followed by a crossref prefix, allowing [@a; @b] and
+# digitless keys. This intentionally mirrors tests/test_manuscript_integrity.py.
+CITE_RE = re.compile(r"(?<![A-Za-z0-9_])@([A-Za-z][A-Za-z0-9_:-]+)")
 BIBKEY_RE = re.compile(r"^@[a-zA-Z]+\{([^,]+),", re.MULTILINE)
+MANUAL_NUMBER_RE = re.compile(r"\b(?:Figure|Fig\.|Table)\s+\d+\b")
 
 
 def source_files() -> list[Path]:
@@ -38,13 +40,19 @@ def source_files() -> list[Path]:
 
 def main() -> int:
     labels: dict[str, str] = {}
+    label_locations: dict[str, list[str]] = {}
     xrefs: dict[str, list[str]] = {}
     cites: dict[str, list[str]] = {}
+    manual_numbering: list[str] = []
 
     for path in source_files():
         text = path.read_text(encoding="utf-8")
-        for m in LABEL_RE.finditer(text):
-            labels.setdefault(m.group(1), path.name)
+        for line_no, line in enumerate(text.splitlines(), start=1):
+            for m in LABEL_RE.finditer(line):
+                label = m.group(1)
+                location = f"{path.name}:{line_no}"
+                labels.setdefault(label, location)
+                label_locations.setdefault(label, []).append(location)
         for m in XREF_RE.finditer(text):
             xrefs.setdefault(m.group(1), []).append(path.name)
         for m in CITE_RE.finditer(text):
@@ -52,6 +60,9 @@ def main() -> int:
             if key.split(":", 1)[0] in {"sec", "fig", "tbl", "eq"}:
                 continue
             cites.setdefault(key, []).append(path.name)
+        for line_no, line in enumerate(text.splitlines(), start=1):
+            if MANUAL_NUMBER_RE.search(line):
+                manual_numbering.append(f"{path.name}:{line_no}: {line.strip()}")
 
     bib_text = (MANUSCRIPT / "references.bib").read_text(encoding="utf-8")
     bibkeys = set(BIBKEY_RE.findall(bib_text))
@@ -61,22 +72,44 @@ def main() -> int:
     cite_names = set(cites)
 
     dangling = sorted(xref_names - label_names)
+    duplicate_labels = {
+        label: locations
+        for label, locations in sorted(label_locations.items())
+        if len(locations) > 1
+    }
     dead_labels = sorted(label_names - xref_names)
+    dead_figures = sorted(label for label in dead_labels if label.startswith("fig:"))
     missing_cites = sorted(cite_names - bibkeys)
     uncited = sorted(bibkeys - cite_names)
 
-    print(f"labels={len(label_names)} xrefs={len(xref_names)} "
-          f"cites={len(cite_names)} bibkeys={len(bibkeys)}")
+    print(
+        f"labels={len(label_names)} xrefs={len(xref_names)} "
+        f"cites={len(cite_names)} bibkeys={len(bibkeys)}"
+    )
     print("\n[DANGLING cross-refs] (referenced, no label — renders as ??):")
     print("  " + (", ".join(dangling) if dangling else "none ✓"))
+    print("\n[DUPLICATE labels] (same anchor defined more than once):")
+    if duplicate_labels:
+        print(
+            "  "
+            + "\n  ".join(
+                f"{label}: {', '.join(locations)}" for label, locations in duplicate_labels.items()
+            )
+        )
+    else:
+        print("  none ✓")
     print("\n[DEAD labels] (labelled, never referenced):")
     print("  " + (", ".join(dead_labels) if dead_labels else "none ✓"))
+    print("\n[DEAD figure labels] (labelled figures must be referenced in prose):")
+    print("  " + (", ".join(dead_figures) if dead_figures else "none ✓"))
     print("\n[MISSING citations] (cited, absent from .bib — build-fatal):")
     print("  " + (", ".join(missing_cites) if missing_cites else "none ✓"))
     print("\n[UNCITED bib entries] (in .bib, never cited):")
     print("  " + (", ".join(uncited) if uncited else "none ✓"))
+    print("\n[MANUAL figure/table numbering] (use pandoc-crossref refs instead):")
+    print("  " + ("\n  ".join(manual_numbering) if manual_numbering else "none ✓"))
 
-    fatal = bool(dangling or missing_cites)
+    fatal = bool(dangling or duplicate_labels or dead_figures or missing_cites or manual_numbering)
     print("\nRESULT:", "FAIL" if fatal else "PASS")
     return 1 if fatal else 0
 

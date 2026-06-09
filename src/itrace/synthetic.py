@@ -102,10 +102,15 @@ class SyntheticSessionTruth:
     seed: int
 
 
-def _minimum_jerk(n: int) -> FloatArray:
-    """Normalised minimum-jerk displacement profile in [0, 1] over n samples."""
+def minimum_jerk_profile(n: int) -> FloatArray:
+    """Normalised minimum-jerk displacement profile in [0, 1] over *n* samples."""
     tau = np.linspace(0.0, 1.0, n)
     return cast(FloatArray, 10 * tau**3 - 15 * tau**4 + 6 * tau**5)
+
+
+def _minimum_jerk(n: int) -> FloatArray:
+    """Backward-compatible alias for :func:`minimum_jerk_profile`."""
+    return minimum_jerk_profile(n)
 
 
 def gaze_with_saccade(

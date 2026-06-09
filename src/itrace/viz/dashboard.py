@@ -29,10 +29,9 @@ from .. import pipeline, saccades
 from ..synthetic import gaze_with_saccade, pupil_sine_with_blink
 from ..types import GazeStream, PupilStream, Saccade, SessionReport
 from .distributions import plot_amplitude_histogram, plot_main_sequence
+from .palette import FONT_FLOOR, WONG  # single-source Wong (2011) colour-blind-safe palette
 from .scanpath import plot_scanpath
 from .traces import plot_velocity_trace
-
-from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
 
 
 def _plot_direction_polar(saccs: list[Saccade], ax: Axes) -> None:
@@ -73,7 +72,7 @@ def _plot_summary_text(report: SessionReport, ax: Axes) -> None:
         ha="left",
         va="top",
         family="monospace",
-        fontsize=10,
+        fontsize=FONT_FLOOR,
         transform=ax.transAxes,
     )
 

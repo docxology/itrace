@@ -1,16 +1,19 @@
 # AGENTS.md — iTrace
 
 Working-tree project: a standalone, self-contained `uv` package. Develop and
-test directly here (`uv run pytest tests/`). Not wired into the template
-pipeline until promoted to `active/`.
+test directly here (`uv run pytest tests/`). It is not part of default template
+pipeline discovery; render it explicitly from the sibling template checkout with
+`--project working/iTrace`.
 
 ## Architecture invariants (do not break)
 
 1. **Import safety.** `import itrace` and the entire test suite MUST succeed
    with zero optional dependencies installed. Never add a top-level
-   `import cv2` / `mediapipe` / `streamlit` / `plotly` / `matplotlib` in
-   `src/itrace/`. Hardware/dashboard/figure deps are imported lazily *inside*
-   functions (`capture._require_capture_deps`, `dashboard._require_streamlit`).
+   `import cv2` / `mediapipe` / `streamlit` / `matplotlib` / `fastapi` in
+   `src/itrace/` root modules. Hardware/dashboard/figure/web deps are imported
+   lazily inside functions (`capture._require_capture_deps`,
+   `dashboard._require_streamlit`, `live.server.create_app`). The `viz/`
+   subpackage is matplotlib-gated like `capture/` is OpenCV-gated.
 2. **Pure core vs thin shell.** Everything except `capture.py` (and the
    hardware path of the CLI `record`/`dashboard` commands) is pure NumPy/SciPy
    and must stay unit-testable without a camera. `iris_landmarks_to_sample`
@@ -37,6 +40,8 @@ uv run mypy src/itrace          # --strict (configured in pyproject)
 
 ```
 src/itrace/      pure analysis core + thin capture/dashboard shells + cli
+  capture.py     optional webcam backend + canonical capture I/O helpers
+  live/          local HTML orchestrator (state, analysis, server submodules)
   eyemodel.py    3-D eyeball forward model + pinhole projection → landmarks
   scene.py       animated gaze/pupil trajectory + full closed-loop validation
 tests/           no-mocks suite; tests/fixtures/reference_impl.py = oracle

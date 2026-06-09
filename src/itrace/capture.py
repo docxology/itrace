@@ -18,15 +18,28 @@ MediaPipe Face Mesh (refine_landmarks=True) iris indices default to
 from __future__ import annotations
 
 import base64
+import csv
+import os
 import time
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from pathlib import Path
+from typing import Any, Protocol, runtime_checkable
 
 import numpy as np
 
 from .geometry import iris_offset_to_gaze_angle
-from .types import FloatArray, GazeSample, PupilSample, PupilUnit
+from .types import (
+    BinocularGazeSample,
+    EyeGazeDiagnostic,
+    FloatArray,
+    GazeSample,
+    GazeStream,
+    PupilSample,
+    PupilStream,
+    PupilUnit,
+)
 
 # MediaPipe Face Mesh canonical indices (refine_landmarks=True).
 RIGHT_IRIS = (468, 469, 470, 471, 472)
@@ -73,6 +86,7 @@ class LiveFrameSample:
     eye_crop_jpeg: str
 
 
+@runtime_checkable
 class CaptureBackend(Protocol):
     """Minimal protocol for webcam, video-file, WebRTC, or synthetic backends."""
 
@@ -83,6 +97,81 @@ class CaptureBackend(Protocol):
     def live_frames(self, max_frames: int | None = None) -> Iterable[LiveFrameSample]:
         """Yield capture samples plus eye-crop visual context."""
         ...
+
+
+@contextmanager
+def native_stderr(backend_logs: bool) -> Iterator[None]:
+    """Optionally silence noisy native OpenCV/MediaPipe stderr diagnostics."""
+    if backend_logs:
+        yield
+        return
+    saved = os.dup(2)
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    try:
+        os.dup2(devnull, 2)
+        yield
+    finally:
+        os.dup2(saved, 2)
+        os.close(devnull)
+        os.close(saved)
+
+
+def samples_to_streams(samples: Sequence[CaptureSample]) -> tuple[GazeStream, PupilStream]:
+    """Convert capture samples into aligned gaze and pupil streams."""
+    gaze = GazeStream(
+        t=np.array([sample.gaze.t for sample in samples], dtype=np.float64),
+        x=np.array([sample.gaze.x for sample in samples], dtype=np.float64),
+        y=np.array([sample.gaze.y for sample in samples], dtype=np.float64),
+    )
+    pupil_samples = [sample.pupil for sample in samples if sample.pupil is not None]
+    pupil = PupilStream(
+        t=np.array([sample.t for sample in pupil_samples], dtype=np.float64),
+        size=np.array([sample.size for sample in pupil_samples], dtype=np.float64),
+        unit=pupil_samples[0].unit if pupil_samples else PupilUnit.RELATIVE,
+    )
+    return gaze, pupil
+
+
+def write_capture_records_csv(samples: Sequence[CaptureSample], out: Path) -> Path:
+    """Write full capture records: frame, timing, gaze, pupil proxy, FPS, quality."""
+    quality_keys = sorted({key for sample in samples for key in sample.quality})
+    fieldnames = [
+        "frame_index",
+        "timestamp_s",
+        "gaze_x_deg",
+        "gaze_y_deg",
+        "pupil_size",
+        "pupil_unit",
+        "fps_estimate_hz",
+        *[f"quality_{key}" for key in quality_keys],
+    ]
+    with out.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fieldnames)
+        writer.writeheader()
+        for sample in samples:
+            row: dict[str, object] = {
+                "frame_index": sample.frame_index,
+                "timestamp_s": sample.timestamp_s,
+                "gaze_x_deg": sample.gaze.x,
+                "gaze_y_deg": sample.gaze.y,
+                "pupil_size": sample.pupil.size if sample.pupil is not None else "",
+                "pupil_unit": sample.pupil.unit.value if sample.pupil is not None else "",
+                "fps_estimate_hz": sample.fps_estimate_hz,
+            }
+            row.update({f"quality_{key}": sample.quality.get(key, "") for key in quality_keys})
+            writer.writerow(row)
+    return out
+
+
+@dataclass(frozen=True, slots=True)
+class _WebcamFrame:
+    """One camera frame with optional Face Mesh landmarks."""
+
+    frame: FloatArray
+    frame_index: int
+    timestamp_s: float
+    landmarks: FloatArray | None
+    fps_estimate_hz: float
 
 
 def _landmarks_array(landmarks: FloatArray | list[list[float]]) -> FloatArray:
@@ -196,6 +285,25 @@ def _eye_gaze(
     max_angle_deg: float,
 ) -> tuple[float, float]:
     """Return (yaw_deg, pitch_deg) for one eye from normalised landmarks."""
+    diagnostic = _eye_diagnostic(
+        landmarks,
+        iris_idx,
+        corner_idx,
+        max_angle_deg,
+        eye="eye",
+    )
+    return diagnostic.yaw_deg, diagnostic.pitch_deg
+
+
+def _eye_diagnostic(
+    landmarks: FloatArray,
+    iris_idx: tuple[int, ...],
+    corner_idx: tuple[int, int],
+    max_angle_deg: float,
+    *,
+    eye: str,
+) -> EyeGazeDiagnostic:
+    """Return one eye's gaze and quality-relevant landmark diagnostics."""
     iris = landmarks[list(iris_idx)]
     iris_center = iris.mean(axis=0)
     c0 = landmarks[corner_idx[0]]
@@ -211,7 +319,15 @@ def _eye_gaze(
     # screen-y is down; iris_offset_to_gaze_angle keeps sign, geometry layer
     # negates for direction. Here pitch is returned in the gaze-up convention.
     pitch = float(-iris_offset_to_gaze_angle(offset_y, max_angle_deg))
-    return yaw, pitch
+    radius = float(np.mean(np.linalg.norm(iris[:, :2] - iris_center[:2], axis=1)))
+    return EyeGazeDiagnostic(
+        eye=eye,
+        yaw_deg=yaw,
+        pitch_deg=pitch,
+        iris_offset_x=float(offset_x),
+        iris_offset_y=float(offset_y),
+        pupil_proxy_relative=float(radius / half_width),
+    )
 
 
 def iris_landmarks_to_sample(
@@ -234,6 +350,45 @@ def iris_landmarks_to_sample(
     ryaw, rpitch = _eye_gaze(arr, right_iris, right_corners, max_angle_deg)
     lyaw, lpitch = _eye_gaze(arr, left_iris, left_corners, max_angle_deg)
     return GazeSample(t=t, x=(ryaw + lyaw) / 2.0, y=(rpitch + lpitch) / 2.0)
+
+
+def iris_landmarks_to_binocular_sample(
+    landmarks: FloatArray | list[list[float]],
+    t: float,
+    *,
+    max_angle_deg: float = 25.0,
+    right_iris: tuple[int, ...] = RIGHT_IRIS,
+    left_iris: tuple[int, ...] = LEFT_IRIS,
+    right_corners: tuple[int, int] = RIGHT_EYE_CORNERS,
+    left_corners: tuple[int, int] = LEFT_EYE_CORNERS,
+) -> BinocularGazeSample:
+    """Convert landmarks to binocular gaze plus per-eye diagnostics.
+
+    The binocular estimate remains the mean of the left and right eye estimates,
+    while ``vergence_x_deg`` and ``vertical_disparity_deg`` expose disagreement
+    that callers can use as a quality/confidence signal. This is still purely
+    landmark-based and makes no device-validation claim.
+    """
+    arr = _landmarks_array(landmarks)
+    right = _eye_diagnostic(arr, right_iris, right_corners, max_angle_deg, eye="right")
+    left = _eye_diagnostic(arr, left_iris, left_corners, max_angle_deg, eye="left")
+    gaze = GazeSample(
+        t=t,
+        x=(right.yaw_deg + left.yaw_deg) / 2.0,
+        y=(right.pitch_deg + left.pitch_deg) / 2.0,
+    )
+    vergence_x = right.yaw_deg - left.yaw_deg
+    vertical_disparity = right.pitch_deg - left.pitch_deg
+    return BinocularGazeSample(
+        t=t,
+        gaze=gaze,
+        right=right,
+        left=left,
+        vergence_x_deg=vergence_x,
+        vertical_disparity_deg=vertical_disparity,
+        asymmetry_deg=float(np.hypot(vergence_x, vertical_disparity)),
+        pupil_proxy_relative=(right.pupil_proxy_relative + left.pupil_proxy_relative) / 2.0,
+    )
 
 
 def _iris_radius_over_half_width(
@@ -316,8 +471,11 @@ class WebcamSource:
         self._cv2, mp = _require_capture_deps()
         self._mp_face = mp.solutions.face_mesh.FaceMesh
 
-    def frames(self, max_frames: int | None = None) -> Iterator[CaptureSample]:  # pragma: no cover
-        """Yield timestamped capture samples from the live camera."""
+    def _iter_webcam_frames(
+        self,
+        max_frames: int | None = None,
+    ) -> Iterator[_WebcamFrame]:
+        """Yield camera frames with optional Face Mesh landmarks."""
         cv2 = self._cv2
         cap = cv2.VideoCapture(self.camera_index)  # type: ignore[attr-defined]
         if not cap.isOpened():
@@ -336,25 +494,38 @@ class WebcamSource:
                 if not ok:
                     break
                 t = time.monotonic() - start
+                fps = read_count / t if t > 0.0 else 0.0
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # type: ignore[attr-defined]
                 result = face_mesh.process(rgb)  # type: ignore[attr-defined]
-                if not result.multi_face_landmarks:
-                    continue
-                lm = result.multi_face_landmarks[0].landmark
-                arr = np.array([[p.x, p.y, p.z] for p in lm], dtype=np.float64)
-                yielded += 1
-                fps = yielded / t if t > 0.0 else 0.0
-                yield iris_landmarks_to_capture_sample(
-                    arr,
-                    t=t,
+                landmarks: FloatArray | None = None
+                if result.multi_face_landmarks:
+                    lm = result.multi_face_landmarks[0].landmark
+                    landmarks = np.array([[p.x, p.y, p.z] for p in lm], dtype=np.float64)
+                    yielded += 1
+                yield _WebcamFrame(
+                    frame=frame,
                     frame_index=frame_index,
-                    fps_estimate_hz=fps,
-                    max_angle_deg=self.max_angle_deg,
+                    timestamp_s=t,
+                    landmarks=landmarks,
+                    fps_estimate_hz=yielded / t if landmarks is not None and t > 0.0 else fps,
                 )
         finally:
             cap.release()
             if "face_mesh" in locals():
                 face_mesh.close()
+
+    def frames(self, max_frames: int | None = None) -> Iterator[CaptureSample]:  # pragma: no cover
+        """Yield timestamped capture samples from the live camera."""
+        for webcam_frame in self._iter_webcam_frames(max_frames=max_frames):
+            if webcam_frame.landmarks is None:
+                continue
+            yield iris_landmarks_to_capture_sample(
+                webcam_frame.landmarks,
+                t=webcam_frame.timestamp_s,
+                frame_index=webcam_frame.frame_index,
+                fps_estimate_hz=webcam_frame.fps_estimate_hz,
+                max_angle_deg=self.max_angle_deg,
+            )
 
     def gaze_frames(
         self, max_frames: int | None = None
@@ -372,72 +543,28 @@ class WebcamSource:
     ) -> Iterator[LiveFrameSample]:  # pragma: no cover
         """Yield capture samples with live eye crops for the HTML orchestrator."""
         cv2 = self._cv2
-        cap = cv2.VideoCapture(self.camera_index)  # type: ignore[attr-defined]
-        if not cap.isOpened():
-            msg = f"could not open camera index {self.camera_index}"
-            raise RuntimeError(msg)
-        try:
-            face_mesh_cls = self._mp_face
-            face_mesh = face_mesh_cls(refine_landmarks=True, max_num_faces=1)  # type: ignore[operator]
-            read_count = 0
-            yielded = 0
-            start = time.monotonic()
-            while max_frames is None or read_count < max_frames:
-                ok, frame = cap.read()
-                frame_index = read_count
-                read_count += 1
-                if not ok:
-                    break
-                t = time.monotonic() - start
-                frame_height, frame_width = int(frame.shape[0]), int(frame.shape[1])
-                fps_read = read_count / t if t > 0.0 else 0.0
-                rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # type: ignore[attr-defined]
-                result = face_mesh.process(rgb)  # type: ignore[attr-defined]
-                if not result.multi_face_landmarks:
-                    eye_box = _default_eye_box(frame_width, frame_height)
-                    yield LiveFrameSample(
-                        capture=CaptureSample(
-                            frame_index=frame_index,
-                            timestamp_s=t,
-                            gaze=GazeSample(t=t, x=float("nan"), y=float("nan")),
-                            pupil=PupilSample(
-                                t=t,
-                                size=float("nan"),
-                                unit=PupilUnit.RELATIVE,
-                            ),
-                            fps_estimate_hz=fps_read,
-                            quality={"face_detected": 0.0},
-                        ),
-                        frame_width=frame_width,
-                        frame_height=frame_height,
-                        eye_box=eye_box,
-                        eye_crop_jpeg=encode_eye_crop_jpeg_base64(
-                            frame,
-                            eye_box,
-                            cv2_module=cv2,
-                            jpeg_quality=jpeg_quality,
-                        ),
-                    )
-                    continue
-                lm = result.multi_face_landmarks[0].landmark
-                arr = np.array([[p.x, p.y, p.z] for p in lm], dtype=np.float64)
-                yielded += 1
-                fps = yielded / t if t > 0.0 else 0.0
-                capture = iris_landmarks_to_capture_sample(
-                    arr,
-                    t=t,
-                    frame_index=frame_index,
-                    fps_estimate_hz=fps,
-                    max_angle_deg=self.max_angle_deg,
-                )
-                eye_box = eye_box_from_landmarks(
-                    arr,
-                    frame_width=frame_width,
-                    frame_height=frame_height,
-                    padding_fraction=crop_padding_fraction,
-                )
+        for webcam_frame in self._iter_webcam_frames(max_frames=max_frames):
+            frame = webcam_frame.frame
+            frame_height, frame_width = int(frame.shape[0]), int(frame.shape[1])
+            if webcam_frame.landmarks is None:
+                eye_box = _default_eye_box(frame_width, frame_height)
                 yield LiveFrameSample(
-                    capture=capture,
+                    capture=CaptureSample(
+                        frame_index=webcam_frame.frame_index,
+                        timestamp_s=webcam_frame.timestamp_s,
+                        gaze=GazeSample(
+                            t=webcam_frame.timestamp_s,
+                            x=float("nan"),
+                            y=float("nan"),
+                        ),
+                        pupil=PupilSample(
+                            t=webcam_frame.timestamp_s,
+                            size=float("nan"),
+                            unit=PupilUnit.RELATIVE,
+                        ),
+                        fps_estimate_hz=webcam_frame.fps_estimate_hz,
+                        quality={"face_detected": 0.0},
+                    ),
                     frame_width=frame_width,
                     frame_height=frame_height,
                     eye_box=eye_box,
@@ -448,10 +575,32 @@ class WebcamSource:
                         jpeg_quality=jpeg_quality,
                     ),
                 )
-        finally:
-            cap.release()
-            if "face_mesh" in locals():
-                face_mesh.close()
+                continue
+            capture = iris_landmarks_to_capture_sample(
+                webcam_frame.landmarks,
+                t=webcam_frame.timestamp_s,
+                frame_index=webcam_frame.frame_index,
+                fps_estimate_hz=webcam_frame.fps_estimate_hz,
+                max_angle_deg=self.max_angle_deg,
+            )
+            eye_box = eye_box_from_landmarks(
+                webcam_frame.landmarks,
+                frame_width=frame_width,
+                frame_height=frame_height,
+                padding_fraction=crop_padding_fraction,
+            )
+            yield LiveFrameSample(
+                capture=capture,
+                frame_width=frame_width,
+                frame_height=frame_height,
+                eye_box=eye_box,
+                eye_crop_jpeg=encode_eye_crop_jpeg_base64(
+                    frame,
+                    eye_box,
+                    cv2_module=cv2,
+                    jpeg_quality=jpeg_quality,
+                ),
+            )
 
 
 def _require_cv2() -> Any:

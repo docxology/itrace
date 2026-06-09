@@ -4,11 +4,16 @@ from __future__ import annotations
 
 import csv
 import json
+from pathlib import Path
 
 import numpy as np
+import pytest
 
 from itrace import cli, io
 from itrace.synthetic import gaze_with_saccade, pupil_sine_with_blink
+from itrace.types import GazeStream, PupilStream, PupilUnit
+
+FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def test_analyze_config_json_and_cli_precedence(tmp_path) -> None:
@@ -78,6 +83,52 @@ def test_validate_recording_writes_warnings_and_quality(tmp_path) -> None:
     assert data["calibration"]["available"] is False
     assert data["warnings"]
     assert data["errors"] == []
+
+
+def test_validate_recording_example_fixture_covers_gap_low_validity_and_calibration(
+    tmp_path,
+) -> None:
+    gaze = GazeStream(
+        t=np.linspace(0.0, 0.09, 10),
+        x=np.array([0.0, 0.1, 0.2, 0.3, np.nan, np.nan, 0.6, 0.7, 0.8, 0.9]),
+        y=np.array([0.0, 0.1, 0.2, 0.3, np.nan, np.nan, 0.6, 0.7, 0.8, 0.9]),
+    )
+    pupil = PupilStream(
+        t=np.linspace(0.0, 0.04, 5),
+        size=np.array([3.0, 0.0, np.nan, 0.0, 3.2]),
+        unit=PupilUnit.RELATIVE,
+    )
+    gaze_csv = io.write_gaze_csv(gaze, tmp_path / "gaze.csv")
+    pupil_csv = io.write_pupil_csv(pupil, tmp_path / "pupil.csv")
+    out = tmp_path / "validation.json"
+    calibration_path = FIXTURES / "calibration" / "expected_calibration_error.json"
+
+    cli.validate_recording(
+        gaze_csv=gaze_csv,
+        out=out,
+        pupil_csv=pupil_csv,
+        calibration_json=calibration_path,
+    )
+
+    data = json.loads(out.read_text())
+    expected = json.loads(
+        (
+            FIXTURES / "validation" / "validate_recording_short_gap_low_valid_expected.json"
+        ).read_text()
+    )
+    assert data["preprocessing"] == expected["preprocessing"]
+    assert data["quality"]["valid_sample_fraction"] == pytest.approx(
+        expected["quality"]["valid_sample_fraction"]
+    )
+    assert data["quality"]["dropout_fraction"] == pytest.approx(
+        expected["quality"]["dropout_fraction"]
+    )
+    assert data["pupil"]["valid_sample_fraction"] == pytest.approx(
+        expected["pupil"]["valid_sample_fraction"]
+    )
+    assert data["calibration"]["available"] is expected["calibration"]["available"]
+    for warning in expected["warnings"]:
+        assert warning in data["warnings"]
 
 
 def test_calibrate_command_writes_model_and_calibrated_gaze(tmp_path) -> None:

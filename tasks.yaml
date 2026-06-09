@@ -1,0 +1,341 @@
+# tasks.yaml — task + Gantt source of truth for this project.
+# Managed by the projects/taskboard server (live read-write) and seed_tasks.py.
+# status: todo | in_progress | blocked | done. dates: YYYY-MM-DD. progress: 0-100.
+project:
+  name: iTrace
+  title: iTrace — webcam eye-tracking toolkit
+  status: active
+  color: '#64B5CD'
+  lead: DAF
+tasks:
+- id: it-1
+  title: Expose gaze-quality fields in itrace stats
+  status: done
+  start: '2026-05-26'
+  end: '2026-05-29'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - cli
+  notes: ''
+- id: it-2
+  title: --config-json reproducible method settings
+  status: done
+  start: '2026-05-27'
+  end: '2026-05-29'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - cli
+  notes: ''
+- id: it-3
+  title: Traceability matrix + figure manifest JSON
+  status: done
+  start: '2026-05-28'
+  end: '2026-05-29'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - reproducibility
+  notes: ''
+- id: it-4
+  title: 'API/CLI examples: AffineCalibration, robust_gaze_quality, merge_gap_s'
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - docs
+  notes: 'Complete for the current API/CLI example surface. Evidence on 2026-06-09:
+    README library examples cover `AffineCalibration`, `robust_gaze_quality`, and
+    `DetectionConfig(..., merge_gap_s=...)`; CLI help/docstrings describe config
+    JSON merge-gap settings, AffineCalibration, robust gaze quality, and calibration
+    availability. Gates passed: `uv run pytest tests/test_package.py tests/test_report_validation.py
+    tests/test_cli_todo_sprint.py tests/test_calibration.py -q` (25 passed), `uv
+    run ruff check src/itrace/types.py src/itrace/reporting.py src/itrace/cli.py
+    tests/test_package.py`, and `uv run mypy src/itrace/types.py src/itrace/reporting.py
+    src/itrace/cli.py`.'
+- id: it-5
+  title: 'CSV fixture: calibrated vs uncalibrated + expected JSON'
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps:
+  - it-4
+  tags:
+  - fixtures
+  notes: 'Complete for the local fixture surface. Evidence on 2026-06-09:
+    `tests/fixtures/calibration/calibrated_vs_uncalibrated_points.csv` and
+    `tests/fixtures/calibration/expected_calibration_error.json` demonstrate
+    raw-vs-target affine calibration and expected calibration-error output.
+    Gates passed: `uv run pytest tests/test_calibration.py tests/test_cli_todo_sprint.py
+    tests/test_validation_domains.py tests/test_capture_backend_conformance.py
+    tests/test_capture.py -q` (38 passed), `uv run ruff check ...`, `uv run
+    ruff format --check ...`, and `uv run mypy src/itrace/capture.py
+    src/itrace/cli.py src/itrace/validation.py`.'
+- id: it-6
+  title: Device-level validation vs reference eye-tracker / public dataset
+  status: blocked
+  start: '2026-06-20'
+  end: '2026-07-15'
+  progress: 0
+  milestone: false
+  deps: []
+  tags:
+  - validation
+  notes: 'Blocked until dataset/device access, authorization, and reference-backed
+    evidence are explicit. Current boundary: algorithmically verified vs synthetic truth only.
+    The reference-comparison protocol scaffold is tracked separately as `it-10`
+    and is complete; no reference-device comparison data or public-dataset
+    validation claim is made here.'
+- id: it-7
+  title: Write/render validation manuscript + supplement
+  status: todo
+  start: '2026-06-20'
+  end: '2026-07-08'
+  progress: 0
+  milestone: false
+  deps:
+  - it-6
+  tags:
+  - manuscript
+  notes: 'ISA deferred: manuscript-quality validation supplement (protocols, datasets, stats, limitations).'
+- id: it-8
+  title: Packaging / release automation (wheel smoke, extras matrix, release notes)
+  status: todo
+  start: '2026-06-18'
+  end: '2026-06-28'
+  progress: 0
+  milestone: false
+  deps:
+  - it-6
+  tags:
+  - release
+  notes: TODO Large §3, currently unchecked.
+- id: it-9
+  title: Public-dataset validation study (MPIIGaze / GazeCapture)
+  status: blocked
+  start: '2026-06-20'
+  end: '2026-07-10'
+  progress: 0
+  milestone: false
+  deps:
+  - it-6
+  tags:
+  - validation
+  notes: 'TODO Large Improvements: public-dataset webcam-gaze validation. Blocked until
+    dataset selection, licensing/authorization, subject/session splits, and acceptance thresholds are explicit.'
+- id: it-10
+  title: Reference eye-tracker synchronization + comparison protocol
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - validation
+  notes: 'Complete as a protocol scaffold, not as a completed validation study.
+    Evidence on 2026-06-09: `docs/VALIDATION_PROTOCOLS.md` documents the
+    reference-tracker protocol including synchronization, calibration, clock
+    alignment, event matching, Bland-Altman plots, and preregistered acceptance
+    thresholds; README/ISA/manuscript surfaces preserve the explicit
+    no-reference-device boundary. Focused gate passed with `uv run pytest
+    tests/test_documentation_traceability.py tests/test_empirical_sessions.py
+    tests/test_experiments.py tests/test_pupilseg.py tests/test_benchmark.py
+    -q` (33 passed). Actual device-level comparison remains blocked under
+    `it-6`/`it-19` until device access, consent/privacy handling, and
+    reference-backed evidence exist.'
+- id: it-11
+  title: Live-capture long-running reliability tests (memory, FPS, dropped frames, export integrity)
+  status: todo
+  start: '2026-06-18'
+  end: '2026-06-30'
+  progress: 0
+  milestone: false
+  deps: []
+  tags:
+  - tests
+  notes: 'TODO Large Improvements: extended-session reliability.'
+- id: it-12
+  title: 'Signal-processing backlog: lens distortion, head-pose, REMoDNaV events, binocular calib, capture-backend
+    plugin API'
+  status: todo
+  start: '2026-07-15'
+  end: '2026-08-15'
+  progress: 0
+  milestone: false
+  deps:
+  - it-6
+  tags:
+  - backlog
+  notes: 'Grouped TODO Large Improvements: add binocular calibration and confidence down-weighting
+    for live capture; add lens-distortion and camera-intrinsic calibration support; add head-pose compensation
+    from Face Mesh geometry; add REMoDNaV-like richer event classification, including smooth pursuit,
+    PSO/glissade classes, and explicit event-merging/splitting rules; add a stable plugin/backend interface
+    for alternative capture sources. The current minimal CaptureBackend conformance suite is split
+    out and complete under `it-20`; the larger plugin/API expansion remains open here.'
+- id: it-13
+  title: Tighten report dictionary type aliases
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - typing
+  - schema
+  notes: 'Complete for the current practical tightening pass. Evidence on 2026-06-09:
+    `NumericReportDict` and `ReportPayload` aliases now type SessionReport main-sequence,
+    pupil, quality, config, and reporting-helper payloads. Gates passed: focused
+    25-test suite, ruff on changed iTrace files, and mypy on `src/itrace/types.py
+    src/itrace/reporting.py src/itrace/cli.py`.'
+- id: it-14
+  title: Optional-extra import-safety drift guards
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - tests
+  - import-safety
+  notes: 'Complete for the current optional-extra surface. Evidence on 2026-06-09:
+    package tests now derive runtime optional dependency modules from pyproject extras
+    and fail on unmapped new runtime extras; clean-process import and live-module import
+    safety checks still cover cv2, mediapipe, streamlit, plotly, matplotlib, fastapi,
+    and uvicorn. Gates passed: focused 25-test suite plus ruff on changed files.'
+- id: it-15
+  title: Visible live calibration target workflow
+  status: todo
+  start: '2026-06-18'
+  end: '2026-06-28'
+  progress: 0
+  milestone: false
+  deps: []
+  tags:
+  - live
+  - calibration
+  notes: 'TODO Medium Improvements and follow-up: add visible target presentation and
+    click/space confirmations to the live HTML calibration workflow while keeping sampling backend-owned.'
+- id: it-16
+  title: Validation examples and README figure snapshots
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps:
+  - it-5
+  tags:
+  - docs
+  - fixtures
+  notes: 'Complete for local examples and README evidence. Evidence on 2026-06-09:
+    `tests/fixtures/validation/validate_recording_short_gap_low_valid_expected.json`
+    is exercised by the real CLI and covers short-gap interpolation, low finite-gaze
+    and pupil-valid warnings, and calibration availability; README points to the
+    fixture directories and already carries live HTML and quality-diagnostics
+    figure snapshots. Gates passed: focused 38-test suite, ruff, ruff format-check,
+    and mypy on the edited source surface.'
+- id: it-17
+  title: Pupil segmentation reference calibration
+  status: blocked
+  start: '2026-07-01'
+  end: '2026-07-20'
+  progress: 0
+  milestone: false
+  deps:
+  - it-6
+  tags:
+  - validation
+  - pupil
+  notes: 'TODO Large Improvements: calibrate pupil segmentation against reference geometry
+    or a learned model so live webcam pupil output can move beyond relative proxy measurements.
+    Blocked until reference geometry/model data and acceptance thresholds are explicit.'
+- id: it-18
+  title: First-class pymovements and REMoDNaV runner integrations
+  status: todo
+  start: '2026-07-15'
+  end: '2026-08-05'
+  progress: 0
+  milestone: false
+  deps:
+  - it-12
+  tags:
+  - integrations
+  - backlog
+  notes: 'TODO Large Improvements: add first-class pymovements and REMoDNaV runner integrations
+    with recorded detector configuration files.'
+- id: it-19
+  title: Preregistered reference-device study promotion
+  status: blocked
+  start: '2026-07-20'
+  end: '2026-08-20'
+  progress: 0
+  milestone: false
+  deps:
+  - it-10
+  tags:
+  - validation
+  - study
+  notes: 'TODO Large Improvements: promote guided empirical-session reports into a preregistered
+    reference-device study with synchronized truth, consent/privacy handling, and subject-level uncertainty.
+    Blocked until protocol, device access, and data-governance prerequisites are explicit.'
+- id: it-20
+  title: CaptureBackend conformance test suite
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - tests
+  - backends
+  notes: 'Complete for the current minimal backend protocol. Evidence on 2026-06-09:
+    `CaptureBackend` is runtime-checkable and `tests/test_capture_backend_conformance.py`
+    verifies synthetic/recorded-frame-style adapters, max-frame limits, stream conversion,
+    capture-record CSV export, and live-frame visual context without camera dependencies.
+    The broader alternative-backend plugin API remains open under `it-12`. Gates
+    passed: focused 38-test suite, ruff, ruff format-check, and mypy on the edited
+    source surface.'
+- id: it-21
+  title: Validation-domain registry and acceptance presets
+  status: done
+  start: '2026-06-09'
+  end: '2026-06-09'
+  progress: 100
+  milestone: false
+  deps: []
+  tags:
+  - validation
+  - config
+  notes: 'Complete for local configuration. Evidence on 2026-06-09:
+    `itrace.validation.validation_domain_registry()` serializes the built-in
+    synthetic domains and `acceptance_threshold_presets()` exposes `demo`,
+    `webcam_exploratory`, and `reference_device_comparison` thresholds with
+    explicit truth boundaries. README documents both. Gates passed: focused
+    38-test suite, ruff, ruff format-check, and mypy on the edited source
+    surface.'
+- id: it-m1
+  title: iTrace device-validated release
+  status: todo
+  start: '2026-07-18'
+  end: '2026-07-18'
+  progress: 0
+  milestone: true
+  deps:
+  - it-6
+  - it-9
+  - it-10
+  tags: []
+  notes: ''

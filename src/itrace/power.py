@@ -26,9 +26,10 @@ What is — and is not — emergent
   — a derivative, which amplifies high-frequency noise.
 * **pupil** correlation robustness is **NOT emergent**: the pupil/iris ratio is
   read from a separate modelled measurement whose noise is set by
-  ``pupil_noise_scale`` (real pupil segmentation is not implemented). Pupil
-  position in the ordering is therefore an *assumption*, not a finding, and would
-  move if ``pupil_noise_scale`` changed. Report it as conditional.
+  ``pupil_noise_scale`` (the sweep does not run a calibrated image-segmentation
+  or millimetre pupil model). Pupil position in the ordering is therefore an
+  *assumption*, not a finding, and would move if ``pupil_noise_scale`` changed.
+  Report it as conditional.
 
 Saccade F1 uses **interval-overlap** matching: a true saccade counts as recalled
 if any detected interval overlaps it (no separate temporal tolerance). Means use

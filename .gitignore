@@ -14,3 +14,10 @@ coverage.xml
 .venv/
 .claude/
 .benchmarks/
+
+# Local-only capture artifacts: single-participant derived pilot records and
+# live-smoke run outputs stay local. Public evidence is the aggregated, derived
+# summaries in docs/empirical_*.json and output/figures/empirical_*.png.
+output/empirical_pilot/
+output/live_smoke/
+output/pdf_preview/manuscript_cover.png

@@ -10,10 +10,10 @@ padding, so the partial-occlusion ramp on either side of a closure does not leak
 into the signal; a trace with no valid samples is reported as unusable rather
 than silently flattened to a constant. Outliers are flagged by the scaled median
 absolute deviation ($1.4826\,\mathrm{MAD}$), which is robust to the very spikes it
-must catch. The deblinked trace is low-pass filtered with a zero-phase
-Butterworth filter (with a short-trace moving-average fallback) and
-baseline-corrected, subtractively or divisively, against a chosen pre-event time
-window.
+must catch. The deblinked trace is low-pass filtered with a deterministic
+zero-phase Butterworth implementation choice (with a short-trace moving-average
+fallback) [@butterworth1930theory] and baseline-corrected, subtractively or
+divisively, against a chosen pre-event time window.
 
 The runtime `PupilConfig` now controls the same decisions the standalone
 functions expose: the low-confidence pupil threshold, interpolation padding, and
@@ -26,6 +26,17 @@ trace was usable and how strongly the cleaned pupil changed over time.
 Brightness and contrast effects are not modelled away in this version; tools such
 as Open-DPSM show why dynamic visual confounds need explicit modelling when pupil
 size is interpreted cognitively [@cai2024opendpsm].
+
+The separate `pupilseg` module covers a narrower, testable image-space step for
+callers that already have an eye crop. It thresholds the finite crop intensities,
+selects the largest dark connected component, reports centroid/radius/area and
+contrast-derived confidence, and converts that segmentation into either a
+`PupilUnit.PIXELS` sample or a pupil/iris-relative sample when an iris-radius
+normalizer is supplied. This deliberately does less than established pupil
+detectors and platforms such as ElSe, PuRe, or PupilEXT
+[@fuhl2015else; @santini2018pure; @zandi2021pupilext]: it is a pure-core
+fixture-verified path for pixels/relative measurements, not a millimetre
+calibration or device validation claim.
 
 For closed-loop and online use, a causal `PhaseDetector` classifies each streamed
 sample as dilation, constriction, peak, or trough using only the current and

@@ -14,6 +14,8 @@ subset iTrace uses for line/scatter series.
 
 from __future__ import annotations
 
+from typing import Any
+
 # Wong (2011) colour-blind-safe qualitative palette.
 WONG: list[str] = [
     "#0072B2",  # blue
@@ -23,6 +25,12 @@ WONG: list[str] = [
     "#CC79A7",  # reddish purple
     "#56B4E9",  # sky blue
 ]
+
+INK = "#17202f"
+MUTED = "#627386"
+GRID = "#d8e1ea"
+PANEL_FACE = "#f8fafc"
+CARD_FACE = "#ffffff"
 
 # Readable font floor + clean print defaults. Titles reach the template's 16pt
 # accessibility target; the base/tick sizes stay just below it so dense
@@ -40,6 +48,11 @@ HOUSE_RC: dict[str, object] = {
     "axes.spines.top": False,
     "axes.spines.right": False,
     "figure.facecolor": "white",
+    "axes.facecolor": CARD_FACE,
+    "axes.edgecolor": "#ccd6e0",
+    "grid.color": GRID,
+    "grid.linewidth": 0.8,
+    "grid.alpha": 0.45,
     "savefig.facecolor": "white",
     "savefig.dpi": 300,
 }
@@ -57,3 +70,47 @@ def apply_house_style() -> None:
     import matplotlib.pyplot as plt
 
     plt.rcParams.update(HOUSE_RC)
+
+
+def panel_label(ax: Any, label: str, *, x: float = -0.08, y: float = 1.04) -> None:
+    """Place a consistent bold panel label in axes coordinates."""
+    ax.text(
+        x,
+        y,
+        label,
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=15,
+        fontweight="bold",
+        color=INK,
+    )
+
+
+def result_box(
+    ax: Any,
+    text: str,
+    *,
+    xy: tuple[float, float] = (0.04, 0.96),
+    color: str = INK,
+    align: str = "left",
+) -> None:
+    """Draw one compact result callout with the shared publication style."""
+    ax.text(
+        xy[0],
+        xy[1],
+        text,
+        transform=ax.transAxes,
+        ha=align,
+        va="top",
+        fontsize=FONT_FLOOR,
+        color=INK,
+        linespacing=1.08,
+        bbox={
+            "boxstyle": "round,pad=0.35,rounding_size=0.12",
+            "fc": CARD_FACE,
+            "ec": color,
+            "lw": 1.0,
+            "alpha": 0.96,
+        },
+    )

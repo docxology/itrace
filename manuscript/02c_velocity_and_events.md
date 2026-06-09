@@ -3,9 +3,10 @@
 ## Velocity
 
 Gaze velocity is estimated two ways, matching how data arrives. For uniformly
-sampled streams a Savitzky–Golay filter fits a local polynomial and returns its
-analytic first derivative, smoothing and differentiating in one pass; the window
-is clamped to an odd length not exceeding the trace. For non-uniform timestamps a
+sampled streams, the implementation uses a Savitzky–Golay local-polynomial
+derivative [@savitzky1964smoothing] as a deterministic
+smoothing-and-differentiation choice; the window is clamped to an odd length not
+exceeding the trace. For non-uniform timestamps a
 central-difference gradient is taken on the actual time vector. Two-dimensional
 speed is the Euclidean norm of the per-axis velocities.
 
@@ -29,7 +30,7 @@ fixation per maximal low-dispersion window.
 Microsaccades follow @engbert2003microsaccades. Velocity uses
 their five-sample moving-average estimator, and a per-axis elliptic threshold
 
-$$ \left(\frac{\dot{x}}{\eta_x}\right)^2 + \left(\frac{\dot{y}}{\eta_y}\right)^2 > 1 $$ {#eq:ek}
+$$ (v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1 $$ {#eq:ek}
 
 ([@eq:ek]) flags an event when held for at least a minimum number of samples. The threshold
 $\eta = \lambda\sigma$ uses the **median-based** robust scale estimator

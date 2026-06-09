@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import csv
+import json
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from itrace.calibration import AffineCalibration, calibration_error, robust_gaze_quality
 from itrace.types import GazeStream
+
+FIXTURES = Path(__file__).parent / "fixtures" / "calibration"
 
 
 def test_affine_calibration_recovers_known_transform() -> None:
@@ -61,6 +67,26 @@ def test_calibration_error_reports_rms_and_percentiles() -> None:
     assert err["n_points"] == 3.0
     assert err["rms_error_deg"] == pytest.approx(1.0)
     assert err["p95_error_deg"] == pytest.approx(1.0)
+
+
+def test_calibrated_vs_uncalibrated_fixture_matches_expected_json() -> None:
+    rows = list(csv.DictReader((FIXTURES / "calibrated_vs_uncalibrated_points.csv").open()))
+    raw_x = [float(row["raw_x"]) for row in rows]
+    raw_y = [float(row["raw_y"]) for row in rows]
+    target_x = [float(row["target_x"]) for row in rows]
+    target_y = [float(row["target_y"]) for row in rows]
+
+    calibration = AffineCalibration.fit(raw_x, raw_y, target_x, target_y)
+    error = calibration_error(calibration, raw_x, raw_y, target_x, target_y)
+    uncalibrated_error = np.hypot(
+        np.asarray(raw_x, dtype=np.float64) - np.asarray(target_x, dtype=np.float64),
+        np.asarray(raw_y, dtype=np.float64) - np.asarray(target_y, dtype=np.float64),
+    )
+    expected = json.loads((FIXTURES / "expected_calibration_error.json").read_text())
+
+    assert float(np.sqrt(np.mean(uncalibrated_error**2))) > 1.5
+    for key, value in expected.items():
+        assert error[key] == pytest.approx(value)
 
 
 def test_robust_gaze_quality_summarizes_dropouts_jitter_and_gaps() -> None:

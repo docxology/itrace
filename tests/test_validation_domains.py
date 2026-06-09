@@ -39,6 +39,29 @@ def test_within_and_cross_domain_validation_summaries() -> None:
         assert "peak_velocity_rmse_deg_s" in domain["summary"]
 
 
+def test_validation_domain_registry_is_machine_readable() -> None:
+    registry = validation.validation_domain_registry()
+
+    assert set(registry) == {domain.name for domain in validation.default_synthetic_domains()}
+    clean = registry["clean_desktop"]
+    assert clean["label"] == "Clean desktop"
+    assert clean["truth_boundary"] == "synthetic ground truth only"
+    assert clean["spec"]["seed"] == 0
+    assert clean["detection"]["method"] == "adaptive_ivt"
+
+
+def test_acceptance_threshold_presets_keep_truth_boundaries_explicit() -> None:
+    presets = validation.acceptance_threshold_presets()
+
+    assert set(presets) == {"demo", "webcam_exploratory", "reference_device_comparison"}
+    assert presets["demo"]["minimum_saccade_f1"] == 0.50
+    assert presets["webcam_exploratory"]["minimum_saccade_f1"] is None
+    assert presets["webcam_exploratory"]["requires_reference_truth"] is False
+    assert presets["reference_device_comparison"]["requires_reference_truth"] is True
+    assert "reference-device" in presets["reference_device_comparison"]["truth_boundary"]
+    assert validation.acceptance_preset("demo") == presets["demo"]
+
+
 def test_default_dropout_domain_validation_uses_safe_gap_interpolation() -> None:
     domain = validation.default_synthetic_domains()[-1]
 

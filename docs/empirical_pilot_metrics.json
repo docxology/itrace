@@ -1,0 +1,40 @@
+{
+  "kind": "empirical_pilot_metrics",
+  "pilot_id": "local_pilot_001",
+  "available": true,
+  "source_report": "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json",
+  "sample_count": 2690,
+  "completed_trial_count": 3,
+  "finite_gaze_fraction": 1.0,
+  "sampling_rate_hz": 29.72241167021321,
+  "sampling_interval_cv": 0.1610601945103741,
+  "max_drift_deg_s": 0.05430030501053513,
+  "pupil_valid_fraction": 1.0,
+  "heldout_target_error": {
+    "available": true,
+    "n_points": 11.0,
+    "mean_error_deg": 5.96116907906378,
+    "median_error_deg": 5.97696819807766,
+    "rms_error_deg": 6.79100922447353,
+    "p95_error_deg": 11.221948473722295,
+    "max_error_deg": 13.900597451350988
+  },
+  "target_acquisition_latency_s": {
+    "available": true,
+    "threshold_deg": 4.0,
+    "n_targets": 17,
+    "median_latency_s": 0.7209225420141365,
+    "p95_latency_s": 2.4240206248126657
+  },
+  "truth_boundary": "screen target prompts provide session-specific estimates only; no reference-device validation or universal webcam accuracy is claimed",
+  "storage_boundary": "derived gaze/pupil/capture records only; raw eye video and persisted eye-crop images are not written by the default workflow",
+  "manuscript_tokens": {
+    "EMPIRICAL_PILOT_STATUS": "3 completed trials, 2690 derived samples",
+    "EMPIRICAL_PILOT_FINITE_GAZE": "100.0%",
+    "EMPIRICAL_PILOT_SAMPLING_HZ": "29.7 Hz",
+    "EMPIRICAL_PILOT_SAMPLING_CV": "0.161",
+    "EMPIRICAL_PILOT_DRIFT": "0.054 deg/s",
+    "EMPIRICAL_PILOT_HELDOUT_RMS": "6.79 deg",
+    "EMPIRICAL_PILOT_LATENCY": "0.72 s median"
+  }
+}

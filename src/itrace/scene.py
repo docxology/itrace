@@ -16,13 +16,13 @@ extraction -> gaze/pupil estimation -> event detection -> recovery error.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import cast
 
 import numpy as np
 
 from . import pipeline, pupil
 from .capture import iris_landmarks_to_sample
 from .eyemodel import Camera, blink_landmarks, eye_to_landmarks, projected_pupil_ratio
+from .synthetic import minimum_jerk_profile
 from .types import BoolArray, FloatArray, GazeStream, PupilStream, PupilUnit, SessionReport
 
 
@@ -90,11 +90,6 @@ class ClosedLoopResult:
     metrics: dict[str, float]
 
 
-def _minimum_jerk(n: int) -> FloatArray:
-    tau = np.linspace(0.0, 1.0, n)
-    return cast(FloatArray, 10 * tau**3 - 15 * tau**4 + 6 * tau**5)
-
-
 def _trajectory(
     spec: EyeSceneSpec,
 ) -> tuple[FloatArray, FloatArray, FloatArray, list[tuple[int, int]]]:
@@ -117,7 +112,7 @@ def _trajectory(
         cursor += n_hold
         if i + 1 < len(fixs):
             nxt = fixs[i + 1]
-            prof = _minimum_jerk(n_sac)
+            prof = minimum_jerk_profile(n_sac)
             yaw_parts.append(fix.yaw_deg + (nxt.yaw_deg - fix.yaw_deg) * prof)
             pitch_parts.append(fix.pitch_deg + (nxt.pitch_deg - fix.pitch_deg) * prof)
             saccades_idx.append((cursor, cursor + n_sac - 1))
@@ -181,8 +176,9 @@ def closed_loop(
     MediaPipe localisation. The pupil/iris ratio is read from a *separate*
     modelled measurement, so its observation noise is added directly with
     standard deviation ``landmark_noise_sd * pupil_noise_scale`` (a modelling
-    assumption — real pupil segmentation is not implemented; see the assumption
-    ledger in the docs). See :mod:`itrace.power` for the noise sweep.
+    assumption rather than a calibrated image-segmentation or millimetre pupil
+    model; see the assumption ledger in the docs). See :mod:`itrace.power` for
+    the noise sweep.
     """
     spec = spec or EyeSceneSpec()
     cam = camera or Camera()

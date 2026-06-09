@@ -1,0 +1,349 @@
+{
+  "kind": "itrace_synthetic_empirical_range_bridge",
+  "version": 1,
+  "truth_boundary": "N=1 derived-session diagnostics contextualize one local operating scale; synthetic truth and reference-oracle tests remain the correctness evidence; this is not reference-device validation.",
+  "storage_boundary": "Derived gaze/pupil/capture records and summary reports only; no raw eye video or persisted eye-crop images are required or persisted by this bridge.",
+  "empirical_available": true,
+  "source_report_available": true,
+  "sources": {
+    "empirical_metrics": "docs/empirical_pilot_metrics.json",
+    "synthetic_validation": "output/synthetic_validation.json",
+    "noise_metrics": "output/figures/noise_metrics.json",
+    "statistical_diagnostics": "output/figures/statistical_diagnostics.json",
+    "source_report": "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+  },
+  "metrics": [
+    {
+      "id": "finite_gaze_fraction",
+      "label": "finite gaze fraction",
+      "empirical": {
+        "available": true,
+        "value": 1.0,
+        "display": "100.0%"
+      },
+      "comparability": "same_unit_contextual",
+      "status": "observed local scale",
+      "interpretation": "The pilot and synthetic domains use the same finite-gaze fraction; the clean N=1 session contextualizes clean-session examples without replacing dropout or low-light stress domains.",
+      "synthetic": {
+        "available": true,
+        "value": 0.9570285714285713,
+        "display": "clean 100.0%; stress min 95.7%",
+        "source": "synthetic domain summaries"
+      }
+    },
+    {
+      "id": "pupil_valid_fraction",
+      "label": "valid pupil fraction",
+      "empirical": {
+        "available": true,
+        "value": 1.0,
+        "display": "100.0%"
+      },
+      "comparability": "same_unit_contextual",
+      "status": "observed local scale",
+      "interpretation": "The local run shows whether the current capture path produced a usable pupil proxy; synthetic dropout domains remain stress tests.",
+      "synthetic": {
+        "available": true,
+        "value": null,
+        "display": "clean 97.8%; stress min 92.0%",
+        "source": "synthetic domain summaries"
+      }
+    },
+    {
+      "id": "sampling_rate_hz",
+      "label": "sampling rate",
+      "empirical": {
+        "available": true,
+        "value": 29.72241167021321,
+        "display": "29.7 Hz"
+      },
+      "comparability": "configuration_contextual",
+      "status": "observed local scale",
+      "interpretation": "A webcam-rate local session contextualizes live-style tests and timestamp-jitter assumptions; it is not a hardware benchmark.",
+      "synthetic": {
+        "available": false,
+        "value": null,
+        "display": "synthetic sessions can be generated at chosen rates",
+        "source": "synthetic generator parameter"
+      }
+    },
+    {
+      "id": "sampling_interval_cv",
+      "label": "sampling interval CV",
+      "empirical": {
+        "available": true,
+        "value": 0.1610601945103741,
+        "display": "0.161"
+      },
+      "comparability": "configuration_contextual",
+      "status": "observed local scale",
+      "interpretation": "The coefficient of variation is a session-timing diagnostic used to sanity-check live-style jitter magnitudes.",
+      "synthetic": {
+        "available": false,
+        "value": null,
+        "display": "timestamp-jitter stress domain, if configured",
+        "source": "session diagnostics"
+      }
+    },
+    {
+      "id": "max_drift_deg_s",
+      "label": "maximum drift slope",
+      "empirical": {
+        "available": true,
+        "value": 0.05430030501053513,
+        "display": "0.054 deg/s"
+      },
+      "comparability": "stress_domain_only",
+      "status": "stress-domain only",
+      "interpretation": "The pilot supplies one low-drift operating scale; synthetic head-drift cases deliberately probe harder conditions.",
+      "synthetic": {
+        "available": true,
+        "value": 0.6287998591797219,
+        "display": "head-drift domain is a stress test",
+        "source": "synthetic head_drift domain"
+      }
+    },
+    {
+      "id": "heldout_target_rms_deg",
+      "label": "held-out target RMS",
+      "empirical": {
+        "available": true,
+        "value": 6.79100922447353,
+        "display": "6.79 deg"
+      },
+      "comparability": "not_directly_comparable",
+      "status": "not directly comparable",
+      "interpretation": "Held-out screen-target residual includes prompt following, calibration, webcam session effects, and user behavior; it is not iid landmark noise or gaze accuracy.",
+      "noise_model": {
+        "available": true,
+        "value": 6.797654368314954,
+        "display": "idealized landmark-noise RMS 0.16-6.80 deg",
+        "source": "noise sweep over synthetic landmarks",
+        "threshold_display": "2 deg at 3.05 px"
+      }
+    },
+    {
+      "id": "target_acquisition_latency_s",
+      "label": "target acquisition latency",
+      "empirical": {
+        "available": true,
+        "value": 0.7209225420141365,
+        "display": "0.72 s"
+      },
+      "comparability": "not_directly_comparable",
+      "status": "not directly comparable",
+      "interpretation": "UI/capture target-acquisition timing measures the local protocol loop, not physiological saccade latency.",
+      "synthetic": {
+        "available": false,
+        "value": null,
+        "display": "not a synthetic saccade-latency oracle",
+        "source": "live UI protocol timing"
+      }
+    },
+    {
+      "id": "saccade_detection_stress",
+      "label": "saccade detection stress",
+      "empirical": {
+        "available": false,
+        "value": null,
+        "display": "unavailable"
+      },
+      "comparability": "synthetic_truth_only",
+      "status": "stress-domain only",
+      "interpretation": "Synthetic truth and oracle comparisons, not the N=1 pilot, test event-detector correctness under known labels.",
+      "synthetic": {
+        "available": true,
+        "value": 0.6287998591797219,
+        "display": "clean F1 81.7%; stress min 62.9%",
+        "source": "synthetic truth domains"
+      },
+      "noise_model": {
+        "available": true,
+        "value": 0.9242649134788261,
+        "display": "F1=0.8 edge at 0.92 px",
+        "source": "noise sweep sidecar"
+      }
+    },
+    {
+      "id": "amplitude_recovery_mae_deg",
+      "label": "amplitude recovery MAE",
+      "empirical": {
+        "available": false,
+        "value": null,
+        "display": "unavailable"
+      },
+      "comparability": "synthetic_truth_only",
+      "status": "stress-domain only",
+      "interpretation": "Amplitude MAE is defined only where synthetic truth labels exist; the pilot supplies operating-scale context, not truth labels.",
+      "synthetic": {
+        "available": true,
+        "value": 0.9376945163169363,
+        "display": "clean 0.06 deg; stress max 0.94 deg",
+        "source": "synthetic truth domains"
+      }
+    },
+    {
+      "id": "model_selection_stability",
+      "label": "amplitude model stability",
+      "empirical": {
+        "available": false,
+        "value": null,
+        "display": "unavailable"
+      },
+      "comparability": "not_directly_comparable",
+      "status": "descriptive model check",
+      "interpretation": "Bootstrap winner frequency describes ranking stability in the synthetic diagnostic report, not a biological population model.",
+      "statistical_model": {
+        "available": true,
+        "family": "lognormal",
+        "top_frequency": 0.75,
+        "display": "lognormal top 75%"
+      }
+    }
+  ],
+  "trial_spread": {
+    "available": true,
+    "trial_count": 3,
+    "trials": [
+      {
+        "id": "fixed_center",
+        "sample_count": 897.0,
+        "duration_s": 30.29238554200856,
+        "finite_gaze_fraction": 1.0,
+        "sampling_rate_hz": 29.838906902201185,
+        "sampling_interval_cv": 0.0976457548114303,
+        "gaze_dispersion_deg": 0.8602314906751986,
+        "drift_slope_deg_s": 0.018379924028931204,
+        "pupil_valid_fraction": 1.0,
+        "pupil_dynamic_range": 0.052138918427769354,
+        "n_saccades": 6.0,
+        "n_fixations": 7.0
+      },
+      {
+        "id": "reading",
+        "sample_count": 905.0,
+        "duration_s": 30.293645292054862,
+        "finite_gaze_fraction": 1.0,
+        "sampling_rate_hz": 29.85176702729347,
+        "sampling_interval_cv": 0.025107017871924674,
+        "gaze_dispersion_deg": 2.3136326055209415,
+        "drift_slope_deg_s": 0.05430030501053513,
+        "pupil_valid_fraction": 1.0,
+        "pupil_dynamic_range": 0.07635483262161424,
+        "n_saccades": 13.0,
+        "n_fixations": 14.0
+      },
+      {
+        "id": "corner_saccades",
+        "sample_count": 704.0,
+        "duration_s": 30.256024957983755,
+        "finite_gaze_fraction": 1.0,
+        "sampling_rate_hz": 29.407691753663716,
+        "sampling_interval_cv": 0.4166289122202453,
+        "gaze_dispersion_deg": 1.9632818398215086,
+        "drift_slope_deg_s": 0.004720150775363349,
+        "pupil_valid_fraction": 1.0,
+        "pupil_dynamic_range": 0.06112426852432673,
+        "n_saccades": 6.0,
+        "n_fixations": 7.0
+      }
+    ],
+    "metrics": {
+      "sample_count": {
+        "n": 3,
+        "min": 704.0,
+        "median": 897.0,
+        "max": 905.0,
+        "mean": 835.3333333333334,
+        "std": 92.92410284145276
+      },
+      "duration_s": {
+        "n": 3,
+        "min": 30.256024957983755,
+        "median": 30.29238554200856,
+        "max": 30.293645292054862,
+        "mean": 30.280685264015727,
+        "std": 0.01744505207286841
+      },
+      "finite_gaze_fraction": {
+        "n": 3,
+        "min": 1.0,
+        "median": 1.0,
+        "max": 1.0,
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "sampling_rate_hz": {
+        "n": 3,
+        "min": 29.407691753663716,
+        "median": 29.838906902201185,
+        "max": 29.85176702729347,
+        "mean": 29.699455227719454,
+        "std": 0.20637472277252272
+      },
+      "sampling_interval_cv": {
+        "n": 3,
+        "min": 0.025107017871924674,
+        "median": 0.0976457548114303,
+        "max": 0.4166289122202453,
+        "mean": 0.17979389496786677,
+        "std": 0.17006584241972386
+      },
+      "gaze_dispersion_deg": {
+        "n": 3,
+        "min": 0.8602314906751986,
+        "median": 1.9632818398215086,
+        "max": 2.3136326055209415,
+        "mean": 1.7123819786725496,
+        "std": 0.6193043169030539
+      },
+      "drift_slope_deg_s": {
+        "n": 3,
+        "min": 0.004720150775363349,
+        "median": 0.018379924028931204,
+        "max": 0.05430030501053513,
+        "mean": 0.025800126604943227,
+        "std": 0.020910005231908273
+      },
+      "pupil_valid_fraction": {
+        "n": 3,
+        "min": 1.0,
+        "median": 1.0,
+        "max": 1.0,
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "pupil_dynamic_range": {
+        "n": 3,
+        "min": 0.052138918427769354,
+        "median": 0.06112426852432673,
+        "max": 0.07635483262161424,
+        "mean": 0.0632060065245701,
+        "std": 0.00999509379269508
+      },
+      "n_saccades": {
+        "n": 3,
+        "min": 6.0,
+        "median": 6.0,
+        "max": 13.0,
+        "mean": 8.333333333333334,
+        "std": 3.2998316455372216
+      },
+      "n_fixations": {
+        "n": 3,
+        "min": 7.0,
+        "median": 7.0,
+        "max": 14.0,
+        "mean": 9.333333333333334,
+        "std": 3.2998316455372216
+      }
+    },
+    "interpretation": "Per-trial spread describes one local derived session; it is not population variability or reference-device accuracy."
+  },
+  "summary": {
+    "metric_count": 10,
+    "observed_local_scale_count": 4,
+    "stress_domain_count": 3,
+    "not_directly_comparable_count": 2
+  }
+}

@@ -12,7 +12,7 @@ explicitly simplified: it ignores spatial correlation between adjacent landmarks
 temporal correlation, heteroscedasticity (error grows at eccentric gaze and under
 poor lighting), and systematic bias — and it is *not* derived from sensor optics.
 Systematic *biases* (corneal refraction, kappa angle, lens distortion) are
-excluded entirely; they belong to the device-validation gap ([@sec:limitations]).
+excluded entirely; they belong to the device validation gap ([@sec:limitations]).
 Appearance-based gaze work on GazeCapture, MPIIGaze, and L2CS-Net makes the
 same practical point from the opposite direction: real-frame accuracy depends on
 dataset, camera, illumination, head pose, and calibration conditions, not just on

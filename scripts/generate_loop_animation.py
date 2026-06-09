@@ -21,7 +21,6 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 
 from itrace import capture, saccades, scene
 from itrace.scene import ClosedLoopResult
-
 from itrace.viz.palette import WONG, apply_house_style
 
 # Single-source palette + house style (readable font floor, white bg, clean

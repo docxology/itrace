@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import TypeAlias
 
 import numpy as np
 from numpy.typing import NDArray
@@ -28,6 +29,8 @@ from numpy.typing import NDArray
 FloatArray = NDArray[np.float64]
 BoolArray = NDArray[np.bool_]
 IntArray = NDArray[np.int_]
+NumericReportDict: TypeAlias = dict[str, float]
+ReportPayload: TypeAlias = dict[str, object]
 
 
 class EventType(str, Enum):
@@ -64,6 +67,32 @@ class PupilSample:
     t: float
     size: float
     unit: PupilUnit = PupilUnit.RELATIVE
+
+
+@dataclass(frozen=True, slots=True)
+class EyeGazeDiagnostic:
+    """One eye's landmark-derived gaze diagnostic in degrees and normalized units."""
+
+    eye: str
+    yaw_deg: float
+    pitch_deg: float
+    iris_offset_x: float
+    iris_offset_y: float
+    pupil_proxy_relative: float
+
+
+@dataclass(frozen=True, slots=True)
+class BinocularGazeSample:
+    """Binocular gaze estimate plus per-eye diagnostics from one landmark frame."""
+
+    t: float
+    gaze: GazeSample
+    right: EyeGazeDiagnostic
+    left: EyeGazeDiagnostic
+    vergence_x_deg: float
+    vertical_disparity_deg: float
+    asymmetry_deg: float
+    pupil_proxy_relative: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -223,12 +252,12 @@ class SessionReport:
     smooth_pursuits: list[SmoothPursuit] = field(default_factory=list)
     psos: list[PSO] = field(default_factory=list)
     scanpath: str = ""
-    main_sequence: dict[str, float] = field(default_factory=dict)
-    pupil: dict[str, float] = field(default_factory=dict)
-    quality: dict[str, float] = field(default_factory=dict)
-    config: dict[str, object] = field(default_factory=dict)
+    main_sequence: NumericReportDict = field(default_factory=dict)
+    pupil: NumericReportDict = field(default_factory=dict)
+    quality: NumericReportDict = field(default_factory=dict)
+    config: ReportPayload = field(default_factory=dict)
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> ReportPayload:
         """JSON-serialisable summary (events collapsed to plain records)."""
         return {
             "n_samples": self.n_samples,

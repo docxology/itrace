@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use iTrace, please cite the software repository and manuscript."
+title: "iTrace: verification-first webcam eye-movement analysis"
+authors:
+  - family-names: "Friedman"
+    given-names: "Daniel Ari"
+version: "0.4.1"
+date-released: "2026-06-09"
+license: MIT
+doi: "10.5281/zenodo.20614026"
+repository-code: "https://github.com/docxology/itrace"
+url: "https://github.com/docxology/itrace"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.20614026"
+    description: "Concept DOI (all versions)"
+  - type: doi
+    value: "10.5281/zenodo.20614027"
+    description: "Version DOI (v0.4.1)"
+abstract: "MIT-licensed source openly released at https://github.com/docxology/itrace and archived on Zenodo at DOI 10.5281/zenodo.20614027 (concept DOI 10.5281/zenodo.20614026)."
+keywords:
+  - eye-tracking
+  - webcam
+  - gaze
+  - saccades
+  - pupillometry
+  - open-source

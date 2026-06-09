@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>iTrace Live</title>
-    <link rel="stylesheet" href="/static/app.css?v=live-ui-refresh-6" />
+    <link rel="stylesheet" href="/static/app.css?v=live-ui-refresh-11" />
   </head>
   <body>
     <main class="app">
@@ -46,6 +46,121 @@
         <button id="resetAllButton" type="button">Reset All</button>
         <button id="exportButton" type="button">Export</button>
         <span id="outputStatus">output: memory</span>
+      </section>
+
+      <section class="experiment-panel" aria-label="Guided empirical eye-video experiment">
+        <div class="section-header">
+          <h2>Empirical Session</h2>
+          <span id="experimentBoundary">derived records only; no reference-device claim</span>
+        </div>
+        <div class="experiment-status-banner" aria-label="Empirical session save status">
+          <div><span>Session</span><strong id="experimentSessionId">next session pending</strong></div>
+          <div><span>Manifest</span><strong id="experimentManifestPath">not configured</strong></div>
+          <div><span>Condition</span><strong id="experimentConditionStatus">indoor_office_daylight</strong></div>
+          <div><span>Reference</span><strong id="experimentReferenceStatus">none</strong></div>
+          <div><span>Auto-save</span><strong id="experimentSaveStatus">not ready</strong></div>
+          <div><span>Report</span><strong id="experimentReportPath">auto-save pending</strong></div>
+        </div>
+        <div class="experiment-metadata-controls" aria-label="Empirical session metadata">
+          <label>
+            Condition
+            <select id="experimentConditionInput">
+              <option value="indoor_office_daylight">daylight</option>
+              <option value="indoor_office_dim">dim</option>
+              <option value="indoor_office_backlit">backlit</option>
+            </select>
+          </label>
+          <label>Participant <input id="experimentParticipantInput" type="text" value="P001" /></label>
+          <label>Device <input id="experimentDeviceInput" type="text" value="local_webcam_001" /></label>
+          <label>Group <input id="experimentSessionGroupInput" type="text" value="" placeholder="auto" /></label>
+          <label>
+            Reference
+            <select id="experimentReferenceKindInput">
+              <option value="none">none</option>
+              <option value="manual_annotation">manual annotation</option>
+              <option value="reference_device">reference device</option>
+              <option value="public_dataset">public dataset</option>
+              <option value="mixed">mixed</option>
+            </select>
+          </label>
+        </div>
+        <div class="experiment-controls">
+          <label>Trial s <input id="experimentDurationInput" type="number" value="30" min="5" step="5" /></label>
+          <label>Range <input id="experimentRangeInput" type="number" value="15" min="1" step="1" /></label>
+          <button id="experimentNextActionButton" type="button">Start Experiment</button>
+          <button id="startExperimentButton" type="button">New Protocol</button>
+          <label>
+            Trial
+            <select id="experimentTrialSelect"></select>
+          </label>
+          <button id="startExperimentTrialButton" type="button">Start Trial</button>
+          <button id="finishExperimentTrialButton" type="button">Finish Trial</button>
+          <button id="reportExperimentButton" type="button">Report</button>
+          <button id="exportExperimentButton" type="button">Save Now</button>
+          <button id="resetExperimentButton" type="button">Reset Experiment</button>
+        </div>
+        <div class="experiment-overview" aria-label="Experiment data overview">
+          <div>
+            <span>Live samples</span>
+            <strong id="experimentSampleCount">0</strong>
+            <small id="experimentFiniteSamples">finite --</small>
+          </div>
+          <div>
+            <span>Protocol</span>
+            <strong id="experimentProtocolSummary">not started</strong>
+            <small id="experimentTrialPlan">--</small>
+          </div>
+          <div>
+            <span>Completed trials</span>
+            <strong id="experimentCompletedNames">none</strong>
+            <small id="experimentProgress">0/0 required</small>
+          </div>
+          <div>
+            <span>Auto-save</span>
+            <strong id="experimentExportReady">not ready</strong>
+            <small id="experimentExportFiles">live export + experiment save pending</small>
+          </div>
+        </div>
+        <div class="experiment-grid">
+          <div class="experiment-stage" id="experimentStage">
+            <div id="experimentTargetDot" aria-hidden="true"></div>
+            <div class="experiment-centerline horizontal" aria-hidden="true"></div>
+            <div class="experiment-centerline vertical" aria-hidden="true"></div>
+            <div id="experimentPrompt">Start an experiment session</div>
+            <div id="experimentCountdown">--</div>
+            <div class="experiment-timer-card" aria-live="polite">
+              <span id="experimentTimerLabel">Timer</span>
+              <strong id="experimentTimerValue">--</strong>
+              <div class="experiment-progress-track" aria-hidden="true">
+                <div id="experimentTimerBar"></div>
+              </div>
+              <small id="experimentTimerDetail">No active trial</small>
+            </div>
+          </div>
+          <div class="experiment-summary">
+            <div><span>Status</span><strong id="experimentStatus">idle</strong></div>
+            <div><span>Completed</span><strong id="experimentCompleted">0</strong></div>
+            <div><span>Held-out RMS</span><strong id="experimentHeldout">--</strong></div>
+            <div><span>Latency</span><strong id="experimentLatency">--</strong></div>
+          </div>
+        </div>
+        <ol class="experiment-stepper" id="experimentStepper" aria-label="Experiment trial progress">
+          <li>Start an experiment session</li>
+        </ol>
+        <table class="experiment-trial-table" id="experimentTrialTable">
+          <thead>
+            <tr>
+              <th>Trial</th>
+              <th>State</th>
+              <th>Samples</th>
+              <th>Finite</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5">Start an experiment session</td></tr>
+          </tbody>
+        </table>
       </section>
 
       <section class="metrics" aria-label="Diagnostics">
@@ -140,6 +255,6 @@
         <article><h2>Main Sequence</h2><canvas id="mainSequence"></canvas></article>
       </section>
     </main>
-    <script src="/static/app.js?v=live-ui-refresh-6"></script>
+    <script src="/static/app.js?v=live-ui-refresh-11"></script>
   </body>
 </html>

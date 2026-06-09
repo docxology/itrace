@@ -1,0 +1,160 @@
+{
+  "kind": "itrace_statistical_interpretation_ledger",
+  "version": 1,
+  "truth_boundary": "Rows interpret generated statistics and visual evidence; they do not convert synthetic or N=1 diagnostics into population physiology or reference-device validation.",
+  "source_artifacts": {
+    "statistical_diagnostics": "output/figures/statistical_diagnostics.json",
+    "synthetic_empirical_range_bridge": "output/figures/synthetic_empirical_range_bridge.json",
+    "noise_metrics": "output/figures/noise_metrics.json",
+    "empirical_metrics": "docs/empirical_pilot_metrics.json"
+  },
+  "empirical_available": true,
+  "rows": [
+    {
+      "id": "robust_amplitude_shape",
+      "label": "Robust amplitude shape",
+      "source_artifact": "statistical_diagnostics",
+      "source_path": "output/figures/statistical_diagnostics.json",
+      "reported_value": "median 0.45 deg; IQR 10.02 deg; outliers 0/15",
+      "estimand": "finite-sample distribution shape of detected synthetic saccade amplitudes",
+      "interpretation": "Quartiles, Bowley skew, and outside values describe amplitude shape before parametric fits.",
+      "does_not_prove": "a population amplitude law or real-eye physiology",
+      "scholarship_basis": [
+        "robust quartiles",
+        "IQR outside-value rule",
+        "percentile bootstrap"
+      ],
+      "evidence_class": "descriptive_statistic",
+      "available": true
+    },
+    {
+      "id": "relative_model_comparison",
+      "label": "Relative model comparison",
+      "source_artifact": "statistical_diagnostics",
+      "source_path": "output/figures/statistical_diagnostics.json",
+      "reported_value": "best lognormal; w(AIC) 0.63; boot lognormal 75%",
+      "estimand": "relative fit ranking among candidate amplitude distributions",
+      "interpretation": "Information criteria and bootstrap winner frequency describe ranking stability.",
+      "does_not_prove": "true family membership or posterior probability",
+      "scholarship_basis": [
+        "AIC",
+        "AICc",
+        "BIC",
+        "Kolmogorov-Smirnov statistic"
+      ],
+      "evidence_class": "relative_model_diagnostic",
+      "available": true
+    },
+    {
+      "id": "distribution_residual_checks",
+      "label": "Distribution residual checks",
+      "source_artifact": "statistical_diagnostics",
+      "source_path": "output/figures/statistical_diagnostics.json",
+      "reported_value": "QQ RMSE 4.62 deg; P-P max |res| 0.25; DKW +/- 0.35",
+      "estimand": "empirical-versus-fitted amplitude quantile/CDF residual scale",
+      "interpretation": "QQ/P-P residuals and a DKW/Massart band show selected-family fit gaps.",
+      "does_not_prove": "a formal model-selection theorem or a device-accuracy result",
+      "scholarship_basis": [
+        "QQ plot",
+        "P-P/CDF residuals",
+        "DKW/Massart band"
+      ],
+      "evidence_class": "model_residual_diagnostic",
+      "available": true
+    },
+    {
+      "id": "main_sequence_uncertainty",
+      "label": "Main-sequence uncertainty",
+      "source_artifact": "statistical_diagnostics",
+      "source_path": "output/figures/statistical_diagnostics.json",
+      "reported_value": "b 0.91 [0.88, 0.92]",
+      "estimand": "finite-sample uncertainty for the detected synthetic main-sequence exponent",
+      "interpretation": "Seeded bootstrap interval for this report's exponent variability.",
+      "does_not_prove": "human physiological population bounds or camera timing precision",
+      "scholarship_basis": [
+        "seeded bootstrap",
+        "main-sequence power-law diagnostic"
+      ],
+      "evidence_class": "bootstrap_uncertainty",
+      "available": true
+    },
+    {
+      "id": "spatial_stability_descriptors",
+      "label": "Spatial stability descriptors",
+      "source_artifact": "statistical_diagnostics",
+      "source_path": "output/figures/statistical_diagnostics.json",
+      "reported_value": "disp 14.86 deg; BCEA 449.54 deg2; entropy 2.43 bits",
+      "estimand": "within-report fixation/gaze spread and entropy descriptors",
+      "interpretation": "Dispersion, hull/BCEA, and entropy summarize within-report spread.",
+      "does_not_prove": "absolute gaze accuracy or participant-level stability",
+      "scholarship_basis": [
+        "BCEA-style spread",
+        "entropy descriptor"
+      ],
+      "evidence_class": "descriptive_statistic",
+      "available": true
+    },
+    {
+      "id": "scanpath_transition_structure",
+      "label": "Scanpath transition structure",
+      "source_artifact": "statistical_diagnostics",
+      "source_path": "output/figures/statistical_diagnostics.json",
+      "reported_value": "7 symbols; scanpath DdulrLlrUdLlrLr",
+      "estimand": "first-order direction-symbol transition structure in one report",
+      "interpretation": "Transition matrix summarizes local scanpath grammar for QA.",
+      "does_not_prove": "identity, biometrics, cognition, or anomaly labels",
+      "scholarship_basis": [
+        "Levenshtein/string encoding",
+        "transition matrix",
+        "cosine-style vector comparison"
+      ],
+      "evidence_class": "scanpath_descriptor",
+      "available": true
+    },
+    {
+      "id": "idealized_noise_sensitivity",
+      "label": "Idealized noise sensitivity",
+      "source_artifact": "noise_metrics",
+      "source_path": "output/figures/noise_metrics.json",
+      "reported_value": "F1 edge 0.92 px; RMS edge 3.05 px",
+      "estimand": "closed-loop estimator sensitivity to seeded synthetic landmark jitter",
+      "interpretation": "Threshold crossings show where idealized landmark jitter degrades recovery.",
+      "does_not_prove": "webcam optics, MediaPipe bias, lighting, or hardware noise",
+      "scholarship_basis": [
+        "Monte-Carlo perturbation",
+        "bounded bootstrap interval"
+      ],
+      "evidence_class": "synthetic_stress_diagnostic",
+      "available": true
+    },
+    {
+      "id": "synthetic_empirical_context",
+      "label": "Synthetic/empirical context",
+      "source_artifact": "synthetic_empirical_range_bridge",
+      "source_path": "output/figures/synthetic_empirical_range_bridge.json",
+      "reported_value": "10 rows; 3 stress; 2 non-comparable",
+      "estimand": "relationship between one local N=1 session scale and synthetic/stress variables",
+      "interpretation": "Local-scale, stress-only, and non-comparable rows remain separated.",
+      "does_not_prove": "device validation, device performance, or universal webcam accuracy",
+      "scholarship_basis": [
+        "data-quality ledger",
+        "truth-boundary taxonomy"
+      ],
+      "evidence_class": "interpretation_boundary",
+      "available": true
+    }
+  ],
+  "summary": {
+    "row_count": 8,
+    "available_count": 8,
+    "evidence_classes": [
+      "bootstrap_uncertainty",
+      "descriptive_statistic",
+      "interpretation_boundary",
+      "model_residual_diagnostic",
+      "relative_model_diagnostic",
+      "scanpath_descriptor",
+      "synthetic_stress_diagnostic"
+    ]
+  }
+}

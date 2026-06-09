@@ -39,6 +39,7 @@ def test_commands_registered() -> None:  # ISC-48
         "dashboard",
         "camera-probe",
         "live-html",
+        "experiment-report",
     ):
         assert cmd in result.output
 
@@ -49,11 +50,13 @@ def test_capture_cli_options_registered() -> None:
     live = runner.invoke(app, ["live-html", "--help"])
     analyze = runner.invoke(app, ["analyze", "--help"])
     stats = runner.invoke(app, ["stats", "--help"])
+    experiment = runner.invoke(app, ["experiment-report", "--help"])
     assert record.exit_code == 0
     assert probe.exit_code == 0
     assert live.exit_code == 0
     assert analyze.exit_code == 0
     assert stats.exit_code == 0
+    assert experiment.exit_code == 0
     assert "records-out" in record.output
     assert "backend-logs" in record.output
     assert "backend-logs" in probe.output
@@ -61,6 +64,7 @@ def test_capture_cli_options_registered() -> None:
         assert option in live.output
     assert "config-json" in analyze.output
     assert "config-json" in stats.output
+    assert "capture_records_csv" in experiment.output
 
 
 def test_native_stderr_suppression_modes(capfd) -> None:

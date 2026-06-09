@@ -7,86 +7,42 @@ Commands
 * ``itrace record``     - live webcam capture (requires the ``capture`` extra).
 * ``itrace dashboard``  - launch the Streamlit dashboard (``dashboard`` extra).
 * ``itrace live-html``  - launch the local HTML orchestrator (``web`` + ``capture`` extras).
+* ``itrace experiment-report`` - summarise a derived live experiment export.
 """
 
 from __future__ import annotations
 
-import csv
 import json
-import os
-from collections.abc import Iterator
-from contextlib import contextmanager
 from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 import typer
 
-from . import io, pipeline, saccades, validation
+from . import benchmark, experiments, io, pipeline, saccades, validation
 from .calibration import (
     AffineCalibration,
     calibration_error,
     interpolate_gaze_gaps,
     robust_gaze_quality,
 )
-from .capture import CaptureSample
+from .capture import (
+    CaptureSample,
+    samples_to_streams,
+    write_capture_records_csv,
+)
+from .capture import (
+    native_stderr as _native_stderr,
+)
 from .config import AnalysisConfig, analysis_config_from_json
 from .pupil import quality_summary
 from .reporting import validate_report_payload
 from .stats import bootstrap, descriptive, distributions, scanpath_metrics
 from .synthetic import gaze_with_saccade, pupil_sine_with_blink
-from .types import GazeStream, PupilStream, PupilUnit, SessionReport
+from .types import SessionReport
 from .version import __version__
 
 app = typer.Typer(add_completion=False, help="iTrace - webcam eye-movement analysis toolkit.")
-
-
-@contextmanager
-def _native_stderr(backend_logs: bool) -> Iterator[None]:
-    """Optionally silence noisy native OpenCV/MediaPipe stderr diagnostics."""
-    if backend_logs:
-        yield
-        return
-    saved = os.dup(2)
-    devnull = os.open(os.devnull, os.O_WRONLY)
-    try:
-        os.dup2(devnull, 2)
-        yield
-    finally:
-        os.dup2(saved, 2)
-        os.close(devnull)
-        os.close(saved)
-
-
-def write_capture_records_csv(samples: list[CaptureSample], out: Path) -> Path:
-    """Write full capture records: frame, timing, gaze, pupil proxy, FPS, quality."""
-    quality_keys = sorted({key for sample in samples for key in sample.quality})
-    fieldnames = [
-        "frame_index",
-        "timestamp_s",
-        "gaze_x_deg",
-        "gaze_y_deg",
-        "pupil_size",
-        "pupil_unit",
-        "fps_estimate_hz",
-        *[f"quality_{key}" for key in quality_keys],
-    ]
-    with out.open("w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=fieldnames)
-        writer.writeheader()
-        for sample in samples:
-            row: dict[str, object] = {
-                "frame_index": sample.frame_index,
-                "timestamp_s": sample.timestamp_s,
-                "gaze_x_deg": sample.gaze.x,
-                "gaze_y_deg": sample.gaze.y,
-                "pupil_size": sample.pupil.size if sample.pupil is not None else "",
-                "pupil_unit": sample.pupil.unit.value if sample.pupil is not None else "",
-                "fps_estimate_hz": sample.fps_estimate_hz,
-            }
-            row.update({f"quality_{key}": sample.quality.get(key, "") for key in quality_keys})
-            writer.writerow(row)
-    return out
 
 
 def write_capture_samples(
@@ -97,20 +53,10 @@ def write_capture_samples(
     The capture module itself is import-safe; constructing ``WebcamSource`` is
     still the only place that imports hardware dependencies.
     """
-    gaze = GazeStream(
-        t=np.array([s.gaze.t for s in samples], dtype=np.float64),
-        x=np.array([s.gaze.x for s in samples], dtype=np.float64),
-        y=np.array([s.gaze.y for s in samples], dtype=np.float64),
-    )
+    gaze, pupil = samples_to_streams(samples)
     io.write_gaze_csv(gaze, out)
     if pupil_out is not None:
-        pupil_samples = [s.pupil for s in samples if s.pupil is not None]
-        pstream = PupilStream(
-            t=np.array([p.t for p in pupil_samples], dtype=np.float64),
-            size=np.array([p.size for p in pupil_samples], dtype=np.float64),
-            unit=pupil_samples[0].unit if pupil_samples else PupilUnit.RELATIVE,
-        )
-        io.write_pupil_csv(pstream, pupil_out)
+        io.write_pupil_csv(pupil, pupil_out)
     return len(samples)
 
 
@@ -191,7 +137,13 @@ def analyze(
     velocity_threshold: float | None = None,
     config_json: Path | None = None,
 ) -> None:
-    """Analyse a gaze CSV (and optional pupil CSV); write a JSON report."""
+    """Analyse gaze/pupil CSV files and write a JSON report.
+
+    Pass ``--config-json`` with an ``AnalysisConfig``-shaped object to document
+    method settings such as ``detection.merge_gap_s``; an explicit
+    ``--velocity-threshold`` still overrides the file for quick fixed-I-VT
+    sweeps.
+    """
     gaze = io.read_gaze_csv(gaze_csv)
     pstream = io.read_pupil_csv(pupil_csv) if pupil_csv is not None else None
     cfg = _config_with_cli_overrides(config_json, velocity_threshold=velocity_threshold)
@@ -215,7 +167,9 @@ def stats(
 
     Computes the descriptive fixation/saccade summaries, the scanpath spread
     metrics, and a maximum-likelihood fit of the saccade-amplitude distribution
-    (when at least three saccades are present), then writes them as JSON.
+    (when at least three saccades are present), then writes them as JSON. The
+    ``quality`` block mirrors ``robust_gaze_quality`` fields so callers can
+    audit dropout, jitter, long gaps, and timestamp monotonicity.
     """
     gaze = io.read_gaze_csv(gaze_csv)
     pstream = io.read_pupil_csv(pupil_csv) if pupil_csv is not None else None
@@ -254,7 +208,7 @@ def calibrate(
     apply_gaze: Path | None = None,
     calibrated_out: Path | None = None,
 ) -> None:
-    """Fit an affine calibration from target-point CSV data."""
+    """Fit an AffineCalibration from raw/target-point CSV data."""
     import pandas as pd
 
     table = pd.read_csv(points_csv)
@@ -294,15 +248,34 @@ def validate_recording(
     config_json: Path | None = None,
     calibration_json: Path | None = None,
 ) -> None:
-    """Validate recording quality before analysis."""
+    """Validate recording quality before analysis.
+
+    The payload includes robust gaze quality, event plausibility, pupil
+    validity, report-shape validation, and calibration availability when
+    ``--calibration-json`` points at an exported affine fit.
+    """
     gaze = io.read_gaze_csv(gaze_csv)
     pstream = io.read_pupil_csv(pupil_csv) if pupil_csv is not None else None
     cfg = load_analysis_config(config_json)
     quality = robust_gaze_quality(gaze)
+    original_finite = int(np.sum(np.isfinite(gaze.x) & np.isfinite(gaze.y) & np.isfinite(gaze.t)))
+    preprocessing: dict[str, object] = {
+        "short_gap_interpolation_used": False,
+        "short_gap_max_s": 0.05,
+    }
     try:
         analysis_gaze = interpolate_gaze_gaps(gaze, max_gap_s=0.05)
+        interpolated_finite = int(
+            np.sum(
+                np.isfinite(analysis_gaze.x)
+                & np.isfinite(analysis_gaze.y)
+                & np.isfinite(analysis_gaze.t)
+            )
+        )
+        preprocessing["short_gap_interpolation_used"] = interpolated_finite > original_finite
     except ValueError:
         analysis_gaze = gaze
+        preprocessing["short_gap_interpolation_used"] = False
     try:
         report = pipeline.analyze_session(analysis_gaze, pstream, config=cfg)
         report_validation = validate_report_payload(report.to_dict())
@@ -313,6 +286,8 @@ def validate_recording(
     errors: list[str] = []
     if quality["dropout_fraction"] > 0.0:
         warnings.append("gaze contains non-finite samples")
+    if quality["valid_sample_fraction"] < 0.85:
+        warnings.append("low finite gaze fraction")
     if quality["nonmonotonic_timestamp_count"] > 0.0:
         errors.append("gaze timestamps are nonmonotonic")
     if quality["large_gap_count"] > 0.0:
@@ -326,9 +301,12 @@ def validate_recording(
         pupil_payload = quality_summary(pstream, min_valid=max(cfg.pupil.blink_threshold, 1e-6))
         if pupil_payload.get("blink_fraction", 0.0) > 0.0:
             warnings.append("pupil trace contains blink or invalid samples")
+        if pupil_payload.get("valid_sample_fraction", 1.0) < 0.5:
+            warnings.append("low pupil-valid fraction")
     payload = {
         "n_samples": len(gaze),
         "duration_s": float(gaze.t[-1] - gaze.t[0]) if len(gaze) >= 2 else 0.0,
+        "preprocessing": preprocessing,
         "quality": quality,
         "events": {
             "n_fixations": len(report.fixations) if report is not None else 0,
@@ -372,6 +350,58 @@ def synthetic_validation(
         f"macro_f1={float(cross['macro_saccade_f1']):.3f}, "
         f"worst={cross['worst_domain']})"
     )
+
+
+@app.command("benchmark")
+def benchmark_events(
+    truth_csv: Path,
+    out: Path = Path("benchmark.json"),
+    gaze_csv: Path | None = None,
+    predicted_events_csv: Path | None = None,
+    comparator_events_csv: Path | None = None,
+    pupil_csv: Path | None = None,
+    config_json: Path | None = None,
+    min_overlap_s: float = 0.005,
+) -> None:
+    """Benchmark saccade events against caller-supplied truth/comparator files."""
+    truth = benchmark.load_saccade_events_csv(truth_csv)
+    systems = {}
+    if gaze_csv is not None:
+        gaze = io.read_gaze_csv(gaze_csv)
+        pstream = io.read_pupil_csv(pupil_csv) if pupil_csv is not None else None
+        report = pipeline.analyze_session(gaze, pstream, config=load_analysis_config(config_json))
+        systems["itrace"] = report.saccades
+    if predicted_events_csv is not None:
+        systems["predicted"] = benchmark.load_saccade_events_csv(predicted_events_csv)
+    if comparator_events_csv is not None:
+        systems["comparator"] = benchmark.load_saccade_events_csv(comparator_events_csv)
+    if not systems:
+        msg = "provide --gaze-csv, --predicted-events-csv, or --comparator-events-csv"
+        raise typer.BadParameter(msg)
+    payload = benchmark.benchmark_payload(truth, systems, min_overlap_s=min_overlap_s)
+    out.write_text(json.dumps(payload, indent=2))
+    typer.echo(f"wrote {out} ({len(systems)} systems, truth_events={len(truth)})")
+
+
+@app.command("experiment-report")
+def experiment_report_command(
+    manifest_json: Path,
+    capture_records_csv: Path,
+    out: Path = Path("experiment_report.json"),
+) -> None:
+    """Report derived empirical parameters for a guided live experiment."""
+    protocol, recorded_trials = experiments.load_experiment_manifest(manifest_json)
+    samples = experiments.read_capture_records_csv(capture_records_csv)
+    payload = experiments.experiment_report(samples, protocol, recorded_trials)
+    out.write_text(json.dumps(payload, indent=2))
+    heldout = payload["heldout_target_error"]
+    assert isinstance(heldout, dict)
+    suffix = (
+        f"heldout_rms={float(heldout['rms_error_deg']):.2f}deg"
+        if heldout.get("available")
+        else str(heldout.get("reason", "heldout unavailable"))
+    )
+    typer.echo(f"wrote {out} ({len(samples)} samples, {suffix})")
 
 
 @app.command()
@@ -440,18 +470,25 @@ def live_html(
     host: str = "127.0.0.1",
     port: int = 8765,
     output_dir: Path | None = None,
+    empirical_manifest: Path | None = None,
     backend_logs: bool = False,
     open_browser: bool = False,
 ) -> None:
     """Launch the local HTML live webcam orchestrator (requires the 'web' extra)."""
     from .live import serve_live_html
 
+    manifest_path = empirical_manifest
+    if manifest_path is None:
+        default_manifest = Path("docs") / "empirical_sessions_manifest.json"
+        if default_manifest.exists():
+            manifest_path = default_manifest
     try:
         serve_live_html(
             camera_index=camera,
             host=host,
             port=port,
             output_dir=output_dir,
+            empirical_manifest_path=manifest_path,
             backend_logs=backend_logs,
             open_browser=open_browser,
         )

@@ -3,8 +3,9 @@
 Saccade and fixation summaries (durations, amplitudes, inter-saccadic
 intervals) are routinely modelled by a handful of parametric families. This
 module fits those families by maximum likelihood via :mod:`scipy.stats`,
-scores them with information criteria and a goodness-of-fit test, and lets the
-caller reconstruct a frozen distribution for plotting.
+scores them with information criteria, relative information-criterion weights,
+and a goodness-of-fit test, and lets the caller reconstruct a frozen
+distribution for plotting.
 
 Supported families
 ------------------
@@ -78,6 +79,9 @@ class FitResult:
         Akaike information criterion ``2k - 2L`` (lower is better).
     bic:
         Bayesian information criterion ``k ln(n) - 2L`` (lower is better).
+    aicc:
+        Small-sample corrected AIC, exposed as a property because it is fully
+        determined by ``aic``, ``k``, and ``n``.
     ks_statistic:
         Kolmogorov-Smirnov statistic between the data and the fitted CDF.
     ks_pvalue:
@@ -103,6 +107,19 @@ class FitResult:
     def k(self) -> int:
         """Number of free (readable) parameters of the fitted family."""
         return len(self.params)
+
+    @property
+    def aicc(self) -> float:
+        """Small-sample corrected AIC, or ``inf`` when undefined.
+
+        The correction is ``AIC + 2k(k+1)/(n-k-1)``. It is finite only when the
+        sample size exceeds ``k + 1``; callers can still report ordinary AIC
+        for extremely small candidate sets.
+        """
+        denom = self.n - self.k - 1
+        if denom <= 0:
+            return float("inf")
+        return float(self.aic + (2.0 * self.k * (self.k + 1)) / denom)
 
 
 def _clean(data: FloatArray | object) -> FloatArray:
@@ -291,6 +308,50 @@ def compare_distributions(
             continue
     results.sort(key=lambda r: r.aic)
     return results
+
+
+def information_weights(
+    results: list[FitResult] | tuple[FitResult, ...],
+    *,
+    criterion: str = "aic",
+) -> dict[str, float]:
+    """Return normalized relative weights for fitted candidate models.
+
+    Parameters
+    ----------
+    results:
+        Candidate fits, typically from :func:`compare_distributions`.
+    criterion:
+        One of ``"aic"``, ``"aicc"``, or ``"bic"``. Weights are computed as
+        ``exp(-0.5 * delta)`` and normalized over the finite criterion values.
+
+    Returns
+    -------
+    dict[str, float]
+        Family name to normalized weight. Fits with non-finite criterion values
+        receive zero weight; an empty or all-nonfinite candidate set yields all
+        zero weights.
+
+    Raises
+    ------
+    ValueError
+        If ``criterion`` is not supported.
+    """
+    if criterion not in {"aic", "aicc", "bic"}:
+        msg = "criterion must be one of 'aic', 'aicc', or 'bic'"
+        raise ValueError(msg)
+
+    values = np.array([float(getattr(result, criterion)) for result in results], dtype=np.float64)
+    weights = np.zeros(values.shape, dtype=np.float64)
+    finite = np.isfinite(values)
+    if np.any(finite):
+        finite_values = values[finite]
+        delta = finite_values - float(np.min(finite_values))
+        raw = np.exp(-0.5 * delta)
+        denom = float(np.sum(raw))
+        if denom > 0.0 and np.isfinite(denom):
+            weights[finite] = raw / denom
+    return {result.family: float(weight) for result, weight in zip(results, weights, strict=True)}
 
 
 def best_fit(

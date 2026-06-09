@@ -1,0 +1,383 @@
+{
+  "kind": "itrace_documentation_visualization_analysis_traceability",
+  "version": "0.4.1",
+  "updated": "2026-06-07",
+  "truth_boundary": "Algorithmic verification uses synthetic truth, independent reference implementations, and the 3-D closed loop. Guided webcam sessions are session diagnostics. Device-level accuracy requires public-dataset or reference-device evidence that is not bundled here.",
+  "claims": [
+    {
+      "id": "gate_metrics_and_render_hydration",
+      "category": "reproducibility_gate",
+      "claim": "Public gate metrics are centralized in the verification metrics ledger; rendered manuscript artifacts and generated figure badges hydrate from that ledger instead of duplicating literal counts in README prose.",
+      "docs": ["README.md", "ISA.md", "manuscript/README.md"],
+      "methods": ["scripts/render_manuscript.py"],
+      "method_symbols": [],
+      "tests": ["tests/test_manuscript_integrity.py"],
+      "evidence": [
+        "docs/verification_metrics.json",
+        "docs/figure_manifest.json",
+        "manuscript/_build.md",
+        "manuscript/_build.txt",
+        "manuscript/_build.tex",
+        "manuscript/_build.pdf"
+      ],
+      "boundary": "Gate metrics are current only after the full gate is rerun and the JSON ledger is refreshed."
+    },
+    {
+      "id": "pure_core_import_safety",
+      "category": "pure_core",
+      "claim": "The tested analysis core remains import-safe and headless; optional capture, web, dashboard, and figure dependencies stay lazy.",
+      "docs": ["README.md", "AGENTS.md", "ISA.md"],
+      "methods": ["src/itrace/pipeline.py", "src/itrace/synthetic.py"],
+      "method_symbols": ["itrace.pipeline.analyze_session", "itrace.synthetic.synthetic_session"],
+      "tests": ["tests/test_package.py", "tests/test_pipeline_io.py"],
+      "evidence": ["docs/verification_metrics.json"],
+      "boundary": "This proves import safety and deterministic analysis behavior, not camera availability."
+    },
+    {
+      "id": "synthetic_truth_event_recovery",
+      "category": "algorithmic_verification",
+      "claim": "Saccade, microsaccade, pupil, and session pipelines recover known synthetic truths within tested tolerances.",
+      "docs": ["README.md", "ISA.md", "manuscript/03a_ground_truth_recovery.md"],
+      "methods": ["src/itrace/synthetic.py", "src/itrace/saccades.py", "src/itrace/pipeline.py"],
+      "method_symbols": [
+        "itrace.synthetic.gaze_with_saccade",
+        "itrace.saccades.detect_ivt",
+        "itrace.saccades.saccade_properties",
+        "itrace.pipeline.analyze_session"
+      ],
+      "tests": [
+        "tests/test_saccades.py",
+        "tests/test_synthetic_session.py",
+        "tests/fixtures/reference_impl.py"
+      ],
+      "evidence": ["output/synthetic_validation.json"],
+      "boundary": "Synthetic truth has known labels; it is not a real-frame or reference-device validation study."
+    },
+    {
+      "id": "closed_loop_algorithmic_verification",
+      "category": "algorithmic_verification",
+      "claim": "The independent 3-D eye forward model and the estimator close the loop with small residuals under shared idealizing assumptions.",
+      "docs": ["README.md", "ISA.md", "manuscript/03c_closed_loop.md"],
+      "methods": ["src/itrace/eyemodel.py", "src/itrace/scene.py", "scripts/generate_loop_animation.py"],
+      "method_symbols": ["itrace.scene.closed_loop"],
+      "tests": ["tests/test_eyemodel.py", "tests/test_scene.py", "tests/test_loop_animation.py"],
+      "evidence": [
+        "output/figures/closed_loop_summary.png",
+        "output/figures/closed_loop.gif"
+      ],
+      "boundary": "The loop checks algorithmic consistency on synthetic landmarks and is blind to shared camera/eye idealizations."
+    },
+    {
+      "id": "noise_sensitivity",
+      "category": "analysis_output",
+      "claim": "Noise-sensitivity figures and tables come from seeded Monte-Carlo perturbations of the tested closed-loop pipeline.",
+      "docs": ["README.md", "ISA.md", "manuscript/03d_noise_sensitivity.md"],
+      "methods": ["src/itrace/power.py", "scripts/generate_power_figure.py"],
+      "method_symbols": ["itrace.power.run_noise_sweep"],
+      "tests": ["tests/test_power.py", "tests/test_orbs_power_figures.py"],
+      "evidence": ["output/figures/noise_power.png", "output/figures/noise_summary.md"],
+      "boundary": "The noise model is idealized landmark jitter; it is not an optics-derived webcam error distribution."
+    },
+    {
+      "id": "pupilseg_units_and_quality",
+      "category": "bounded_diagnostic",
+      "claim": "The eye-crop pupil segmentation path reports pixels or pupil/iris-relative units with confidence and quality fields.",
+      "docs": ["README.md", "ISA.md", "manuscript/02e_pupillometry.md"],
+      "methods": ["src/itrace/pupilseg.py", "src/itrace/types.py"],
+      "method_symbols": ["itrace.pupilseg.segment_pupil_sample"],
+      "tests": ["tests/test_pupilseg.py"],
+      "evidence": ["docs/verification_metrics.json"],
+      "boundary": "No millimetre pupil-diameter claim is made without calibration or reference geometry."
+    },
+    {
+      "id": "binocular_landmark_diagnostics",
+      "category": "bounded_diagnostic",
+      "claim": "Per-eye and binocular landmark diagnostics expose vergence/asymmetry fields from plain landmark arrays.",
+      "docs": ["README.md", "ISA.md", "manuscript/02f_capture_shell.md"],
+      "methods": ["src/itrace/capture.py", "src/itrace/types.py"],
+      "method_symbols": ["itrace.capture.iris_landmarks_to_binocular_sample"],
+      "tests": ["tests/test_capture.py"],
+      "evidence": ["docs/verification_metrics.json"],
+      "boundary": "Diagnostics indicate landmark consistency; they do not calibrate physical gaze accuracy."
+    },
+    {
+      "id": "benchmark_user_supplied_truth",
+      "category": "external_truth_interface",
+      "claim": "The benchmark harness scores iTrace/comparator event intervals against caller-supplied truth files and carries a truth-boundary field.",
+      "docs": ["README.md", "docs/VALIDATION_PROTOCOLS.md", "manuscript/02f_capture_shell.md"],
+      "methods": ["src/itrace/benchmark.py", "src/itrace/stats/events.py"],
+      "method_symbols": ["itrace.benchmark.benchmark_payload"],
+      "tests": ["tests/test_benchmark.py"],
+      "evidence": ["docs/verification_metrics.json"],
+      "boundary": "Comparator agreement is not biological ground truth unless the caller supplies reference annotations or a reference device."
+    },
+    {
+      "id": "guided_empirical_session",
+      "category": "session_diagnostic",
+      "claim": "Guided empirical sessions export derived records and summarize finite gaze, sampling regularity, drift, held-out target residuals, and target latency.",
+      "docs": ["README.md", "docs/VALIDATION_PROTOCOLS.md", "manuscript/03ez_empirical_pilot.md"],
+      "methods": ["src/itrace/experiments.py", "scripts/summarize_empirical_pilot.py"],
+      "method_symbols": ["itrace.experiments.experiment_report"],
+      "tests": ["tests/test_experiments.py", "tests/test_live_html.py"],
+      "evidence": [
+        "docs/empirical_pilot_metrics.json",
+        "output/figures/empirical_pilot_summary.png"
+      ],
+      "boundary": "Prompted targets estimate current-session quality; they are not reference-device validation, and raw eye video or persisted eye-crop images are not written by the default workflow."
+    },
+    {
+      "id": "empirical_sessions_manifest",
+      "category": "session_diagnostic",
+      "claim": "More empirical data are added through a schema-checked repeated-session manifest and generated readiness summary that records available sessions, distinct replicates, conditions, participant/device scope, reference candidates, validated reference evidence, current diagnostic-v1 readiness, and future validation scope.",
+      "docs": ["README.md", "docs/VALIDATION_PROTOCOLS.md", "docs/manual_annotation_protocol.md", "manuscript/03ez_empirical_pilot.md", "manuscript/05_limitations.md"],
+      "methods": ["src/itrace/empirical.py", "scripts/aggregate_empirical_sessions.py"],
+      "method_symbols": [
+        "itrace.empirical.validate_empirical_manifest",
+        "itrace.empirical.validate_reference_artifact",
+        "itrace.empirical.build_empirical_sessions_summary"
+      ],
+      "tests": ["tests/test_empirical_sessions.py", "tests/test_figures.py", "tests/test_live_html.py"],
+      "evidence": [
+        "docs/empirical_sessions_manifest.json",
+        "docs/empirical_sessions_summary.json",
+        "output/figures/empirical_sessions_summary.png"
+      ],
+      "boundary": "Prompt-only repeated sessions improve within-participant/device operating-scale coverage for the declared single-participant/device setup, but do not create population, cross-device, or v1 device-validation claims unless reference-device, public-dataset, or manual-annotation evidence is backed by a valid repo-relative reference artifact."
+    },
+    {
+      "id": "synthetic_empirical_range_bridge",
+      "category": "analysis_output",
+      "claim": "The N=1 pilot is compared with synthetic-domain, landmark-noise, and statistical-diagnostic variables through a generated payload that marks observed local scale, stress-domain-only, and non-comparable fields.",
+      "docs": ["README.md", "ISA.md", "manuscript/03ez_empirical_pilot.md"],
+      "methods": ["src/itrace/stats/range_bridge.py", "scripts/generate_figures.py"],
+      "method_symbols": [
+        "itrace.stats.range_bridge.build_synthetic_empirical_range_bridge",
+        "itrace.stats.range_bridge.load_synthetic_empirical_range_bridge"
+      ],
+      "tests": [
+        "tests/test_range_bridge.py",
+        "tests/test_viz_range_bridge.py",
+        "tests/test_figures.py"
+      ],
+      "evidence": [
+        "output/figures/synthetic_empirical_range_bridge.json",
+        "output/figures/synthetic_empirical_range_bridge.png",
+        "docs/empirical_pilot_metrics.json",
+        "output/synthetic_validation.json",
+        "output/figures/noise_metrics.json",
+        "output/figures/statistical_diagnostics.json"
+      ],
+      "boundary": "The bridge contextualizes one local operating scale against synthetic/stress evidence; it does not validate device accuracy, device performance, or webcam generality."
+    },
+    {
+      "id": "statistical_interpretation_ledger",
+      "category": "analysis_output",
+      "claim": "The statistical interpretation ledger maps each generated statistic to its source artifact, reported value, estimand, scholarship basis, and explicit non-claim boundary.",
+      "docs": ["README.md", "ISA.md", "manuscript/03f_figure_gallery.md"],
+      "methods": ["src/itrace/stats/evidence.py", "src/itrace/viz/evidence.py", "scripts/generate_figures.py"],
+      "method_symbols": [
+        "itrace.stats.evidence.build_statistical_interpretation_ledger",
+        "itrace.stats.evidence.load_statistical_interpretation_ledger",
+        "itrace.viz.evidence.figure_statistical_interpretation_ledger"
+      ],
+      "tests": [
+        "tests/test_statistical_evidence.py",
+        "tests/test_viz_statistical_evidence.py",
+        "tests/test_figures.py"
+      ],
+      "evidence": [
+        "output/figures/statistical_interpretation_ledger.json",
+        "output/figures/statistical_interpretation_ledger.png",
+        "output/figures/statistical_diagnostics.json",
+        "output/figures/synthetic_empirical_range_bridge.json",
+        "output/figures/noise_metrics.json",
+        "docs/empirical_pilot_metrics.json"
+      ],
+      "boundary": "The ledger interprets tested artifacts; it does not turn descriptive statistics, model diagnostics, synthetic stress tests, or one N=1 session into population physiology or device validation."
+    },
+    {
+      "id": "live_backend_analysis_payload",
+      "category": "display_only_ui",
+      "claim": "The live HTML page renders Python-computed analysis payloads and synthetic validation payloads without moving tested Python methods into browser JavaScript.",
+      "docs": ["README.md", "docs/VALIDATION_PROTOCOLS.md", "ISA.md"],
+      "methods": ["src/itrace/live/analysis.py", "src/itrace/live/server.py"],
+      "method_symbols": ["itrace.live.analysis.analysis_payload"],
+      "tests": ["tests/test_live_html.py"],
+      "evidence": ["output/live_smoke/live_browser_smoke.png"],
+      "boundary": "Browser Canvas/SVG is display-only; live webcam diagnostics remain plausibility checks without live reference truth."
+    }
+  ],
+  "figures": [
+    {
+      "id": "graphical_abstract",
+      "path": "output/figures/graphical_abstract.png",
+      "script": "scripts/generate_graphical_abstract.py",
+      "source_data": [
+        "docs/verification_metrics.json",
+        "docs/empirical_sessions_summary.json",
+        "LICENSE",
+        "CITATION.cff"
+      ],
+      "method_symbols": ["itrace.scene.closed_loop", "itrace.validation.synthetic_validation_suite"],
+      "tests": ["tests/test_figures.py", "tests/test_manuscript_integrity.py"],
+      "boundary": "Eye-to-code architecture summary; explicitly labels MIT/GitHub availability and the no-reference-device-claim boundary rather than validating webcam accuracy."
+    },
+    {
+      "id": "empirical_pilot_summary",
+      "path": "output/figures/empirical_pilot_summary.png",
+      "script": "scripts/summarize_empirical_pilot.py",
+      "source_data": [
+        "docs/empirical_pilot_metrics.json",
+        "output/empirical_pilot/local_pilot_001/experiment/experiment_report.json"
+      ],
+      "method_symbols": ["itrace.experiments.experiment_report"],
+      "tests": ["tests/test_experiments.py", "tests/test_manuscript_integrity.py"],
+      "boundary": "Pending fields remain unavailable until a derived experiment report is exported."
+    },
+    {
+      "id": "empirical_sessions_summary",
+      "path": "output/figures/empirical_sessions_summary.png",
+      "script": "scripts/aggregate_empirical_sessions.py",
+      "source_data": [
+        "docs/empirical_sessions_manifest.json",
+        "docs/empirical_sessions_summary.json",
+        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+      ],
+      "method_symbols": [
+        "itrace.empirical.validate_empirical_manifest",
+        "itrace.empirical.build_empirical_sessions_summary"
+      ],
+      "tests": ["tests/test_empirical_sessions.py", "tests/test_figures.py"],
+      "boundary": "Shows empirical replicate coverage and diagnostic-v1 readiness for the declared single-participant/device setup while preserving future backlit-condition and reference-backed validation scope."
+    },
+    {
+      "id": "synthetic_empirical_range_bridge",
+      "path": "output/figures/synthetic_empirical_range_bridge.png",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "output/figures/synthetic_empirical_range_bridge.json",
+        "docs/empirical_pilot_metrics.json",
+        "output/empirical_pilot/local_pilot_001/experiment/experiment_report.json",
+        "output/synthetic_validation.json",
+        "output/figures/noise_metrics.json",
+        "output/figures/statistical_diagnostics.json",
+        "src/itrace/stats/range_bridge.py"
+      ],
+      "method_symbols": [
+        "itrace.stats.range_bridge.build_synthetic_empirical_range_bridge",
+        "itrace.viz.range_bridge.figure_synthetic_empirical_range_bridge"
+      ],
+      "tests": [
+        "tests/test_range_bridge.py",
+        "tests/test_viz_range_bridge.py",
+        "tests/test_figures.py"
+      ],
+      "boundary": "Generated bridge over tested Python payloads; observed local-scale, stress-domain-only, and non-comparable fields stay visually separated."
+    },
+    {
+      "id": "main_sequence",
+      "path": "output/figures/main_sequence.png",
+      "script": "scripts/generate_figures.py",
+      "source_data": ["src/itrace/synthetic.py"],
+      "method_symbols": [
+        "itrace.synthetic.gaze_with_saccade",
+        "itrace.saccades.detect_ivt",
+        "itrace.mainsequence.fit"
+      ],
+      "tests": ["tests/test_figures.py", "tests/test_mainsequence.py"],
+      "boundary": "Synthetic model recovery; not a physiological population estimate."
+    },
+    {
+      "id": "direction_polar",
+      "path": "output/figures/direction_polar.png",
+      "script": "scripts/generate_figures.py",
+      "source_data": ["src/itrace/synthetic.py"],
+      "method_symbols": ["itrace.saccades.detect_ivt", "itrace.saccades.saccade_properties"],
+      "tests": ["tests/test_figures.py", "tests/test_saccades.py"],
+      "boundary": "Displays recovered synthetic saccade directions; not a real-eye direction distribution."
+    },
+    {
+      "id": "statistical_diagnostics",
+      "path": "output/figures/statistical_diagnostics.png",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "output/figures/statistical_diagnostics.json",
+        "src/itrace/synthetic.py",
+        "src/itrace/stats/diagnostics.py",
+        "src/itrace/stats/distributions.py",
+        "src/itrace/stats/scanpath_metrics.py",
+        "src/itrace/stats/similarity.py"
+      ],
+      "method_symbols": [
+        "itrace.stats.diagnostics.session_statistical_diagnostics",
+        "itrace.stats.distributions.compare_distributions",
+        "itrace.stats.scanpath_metrics.main_sequence_exponent_ci",
+        "itrace.stats.scanpath_metrics.scanpath_summary",
+        "itrace.stats.similarity.transition_matrix"
+      ],
+      "tests": [
+        "tests/test_stats_diagnostics.py",
+        "tests/test_stats_distributions.py",
+        "tests/test_stats_scanpath_metrics.py",
+        "tests/test_stats_similarity.py",
+        "tests/test_viz_statistics.py"
+      ],
+      "boundary": "Visualizes robust amplitude-shape summaries with seeded bootstrap intervals, AIC/AICc/BIC/KS model comparison with Akaike weights, bootstrap lowest-AIC winner stability, QQ and P-P/CDF residual diagnostics with integrated and tail-weighted fit distances plus a DKW/Massart reference band, descriptive statistics, and model diagnostics on a tested synthetic report; it does not estimate population physiology, posterior model probability, or device accuracy."
+    },
+    {
+      "id": "statistical_interpretation_ledger",
+      "path": "output/figures/statistical_interpretation_ledger.png",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "output/figures/statistical_interpretation_ledger.json",
+        "output/figures/statistical_diagnostics.json",
+        "output/figures/synthetic_empirical_range_bridge.json",
+        "output/figures/noise_metrics.json",
+        "docs/empirical_pilot_metrics.json",
+        "src/itrace/stats/evidence.py"
+      ],
+      "method_symbols": [
+        "itrace.stats.evidence.build_statistical_interpretation_ledger",
+        "itrace.viz.evidence.figure_statistical_interpretation_ledger"
+      ],
+      "tests": [
+        "tests/test_statistical_evidence.py",
+        "tests/test_viz_statistical_evidence.py",
+        "tests/test_figures.py"
+      ],
+      "boundary": "Shows what each statistic estimates and what it does not prove; it is an interpretation ledger, not a new validation experiment."
+    },
+    {
+      "id": "quality_gallery",
+      "path": "output/figures/session_dashboard.png",
+      "script": "scripts/generate_figures.py",
+      "source_data": ["src/itrace/synthetic.py"],
+      "method_symbols": ["itrace.pipeline.analyze_session", "itrace.synthetic.synthetic_session"],
+      "tests": [
+        "tests/test_viz_dashboard.py",
+        "tests/test_viz_spatial.py",
+        "tests/test_viz_timeline.py",
+        "tests/test_viz_traces.py"
+      ],
+      "boundary": "Visualizes Python-computed report fields; no visual panel creates new validation evidence."
+    },
+    {
+      "id": "closed_loop",
+      "path": "output/figures/closed_loop_summary.png",
+      "script": "scripts/generate_loop_animation.py",
+      "source_data": ["src/itrace/scene.py"],
+      "method_symbols": ["itrace.scene.closed_loop"],
+      "tests": ["tests/test_scene.py", "tests/test_loop_animation.py"],
+      "boundary": "Internal consistency under idealized synthetic landmarks."
+    },
+    {
+      "id": "noise_power",
+      "path": "output/figures/noise_power.png",
+      "script": "scripts/generate_power_figure.py",
+      "source_data": ["output/figures/noise_metrics.json"],
+      "method_symbols": ["itrace.power.run_noise_sweep"],
+      "tests": ["tests/test_power.py", "tests/test_orbs_power_figures.py"],
+      "boundary": "Idealized landmark-noise sensitivity; not a hardware noise measurement."
+    }
+  ]
+}

@@ -8,7 +8,7 @@ plausibility because there is no reference eye tracker in the loop.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, replace
 from math import sqrt
 
 import numpy as np
@@ -32,6 +32,69 @@ class SyntheticDomain:
     detection: DetectionConfig = field(
         default_factory=lambda: DetectionConfig(method="adaptive_ivt", include_pso=True)
     )
+
+
+@dataclass(frozen=True, slots=True)
+class ValidationAcceptancePreset:
+    """Named validation acceptance thresholds with an explicit truth boundary."""
+
+    name: str
+    label: str
+    minimum_saccade_f1: float | None
+    minimum_finite_gaze_fraction: float
+    minimum_pupil_valid_fraction: float
+    maximum_sampling_interval_cv: float
+    requires_reference_truth: bool
+    truth_boundary: str
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-friendly preset record."""
+        return {
+            "name": self.name,
+            "label": self.label,
+            "minimum_saccade_f1": self.minimum_saccade_f1,
+            "minimum_finite_gaze_fraction": self.minimum_finite_gaze_fraction,
+            "minimum_pupil_valid_fraction": self.minimum_pupil_valid_fraction,
+            "maximum_sampling_interval_cv": self.maximum_sampling_interval_cv,
+            "requires_reference_truth": self.requires_reference_truth,
+            "truth_boundary": self.truth_boundary,
+        }
+
+
+_ACCEPTANCE_PRESETS = (
+    ValidationAcceptancePreset(
+        name="demo",
+        label="Synthetic demo",
+        minimum_saccade_f1=0.50,
+        minimum_finite_gaze_fraction=0.90,
+        minimum_pupil_valid_fraction=0.80,
+        maximum_sampling_interval_cv=0.20,
+        requires_reference_truth=False,
+        truth_boundary="Synthetic-domain smoke threshold; not a real-device validation claim.",
+    ),
+    ValidationAcceptancePreset(
+        name="webcam_exploratory",
+        label="Webcam exploratory diagnostics",
+        minimum_saccade_f1=None,
+        minimum_finite_gaze_fraction=0.85,
+        minimum_pupil_valid_fraction=0.50,
+        maximum_sampling_interval_cv=0.25,
+        requires_reference_truth=False,
+        truth_boundary="Live webcam plausibility threshold only; no reference truth is present.",
+    ),
+    ValidationAcceptancePreset(
+        name="reference_device_comparison",
+        label="Reference-device comparison",
+        minimum_saccade_f1=0.80,
+        minimum_finite_gaze_fraction=0.95,
+        minimum_pupil_valid_fraction=0.90,
+        maximum_sampling_interval_cv=0.10,
+        requires_reference_truth=True,
+        truth_boundary=(
+            "Requires synchronized reference-device or authorized public-dataset truth before use."
+        ),
+    ),
+)
 
 
 def default_synthetic_domains() -> tuple[SyntheticDomain, ...]:
@@ -77,6 +140,42 @@ def default_synthetic_domains() -> tuple[SyntheticDomain, ...]:
             ),
         ),
     )
+
+
+def validation_domain_registry(
+    domains: Sequence[SyntheticDomain] | None = None,
+) -> dict[str, dict[str, object]]:
+    """Return a machine-readable registry of validation domains.
+
+    Downstream studies can serialize this structure and append their own domain
+    records without changing iTrace source code. The built-in records remain
+    synthetic only and deliberately do not claim real-device truth.
+    """
+    selected = tuple(domains) if domains is not None else default_synthetic_domains()
+    return {
+        domain.name: {
+            "name": domain.name,
+            "label": domain.label,
+            "spec": asdict(domain.spec),
+            "detection": asdict(domain.detection),
+            "truth_boundary": "synthetic ground truth only",
+        }
+        for domain in selected
+    }
+
+
+def acceptance_threshold_presets() -> dict[str, dict[str, object]]:
+    """Return named acceptance-threshold presets for validation reports."""
+    return {preset.name: preset.to_dict() for preset in _ACCEPTANCE_PRESETS}
+
+
+def acceptance_preset(name: str) -> dict[str, object]:
+    """Return one named acceptance preset, raising for unknown names."""
+    presets = acceptance_threshold_presets()
+    if name not in presets:
+        msg = f"unknown validation acceptance preset: {name}"
+        raise KeyError(msg)
+    return presets[name]
 
 
 def _truth_as_saccades(truth: Sequence[SyntheticSaccadeTruth]) -> list[Saccade]:

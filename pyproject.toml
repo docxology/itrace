@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "itrace"
-version = "0.4.0"
+version = "0.4.1"
 description = "Open-source webcam eye-movement analysis: gaze geometry, saccade/fixation/microsaccade detection, main-sequence dynamics, and pupillometry — a pure, algorithmically verified NumPy/SciPy core with an optional thin webcam/MediaPipe capture shell."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -59,7 +59,6 @@ figures = [
 web = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.30.0",
-    "httpx2>=0.28.0",
 ]
 all = [
     "opencv-python>=4.8.0",
@@ -69,7 +68,6 @@ all = [
     "matplotlib>=3.7.0",
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.30.0",
-    "httpx2>=0.28.0",
 ]
 dev = [
     "pytest>=8.0.0",
@@ -79,6 +77,9 @@ dev = [
     "mypy>=1.10.0",
     "matplotlib>=3.7.0",
     "fastapi>=0.115.0",
+    # Starlette/FastAPI TestClient uses httpx2 in current releases. Keep this
+    # in dev rather than the runtime web extra so local serving has a smaller
+    # network-client dependency surface.
     "httpx>=0.27.0",
     "httpx2>=0.28.0",
     "uvicorn[standard]>=0.30.0",
@@ -88,8 +89,9 @@ dev = [
 itrace = "itrace.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/docxology/template"
-Brief = "https://github.com/docxology/template"
+Homepage = "https://github.com/docxology/itrace"
+Repository = "https://github.com/docxology/itrace"
+Brief = "https://github.com/docxology/itrace"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
-from .palette import WONG  # single-source Wong (2011) colour-blind-safe palette
+from .palette import FONT_FLOOR, WONG  # single-source Wong (2011) colour-blind-safe palette
 
 # Welch segment ceiling; the effective ``nperseg`` is clamped to the signal
 # length so short traces still yield a (coarse) spectrum.
@@ -93,7 +93,7 @@ def plot_event_raster(report: SessionReport, *, ax: Axes | None = None) -> Axes:
     matplotlib.axes.Axes
         The Axes containing the event raster.
     """
-    ax = _ensure_ax(ax, (8, 2.6))
+    ax = _ensure_ax(ax, (8.4, 3.1))
 
     fix_spans = [(f.onset_t, max(f.offset_t - f.onset_t, 0.0)) for f in report.fixations]
     sac_spans = [(s.onset_t, max(s.offset_t - s.onset_t, 0.0)) for s in report.saccades]
@@ -121,7 +121,23 @@ def plot_event_raster(report: SessionReport, *, ax: Axes | None = None) -> Axes:
     ax.set_xlabel("time (s)")
     ax.set_title("Oculomotor event raster")
     if fix_spans or sac_spans:
-        ax.legend(loc="upper right", fontsize="small")
+        ax.legend(
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.23),
+            ncol=2,
+            frameon=False,
+            fontsize=FONT_FLOOR,
+        )
+    ax.text(
+        0.01,
+        1.04,
+        f"fixations n={len(report.fixations)} | saccades n={len(report.saccades)}",
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=FONT_FLOOR,
+        color="0.25",
+    )
     return ax
 
 
@@ -138,7 +154,7 @@ def figure_event_raster(report: SessionReport) -> Figure:
     matplotlib.figure.Figure
         A one-axes figure containing the event raster.
     """
-    fig, ax = plt.subplots(figsize=(8, 2.6))
+    fig, ax = plt.subplots(figsize=(8.4, 3.1))
     plot_event_raster(report, ax=ax)
     fig.tight_layout()
     return fig
@@ -192,7 +208,7 @@ def plot_rate(
     ax.set_ylabel("rate (1/s)")
     ax.set_title("Event rate")
     if t.size > 0:
-        ax.legend(loc="upper right", fontsize="small")
+        ax.legend(loc="upper right", fontsize=FONT_FLOOR)
     return ax
 
 
@@ -280,7 +296,7 @@ def plot_pupil_psd(stream: PupilStream, *, ax: Axes | None = None) -> Axes:
     ax.set_xlabel("frequency (Hz)")
     ax.set_ylabel("PSD (size^2/Hz)")
     ax.set_title("Pupil power spectral density")
-    ax.legend(loc="upper right", fontsize="small")
+    ax.legend(loc="upper right", fontsize=FONT_FLOOR)
     return ax
 
 

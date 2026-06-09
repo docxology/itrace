@@ -17,6 +17,7 @@ from itrace.stats.distributions import (
     compare_distributions,
     fit_distribution,
     frozen_from_result,
+    information_weights,
 )
 
 
@@ -45,6 +46,9 @@ def test_gamma_fit_recovers_parameters() -> None:
     # AIC/BIC consistency with k, n, loglik.
     assert result.aic == pytest.approx(2 * result.k - 2 * result.loglik)
     assert result.bic == pytest.approx(result.k * np.log(result.n) - 2 * result.loglik)
+    assert result.aicc == pytest.approx(
+        result.aic + (2 * result.k * (result.k + 1)) / (result.n - result.k - 1)
+    )
 
 
 def test_gamma_beats_normal_on_gamma_data() -> None:
@@ -176,6 +180,30 @@ def test_compare_distributions_sorted_by_aic() -> None:
     assert aics == sorted(aics)
     # The gamma family should be among the strongest fits on gamma data.
     assert results[0].family in {"gamma", "lognormal", "weibull", "exgaussian"}
+
+
+def test_information_weights_are_normalized_relative_support() -> None:
+    data = _gamma_sample()
+    results = compare_distributions(data)
+
+    weights = information_weights(results, criterion="aic")
+    assert set(weights) == {result.family for result in results}
+    assert sum(weights.values()) == pytest.approx(1.0)
+    assert all(0.0 <= weight <= 1.0 for weight in weights.values())
+    assert weights[results[0].family] == max(weights.values())
+
+    aicc_weights = information_weights(results, criterion="aicc")
+    assert sum(aicc_weights.values()) == pytest.approx(1.0)
+
+
+def test_information_weights_reject_unknown_criterion() -> None:
+    with pytest.raises(ValueError, match="criterion must be"):
+        information_weights([fit_distribution(_gamma_sample(), "gamma")], criterion="hqic")
+
+
+def test_aicc_is_infinite_when_small_sample_correction_is_undefined() -> None:
+    result = fit_distribution(np.array([1.0, 2.0, 3.0]), "gamma")
+    assert np.isinf(result.aicc)
 
 
 def test_compare_distributions_skips_failing_families() -> None:

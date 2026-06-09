@@ -1,0 +1,543 @@
+{
+  "kind": "itrace_publication_figure_manifest",
+  "version": "0.4.1",
+  "updated": "2026-06-09",
+  "truth_boundary": "Figures visualize Python-computed outputs and generated evidence; browser/canvas rendering is display-only and does not create validation evidence.",
+  "figures": [
+    {
+      "path": "output/figures/amplitude_histogram.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 81523,
+      "sha256": "bc71cfc7f5363743993b71989699b12008aec1b1b9b4dab6f7066fb32aa60068",
+      "width_px": 1744,
+      "height_px": 1144,
+      "pixel_std": 0.1759747862815857
+    },
+    {
+      "path": "output/figures/aoi_dwell.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 188714,
+      "sha256": "41b5f34d41ec196c222dbb9a23f84495e3e0e8a5381447651de2fc543976da6c",
+      "width_px": 3544,
+      "height_px": 1442,
+      "pixel_std": 0.2774447798728943
+    },
+    {
+      "path": "output/figures/calibration_residuals.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 51357,
+      "sha256": "128372492db9baac63c7b7d806f80f8b5e6e680b57f0945dd89f5552a1bed419",
+      "width_px": 1444,
+      "height_px": 844,
+      "pixel_std": 0.2987557351589203
+    },
+    {
+      "path": "output/figures/closed_loop.gif",
+      "artifact_kind": "animation",
+      "script": "scripts/generate_loop_animation.py",
+      "source_data": [
+        "src/itrace/scene.py"
+      ],
+      "bytes": 12872986,
+      "sha256": "8a71a68855c807e0db6e0aba54a6336e0bfa2d939ee15405beeda64060517015",
+      "width_px": 4260,
+      "height_px": 1350,
+      "pixel_std": 0.15863385969586483,
+      "frame_count": 70
+    },
+    {
+      "path": "output/figures/closed_loop_summary.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_loop_animation.py",
+      "source_data": [
+        "src/itrace/scene.py"
+      ],
+      "bytes": 324725,
+      "sha256": "496d05420added4a18ebfa9db109512358b9c2808cfae74f665ffbcd250bbfd1",
+      "width_px": 4295,
+      "height_px": 1478,
+      "pixel_std": 0.15672093629837036
+    },
+    {
+      "path": "output/figures/cover_visual.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_graphical_abstract.py",
+      "source_data": [
+        "docs/verification_metrics.json"
+      ],
+      "bytes": 152674,
+      "sha256": "d9852202e82ff828af1b8bb6b48b094ab1bd4f88d82fcd91e7743f8c6d7fed40",
+      "width_px": 2700,
+      "height_px": 1530,
+      "pixel_std": 0.15097829699516296
+    },
+    {
+      "path": "output/figures/direction_polar.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 245252,
+      "sha256": "c0d52c2b36d6b1f2017fb13b37e5b6579d4f1722610fc29bc0c1beabcfd71e00",
+      "width_px": 1860,
+      "height_px": 1620,
+      "pixel_std": 0.17623822391033173
+    },
+    {
+      "path": "output/figures/dropout_raster.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 42948,
+      "sha256": "f9756d8b29841fa76fbcc0073e1360003af06903bd05e5ac5f83d3284fc35976",
+      "width_px": 2192,
+      "height_px": 658,
+      "pixel_std": 0.13735806941986084
+    },
+    {
+      "path": "output/figures/duration_histogram.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 85021,
+      "sha256": "d5a3a8441c176b429a2743531001974bea543002c94910059d10e40e41b71c9d",
+      "width_px": 1744,
+      "height_px": 1144,
+      "pixel_std": 0.181332066655159
+    },
+    {
+      "path": "output/figures/empirical_pilot_summary.png",
+      "artifact_kind": "image",
+      "script": "scripts/summarize_empirical_pilot.py",
+      "source_data": [
+        "docs/empirical_pilot_metrics.json",
+        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+      ],
+      "bytes": 210539,
+      "sha256": "712549a5634c1b16a1579fee68433d663a23f0c25d5028f460511f766863cbc9",
+      "width_px": 3058,
+      "height_px": 1474,
+      "pixel_std": 0.15787442028522491
+    },
+    {
+      "path": "output/figures/empirical_sessions_summary.png",
+      "artifact_kind": "image",
+      "script": "scripts/aggregate_empirical_sessions.py",
+      "source_data": [
+        "docs/empirical_sessions_manifest.json",
+        "docs/empirical_sessions_summary.json",
+        "output/empirical_pilot/local_pilot_001/experiment/experiment_report.json",
+        "output/empirical_pilot/local_pilot_002/experiment/experiment_report.json",
+        "output/empirical_pilot/local_pilot_003/experiment/experiment_report.json",
+        "output/empirical_pilot/local_pilot_004/experiment/experiment_report.json",
+        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+      ],
+      "bytes": 257633,
+      "sha256": "586c2b961a9e846cd2d722e26df5d26d16174b194963fcba59f9c3072df42f25",
+      "width_px": 3334,
+      "height_px": 1594,
+      "pixel_std": 0.13753286004066467
+    },
+    {
+      "path": "output/figures/event_raster.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 58686,
+      "sha256": "5aa14ef54542d4ee59ebfc5f896c3f46d8963ab92227646b18512d72cc71c315",
+      "width_px": 2463,
+      "height_px": 814,
+      "pixel_std": 0.2598573863506317
+    },
+    {
+      "path": "output/figures/eye_orbs.gif",
+      "artifact_kind": "animation",
+      "script": "scripts/generate_orbs_animation.py",
+      "source_data": [
+        "src/itrace/scene.py"
+      ],
+      "bytes": 4088820,
+      "sha256": "1b78c08fc04fd5d92bb537514a0f0b703cb905b10d863482e2c50f4aeaaea4da",
+      "width_px": 3900,
+      "height_px": 1560,
+      "pixel_std": 0.46323942363631426,
+      "frame_count": 53
+    },
+    {
+      "path": "output/figures/eye_orbs_still.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_orbs_animation.py",
+      "source_data": [
+        "src/itrace/scene.py"
+      ],
+      "bytes": 301425,
+      "sha256": "c19478ae822f780397cda4a6f1f135c1b6ef45ca51c04ca1c02ed89110348ea5",
+      "width_px": 3486,
+      "height_px": 1548,
+      "pixel_std": 0.14098471403121948
+    },
+    {
+      "path": "output/figures/fixation_heatmap.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 101863,
+      "sha256": "b20cab1771d2bf4134c9a2e9cbbac9c1fdcf2f1f4532d864dbe244ce537e9d62",
+      "width_px": 1741,
+      "height_px": 1444,
+      "pixel_std": 0.48751965165138245
+    },
+    {
+      "path": "output/figures/gaze_density.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 109822,
+      "sha256": "1b6c588728d904a20cf1bf7d8c92e3af8ec095f7d0332f8d5eea6265dc1ec270",
+      "width_px": 1737,
+      "height_px": 1444,
+      "pixel_std": 0.17405620217323303
+    },
+    {
+      "path": "output/figures/graphical_abstract.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_graphical_abstract.py",
+      "source_data": [
+        "docs/verification_metrics.json",
+        "docs/empirical_sessions_summary.json",
+        "LICENSE",
+        "CITATION.cff"
+      ],
+      "bytes": 541787,
+      "sha256": "761e6be4c5d30c7be66f7657948c2503150a9f224aade0e4bc210def8d50e228",
+      "width_px": 4800,
+      "height_px": 2700,
+      "pixel_std": 0.30390363931655884
+    },
+    {
+      "path": "output/figures/main_sequence.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 323364,
+      "sha256": "70743168e3e7f37bdc1bb36c9410a45ac7b500bedd7662ea183ee23d85dc881d",
+      "width_px": 3240,
+      "height_px": 1290,
+      "pixel_std": 0.18437834084033966
+    },
+    {
+      "path": "output/figures/main_sequence_diagnostics.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 170722,
+      "sha256": "6c804d8535df88c079816fbd2f96bdef533fa3e8da6a786a0742803db067b7e4",
+      "width_px": 3241,
+      "height_px": 1140,
+      "pixel_std": 0.15203671157360077
+    },
+    {
+      "path": "output/figures/microsaccades.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 340585,
+      "sha256": "371ce2f9d6dd22e432a46a77740a2dd52c1bfa862b73ac39f9ed57d6585f6ae3",
+      "width_px": 3103,
+      "height_px": 1444,
+      "pixel_std": 0.1735924780368805
+    },
+    {
+      "path": "output/figures/noise_metrics.json",
+      "artifact_kind": "data",
+      "script": "scripts/generate_power_figure.py",
+      "source_data": [
+        "src/itrace/power.py",
+        "src/itrace/scene.py"
+      ],
+      "bytes": 4528,
+      "sha256": "55d578d590b0fb6ab6fe9a906cb666d26b88e2565194dc0478dd501b4fdb1212",
+      "width_px": 0,
+      "height_px": 0,
+      "pixel_std": 0.0
+    },
+    {
+      "path": "output/figures/noise_power.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_power_figure.py",
+      "source_data": [
+        "output/figures/noise_metrics.json"
+      ],
+      "bytes": 649946,
+      "sha256": "b6db166a74fc5a2da795ff99444f3790ae1f653b0604302032bc41a55df637a7",
+      "width_px": 3180,
+      "height_px": 3446,
+      "pixel_std": 0.15797367691993713
+    },
+    {
+      "path": "output/figures/noise_summary.md",
+      "artifact_kind": "table",
+      "script": "scripts/generate_power_figure.py",
+      "source_data": [
+        "output/figures/noise_metrics.json"
+      ],
+      "bytes": 717,
+      "sha256": "0386fc674ba487ae5de794a175107584492278c62ccdae93e23b27d656c1488c",
+      "width_px": 0,
+      "height_px": 0,
+      "pixel_std": 0.0
+    },
+    {
+      "path": "output/figures/pupil_psd.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 97467,
+      "sha256": "fd2d12319bf936a2df9bf3af5352557bbd4519a67f15836e1109e55e1d063509",
+      "width_px": 1741,
+      "height_px": 1140,
+      "pixel_std": 0.146956667304039
+    },
+    {
+      "path": "output/figures/pupil_trace.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 193271,
+      "sha256": "98553be9acc8a87b64498448cc1b1e4f5bac60d324122c77c2aff53c8b49c72c",
+      "width_px": 2015,
+      "height_px": 994,
+      "pixel_std": 0.16465717554092407
+    },
+    {
+      "path": "output/figures/pupil_velocity.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 161609,
+      "sha256": "d53d6b0f69fc19b26173645da4ddb50c0772a5deb85c94310713c3329fd032dc",
+      "width_px": 2044,
+      "height_px": 844,
+      "pixel_std": 0.2824645936489105
+    },
+    {
+      "path": "output/figures/saccade_rate.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 43956,
+      "sha256": "7235e0d56a195633e312b2e1aadf2d590ab03d3cf75305bea230438b2596166b",
+      "width_px": 2044,
+      "height_px": 844,
+      "pixel_std": 0.1344967782497406
+    },
+    {
+      "path": "output/figures/sampling_intervals.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 57500,
+      "sha256": "0367939ca9863219ca65c134ee184f8d5aec071e513abfdb7645375c1e2f4813",
+      "width_px": 1444,
+      "height_px": 844,
+      "pixel_std": 0.19992974400520325
+    },
+    {
+      "path": "output/figures/scanpath.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 133570,
+      "sha256": "1bbe8a88907aef4c360bedf27cb64232f418ab38e65c3904008e36a096682947",
+      "width_px": 1744,
+      "height_px": 1744,
+      "pixel_std": 0.156441330909729
+    },
+    {
+      "path": "output/figures/session_dashboard.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 869156,
+      "sha256": "a53a2979140fda451493ea945b8bdbb182df0d661d6fd1870da29606b73e4537",
+      "width_px": 4500,
+      "height_px": 2400,
+      "pixel_std": 0.19899912178516388
+    },
+    {
+      "path": "output/figures/session_dashboard_synthetic.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 648077,
+      "sha256": "55c23b849fa6bf3eece2c0a9c3278edacc5e07c3a68617b35f73cfd71a9b96e2",
+      "width_px": 4444,
+      "height_px": 2351,
+      "pixel_std": 0.1686345636844635
+    },
+    {
+      "path": "output/figures/statistical_diagnostics.json",
+      "artifact_kind": "data",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py",
+        "src/itrace/stats/diagnostics.py",
+        "src/itrace/stats/distributions.py",
+        "src/itrace/stats/scanpath_metrics.py",
+        "src/itrace/stats/similarity.py"
+      ],
+      "bytes": 11990,
+      "sha256": "f812a00a7777519ba34b42fe46414f3b301c862960c64f7bf8b11f23ef7e6938",
+      "width_px": 0,
+      "height_px": 0,
+      "pixel_std": 0.0
+    },
+    {
+      "path": "output/figures/statistical_diagnostics.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "output/figures/statistical_diagnostics.json"
+      ],
+      "bytes": 754651,
+      "sha256": "3bc394e5f1465facc667648aef6c4e000ce78686044ec14670e018c19928966d",
+      "width_px": 3989,
+      "height_px": 3633,
+      "pixel_std": 0.33854129910469055
+    },
+    {
+      "path": "output/figures/statistical_interpretation_ledger.json",
+      "artifact_kind": "data",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "docs/empirical_pilot_metrics.json",
+        "output/figures/noise_metrics.json",
+        "output/figures/statistical_diagnostics.json",
+        "output/figures/synthetic_empirical_range_bridge.json",
+        "src/itrace/stats/evidence.py",
+        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+      ],
+      "bytes": 6978,
+      "sha256": "6e7837552974aa90a1d239a6009bc325c6c11eba3ad26461a17bb90779b405f6",
+      "width_px": 0,
+      "height_px": 0,
+      "pixel_std": 0.0
+    },
+    {
+      "path": "output/figures/statistical_interpretation_ledger.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "output/figures/statistical_interpretation_ledger.json"
+      ],
+      "bytes": 838706,
+      "sha256": "8852f1578e18a3b5dfc7d43b0c35ff2055700bf44811f877386d77fc256d7351",
+      "width_px": 4734,
+      "height_px": 2617,
+      "pixel_std": 0.14424757659435272
+    },
+    {
+      "path": "output/figures/synthetic_empirical_range_bridge.json",
+      "artifact_kind": "data",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "docs/empirical_pilot_metrics.json",
+        "output/synthetic_validation.json",
+        "output/figures/noise_metrics.json",
+        "output/figures/statistical_diagnostics.json",
+        "src/itrace/stats/range_bridge.py",
+        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+      ],
+      "bytes": 11785,
+      "sha256": "394bcc41401ba2d8acfab954c6579358bbd9a9c4ca20dcd844ab22acc9ebd2f7",
+      "width_px": 0,
+      "height_px": 0,
+      "pixel_std": 0.0
+    },
+    {
+      "path": "output/figures/synthetic_empirical_range_bridge.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "output/figures/synthetic_empirical_range_bridge.json"
+      ],
+      "bytes": 644898,
+      "sha256": "db9bb98f39c38c136e9bf16fb4ea6fbd3584804b006d27edf2be9e9c071fe047",
+      "width_px": 4498,
+      "height_px": 2382,
+      "pixel_std": 0.14533846080303192
+    },
+    {
+      "path": "output/figures/synthetic_replay.gif",
+      "artifact_kind": "animation",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 2623479,
+      "sha256": "3ef8e2a23585ea69926444eb52087c623dd3668f5b2cdbad8f326d23f76970fe",
+      "width_px": 3000,
+      "height_px": 1200,
+      "pixel_std": 0.18560796248699518,
+      "frame_count": 84
+    },
+    {
+      "path": "output/figures/velocity_trace.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/synthetic.py"
+      ],
+      "bytes": 124160,
+      "sha256": "273744f3683d463b97b719e5923b513b8b138d6f44ea85376e596f8498598462",
+      "width_px": 2044,
+      "height_px": 994,
+      "pixel_std": 0.1653529405593872
+    }
+  ]
+}
