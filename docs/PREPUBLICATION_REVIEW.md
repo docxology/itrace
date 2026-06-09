@@ -22,7 +22,7 @@ The verifier suite is strong but not omniscient. It currently checks stale metri
 
 | Vector | Verdict | Evidence checked | Result |
 |---|---|---|---|
-| Availability, license, citation | Clean after prior fixes | README, Abstract, `pyproject.toml`, `LICENSE`, `CITATION.cff`, verification metrics, rendered builds | MIT/GitHub wording is aligned; at publication the repository was made public and this version archived at Zenodo DOI 10.5281/zenodo.20614027. |
+| Availability, license, citation | Clean after prior fixes | README, Abstract, `pyproject.toml`, `LICENSE`, `CITATION.cff`, verification metrics, rendered builds | MIT/GitHub wording is aligned; at publication the repository was made public and this version archived at Zenodo DOI 10.5281/zenodo.20614909. |
 | Empirical diagnostic scope | Clean | session manifest, session summary, empirical manuscript section, tests | Five sessions are framed as single-participant/single-device diagnostic v1; 0 reference-backed rows remain explicit. |
 | Validation and accuracy boundaries | Clean | README, manuscript methods/results/discussion/limitations, traceability matrix, rendered builds | Synthetic and closed-loop evidence are described as algorithmic verification, not device validation or webcam accuracy. |
 | Citation and scholarship support | Minor fix applied | research brief, scholarship audit, bibliography tests | One research-brief link label looked like a GitHub URL while targeting an ecosyste.ms mirror; label was narrowed to the actual mirror. No new external evidence claim was added. |
@@ -34,13 +34,13 @@ The verifier suite is strong but not omniscient. It currently checks stale metri
 - Device-level gaze accuracy still requires public-dataset, reference-device, or validated manual-annotation evidence.
 - Population generality, cross-device generality, lighting/head-pose generality, and reference-device agreement remain future scope.
 - The planned validation expansion remains 12 sessions, 12 replicate IDs, 3 conditions including `indoor_office_backlit`, and at least 1 validated reference artifact.
-- The GitHub repository URL is fixed for citation and release metadata; at publication the repository was made public and this version archived on Zenodo (DOI 10.5281/zenodo.20614027).
+- The GitHub repository URL is fixed for citation and release metadata; at publication the repository was made public and this version archived on Zenodo (DOI 10.5281/zenodo.20614909).
 
 ## Visualization and claim sweep
 
 Final visualization polish targeted reader-facing composites only: the range bridge, statistical interpretation ledger, statistical diagnostics composite, and empirical-session intake summary. The changes improve spacing, wrapping, and boundary labels without changing evidence values, readiness criteria, or source JSON. Regression tests now check rendered table text for severe row overlap and reject stale test counts, stale coverage, and positive device/webcam accuracy claims across public claim surfaces.
 
-RedTeam claim review after the polish treats `docs/verification_metrics.json`, `docs/empirical_sessions_summary.json`, `docs/empirical_sessions_manifest.json`, `docs/TRACEABILITY_MATRIX.json`, and `docs/figure_manifest.json` as the controlling ledgers. The canonical claim remains: v0.4.1 is MIT-licensed, openly released at `https://github.com/docxology/itrace` and archived at Zenodo DOI 10.5281/zenodo.20614027, with 528 tests, 90.23% coverage, five diagnostic sessions, two conditions, and 0 reference-backed rows. Device validation, population generality, cross-device claims, and reference-device agreement remain explicitly future scope.
+RedTeam claim review after the polish treats `docs/verification_metrics.json`, `docs/empirical_sessions_summary.json`, `docs/empirical_sessions_manifest.json`, `docs/TRACEABILITY_MATRIX.json`, and `docs/figure_manifest.json` as the controlling ledgers. The canonical claim remains: v0.4.1 is MIT-licensed, openly released at `https://github.com/docxology/itrace` and archived at Zenodo DOI 10.5281/zenodo.20614909, with 528 tests, 90.23% coverage, five diagnostic sessions, two conditions, and 0 reference-backed rows. Device validation, population generality, cross-device claims, and reference-device agreement remain explicitly future scope.
 
 ## Final gate commands
 

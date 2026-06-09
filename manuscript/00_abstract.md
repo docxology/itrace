@@ -33,5 +33,5 @@ trackers; it is a verification-first reference implementation whose evidence
 boundaries are visible in the code, figures, reports, and manuscript. iTrace is
 MIT-licensed and openly released at
 https://github.com/docxology/itrace, with this version archived at DOI
-10.5281/zenodo.20614027 (concept DOI 10.5281/zenodo.20614026 resolves to the
+10.5281/zenodo.20614909 (concept DOI 10.5281/zenodo.20614908 resolves to the
 latest version).

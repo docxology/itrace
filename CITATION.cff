@@ -7,17 +7,17 @@ authors:
 version: "0.4.1"
 date-released: "2026-06-09"
 license: MIT
-doi: "10.5281/zenodo.20614026"
+doi: "10.5281/zenodo.20614908"
 repository-code: "https://github.com/docxology/itrace"
 url: "https://github.com/docxology/itrace"
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.20614026"
+    value: "10.5281/zenodo.20614908"
     description: "Concept DOI (all versions)"
   - type: doi
-    value: "10.5281/zenodo.20614027"
+    value: "10.5281/zenodo.20614909"
     description: "Version DOI (v0.4.1)"
-abstract: "MIT-licensed source openly released at https://github.com/docxology/itrace and archived on Zenodo at DOI 10.5281/zenodo.20614027 (concept DOI 10.5281/zenodo.20614026)."
+abstract: "MIT-licensed source openly released at https://github.com/docxology/itrace and archived on Zenodo at DOI 10.5281/zenodo.20614909 (concept DOI 10.5281/zenodo.20614908)."
 keywords:
   - eye-tracking
   - webcam

@@ -35,8 +35,8 @@ validated eye trackers; it is a verification-first reference
 implementation whose evidence boundaries are visible in the code,
 figures, reports, and manuscript. iTrace is MIT-licensed and openly
 released at https://github.com/docxology/itrace, with this version
-archived at DOI 10.5281/zenodo.20614027 (concept DOI
-10.5281/zenodo.20614026 resolves to the latest version).
+archived at DOI 10.5281/zenodo.20614909 (concept DOI
+10.5281/zenodo.20614908 resolves to the latest version).
 
 Introduction
 
@@ -869,7 +869,7 @@ figures, and live displays from Python-computed payloads. Three badges
 summarise the current verification gate, the five-session diagnostic v1
 release scope, and the no-reference-device-claim boundary. The footer
 states MIT License, github.com/docxology/itrace, and the Zenodo DOI
-10.5281/zenodo.20614027; the figure describes architecture and evidence
+10.5281/zenodo.20614909; the figure describes architecture and evidence
 boundaries, not webcam accuracy validation.]
 
 Results: ground-truth recovery

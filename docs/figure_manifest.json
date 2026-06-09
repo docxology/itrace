@@ -231,11 +231,11 @@
         "LICENSE",
         "CITATION.cff"
       ],
-      "bytes": 541787,
-      "sha256": "761e6be4c5d30c7be66f7657948c2503150a9f224aade0e4bc210def8d50e228",
+      "bytes": 542613,
+      "sha256": "4a87aa0812b034f00f93ed03c204f9141af09938da197098a36c6ee4ea52e333",
       "width_px": 4800,
       "height_px": 2700,
-      "pixel_std": 0.30390363931655884
+      "pixel_std": 0.30392059683799744
     },
     {
       "path": "output/figures/main_sequence.png",

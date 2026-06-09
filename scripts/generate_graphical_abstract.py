@@ -15,7 +15,7 @@ from itrace import scene
 from itrace.viz.palette import CARD_FACE, FONT_FLOOR, INK, MUTED, WONG, apply_house_style
 
 ROOT = Path(__file__).resolve().parents[1]
-AVAILABILITY_FOOTER = "MIT License | github.com/docxology/itrace | DOI 10.5281/zenodo.20614027"
+AVAILABILITY_FOOTER = "MIT License | github.com/docxology/itrace | DOI 10.5281/zenodo.20614909"
 NO_REFERENCE_DEVICE_BOUNDARY = "no reference-device claim"
 
 

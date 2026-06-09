@@ -129,7 +129,7 @@ def test_abstract_is_citation_free_and_declares_availability() -> None:
     for required in (
         "MIT-licensed and openly released",
         "https://github.com/docxology/itrace",
-        "10.5281/zenodo.20614027",
+        "10.5281/zenodo.20614909",
     ):
         assert required in normalized_abstract
 
@@ -144,7 +144,7 @@ def test_abstract_is_citation_free_and_declares_availability() -> None:
     assert "Kronemer et al." not in rendered_abstract
     assert "MIT-licensed and openly released" in normalized_rendered_abstract
     assert "https://github.com/docxology/itrace" in normalized_rendered_abstract
-    assert "10.5281/zenodo.20614027" in normalized_rendered_abstract
+    assert "10.5281/zenodo.20614909" in normalized_rendered_abstract
 
 
 def test_manuscript_cover_uses_release_date() -> None:
@@ -342,7 +342,7 @@ def test_public_claim_surfaces_reject_stale_or_overclaim_phrases() -> None:
     assert "v0.4.1" in haystack
     assert "v0.4.0" not in haystack
     assert "MIT-licensed and openly released" in haystack
-    assert "10.5281/zenodo.20614027" in haystack
+    assert "10.5281/zenodo.20614909" in haystack
     assert "ready for diagnostic v1" in haystack
     assert "0 reference-backed rows" in haystack
 
@@ -413,8 +413,8 @@ def test_release_license_and_citation_metadata_are_consistent() -> None:
     assert "Copyright (c) 2026 Daniel Ari Friedman" in license_text
     assert "iTrace v0.4.1" in release_notes
     assert repository in release_notes
-    assert "10.5281/zenodo.20614027" in release_notes
-    assert "10.5281/zenodo.20614026" in release_notes
+    assert "10.5281/zenodo.20614909" in release_notes
+    assert "10.5281/zenodo.20614908" in release_notes
 
     for text in (readme, citation, abstract, release_notes):
         normalized_text = re.sub(r"\s+", " ", text)
@@ -439,7 +439,7 @@ def test_prepublication_review_matches_current_ledgers() -> None:
     assert f"{sessions['replicate_count']} replicate IDs" in normalized
     assert f"{sessions['condition_count']} conditions" in normalized
     assert f"{sessions['reference_evidence_count']} reference-backed rows" in normalized
-    assert "archived at Zenodo DOI 10.5281/zenodo.20614027" in normalized
+    assert "archived at Zenodo DOI 10.5281/zenodo.20614909" in normalized
     assert "not device validation or webcam accuracy" in normalized
     assert "does not approve public claims of webcam/device accuracy" in normalized
     assert "raw eye video and persisted eye crops remain outside the default workflow" in normalized

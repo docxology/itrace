@@ -16,8 +16,8 @@ with an optional, thin webcam + MediaPipe capture shell.
 
 iTrace is MIT-licensed and openly released at
 https://github.com/docxology/itrace, with this version archived on Zenodo at
-DOI [10.5281/zenodo.20614027](https://doi.org/10.5281/zenodo.20614027) (concept
-DOI [10.5281/zenodo.20614026](https://doi.org/10.5281/zenodo.20614026) always
+DOI [10.5281/zenodo.20614909](https://doi.org/10.5281/zenodo.20614909) (concept
+DOI [10.5281/zenodo.20614908](https://doi.org/10.5281/zenodo.20614908) always
 resolves to the latest version). The repository URL is fixed here, in
 `pyproject.toml`, in `docs/verification_metrics.json`, and in `CITATION.cff` so
 the release and manuscript citation metadata stay aligned. See
