@@ -3,11 +3,11 @@
 **Date:** 2026-06-02  
 **Gate refresh:** 2026-06-09  
 **Scope:** Full package at `working/iTrace`  
-**Gates verified:** 528 tests / 90.23% coverage, `mypy --strict` clean (56 source files), `ruff` clean, `ruff format` clean, `import itrace` safe without optional extras  
+**Gates verified:** 543 tests / 90.49% coverage, `mypy --strict` clean (56 source files), `ruff` clean, `ruff format` clean, `import itrace` safe without optional extras
 **Verdict:** REJECT (initial) → **APPROVE after remediation** (2026-06-02)
 
-Remediation items 1–6 implemented; June 9 verifier refresh gates: 528 tests,
-90.23% coverage, ruff format over 121 Python files, and mypy over 56 source
+Remediation items 1–6 implemented; June 9 verifier refresh gates: 543 tests,
+90.49% coverage, ruff format over 121 Python files, and mypy over 56 source
 files clean.
 
 ---
@@ -47,7 +47,7 @@ The shell orchestration layer (`cli.py`, `live.py`, `capture.WebcamSource`) carr
 | ID | Location | Severity | Remedy |
 |----|----------|----------|--------|
 | 3.1 | `live._analysis_payload` | high | Split + delegate to `reporting` builders |
-| 3.2 | `cli.validate_recording` | medium | Future: `validation.recording_validation_payload` |
+| 3.2 | `cli.validate_recording` | medium | `validation.recording_validation_payload` | remediated |
 | 3.3 | adaptive vs fixed IVT | medium | See 2.5 |
 
 ## 4. Type-contract problems

@@ -110,6 +110,27 @@ def test_mad_all_nan() -> None:
     assert flags.all()
 
 
+def test_pupil_baseline_and_response_features() -> None:
+    from itrace.pupil import baseline_correct, response_features
+    from itrace.types import PupilStream
+
+    t = np.linspace(0, 10, 300)
+    # Sine modulation with dilation peak at 3s
+    size = 0.2 + 0.05 * np.sin(2 * np.pi * 0.1 * t)
+    pupil = PupilStream(t=t, size=size)
+
+    # Test baseline divisive
+    div = baseline_correct(pupil, baseline_window_s=(0.0, 1.0), mode="divisive")
+    assert div.unit == pupil.unit
+    assert np.all(np.isfinite(div.size))
+
+    # Test response features
+    feat = response_features(pupil, baseline_window_s=(0.0, 1.0), response_window_s=(1.0, 5.0))
+    assert feat["latency_to_peak_s"] >= 0.0
+    assert "dilation_auc" in feat
+    assert "baseline_relative_peak_change" in feat
+
+
 def test_quality_summary_counts_blinks_invalid_samples_and_velocity() -> None:
     t = np.linspace(0.0, 2.0, 201)
     size = 3.0 + 0.2 * np.sin(2 * np.pi * t)

@@ -347,6 +347,11 @@ clean `mypy --strict`, all evidenced by real captured command output.
 - [x] ISC-173: `docs/empirical_sessions_manifest.json` plus `scripts/aggregate_empirical_sessions.py` provide a single-participant/device repeated-session empirical intake gate that validates metadata/provenance, rejects raw-video report paths, writes `docs/empirical_sessions_summary.json`, treats the five-session/two-condition diagnostic pilot as v1-ready, and records the 12-session/backlit/reference-backed validation target as future scope
 - [x] ISC-174: the live HTML empirical-session panel exposes condition, participant, device, session-group, and reference-kind controls before session start, sends those fields to the backend, and displays the assigned session ID, manifest path, auto-save state, condition, reference lane, and report path
 - [x] ISC-175: non-`none` empirical `reference_kind` rows count toward v1 readiness only when a valid repo-relative `reference_artifact` JSON exists; manual-annotation artifacts validate derived target-window annotations and reject raw-video paths
+- [x] ISC-178: `itrace.config` exposes `AOIConfig` and `CalibrationConfig` with model validation and JSON export
+- [x] ISC-179: `itrace.stats.scanpath_metrics` exposes `aoi_dwell_statistics` and `aoi_transition_matrix` with first-class `AOI` dataclass integration
+- [x] ISC-180: `itrace.calibration` implements `PolynomialCalibration` with 6-term basis and ridge penalty
+- [x] ISC-181: `itrace.validation` implements `recording_validation_payload` decoupled from CLI layer
+- [x] ISC-182: Live HTML web client renders visual pulsing calibration targets during 4-point calibration sequences
 
 ## Test Strategy
 
@@ -602,8 +607,8 @@ All evidence below is from real commands refreshed on 2026-06-09 in
 - focused empirical/documentation/manuscript tests:
   `57 passed` from
   `uv run pytest tests/test_empirical_sessions.py tests/test_live_html.py tests/test_manuscript_integrity.py tests/test_documentation_traceability.py --tb=short`.
-- full pytest/coverage: `528 passed, 2 warnings`; `Total coverage:
-  90.23%` from `uv run pytest --cov=itrace`.
+- full pytest/coverage: `543 passed, 1 skipped, 2 warnings`; `Total coverage:
+  90.49%` from `uv run pytest --cov=itrace`.
 - ruff format: `121 files already formatted` from
   `uv run ruff format --check src/ tests/ scripts/`.
 - ruff check: `All checks passed!` from `uv run ruff check src/ tests/ scripts/`.
@@ -628,7 +633,7 @@ All evidence below is from real commands refreshed on 2026-06-09 in
   cover-missing fallback text.
 - generated visual evidence: `scripts/generate_figures.py` refreshed
   `docs/figure_manifest.json` and the figure gallery; the graphical abstract was
-  inspected as a rendered PNG and shows the `528 tests / 90.23% coverage` badge.
+  inspected as a rendered PNG and shows the `543 tests / 90.49% coverage` badge.
 
 ## Verification (iteration 8 — TODO implementation sprint)
 

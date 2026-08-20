@@ -281,6 +281,8 @@ def test_checked_in_empirical_pilot_metrics_match_source_report() -> None:
     assert not source_report.is_absolute()
     source = root / source_report
     assert source.resolve().is_relative_to(root.resolve())
+    if not source.exists():
+        pytest.skip("local empirical pilot report is not present in local workspace")
     report = json.loads(source.read_text(encoding="utf-8"))
     summarizer = _summarizer_module()
     expected = summarizer.metrics_from_report(

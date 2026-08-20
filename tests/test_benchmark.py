@@ -68,6 +68,26 @@ def test_benchmark_payload_compares_user_supplied_truth_and_systems() -> None:
     assert payload["systems"]["good"]["timing"]["onset_mae_s"] < 0.002
 
 
+def test_benchmark_cli_comparator_missing_file(tmp_path: Path) -> None:
+    from typer.testing import CliRunner
+
+    from itrace.cli import app
+
+    c_runner = CliRunner()
+    truth_csv = tmp_path / "truth.csv"
+    truth_csv.write_text(
+        "onset_t,offset_t,amplitude_deg,direction_deg,peak_velocity_deg_s\n0.1,0.2,5.0,0.0,200.0\n",
+        encoding="utf-8",
+    )
+
+    result = c_runner.invoke(
+        app,
+        ["benchmark", str(truth_csv), "--comparator-events-csv", str(tmp_path / "missing.csv")],
+    )
+    assert result.exit_code != 0
+    assert result.exception is not None or "does not exist" in result.output
+
+
 def test_load_saccade_events_csv_validates_shape(tmp_path: Path) -> None:
     events = [_event(0.1, 0.2)]
     path = _events_csv(tmp_path / "events.csv", events)

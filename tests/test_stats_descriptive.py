@@ -26,6 +26,19 @@ def _multi_saccade_stream() -> GazeStream:
     return GazeStream(t=np.concatenate(ts), x=np.concatenate(xs), y=np.concatenate(ys))
 
 
+def test_bootstrap_edge_cases() -> None:
+    from itrace.stats import bootstrap
+
+    with pytest.raises(ValueError, match="at least one value"):
+        bootstrap.bootstrap_statistic([], np.mean)
+    with pytest.raises(ValueError, match="n_boot must be >= 1"):
+        bootstrap.bootstrap_statistic([1.0, 2.0, 3.0], np.mean, n_boot=0)
+    with pytest.raises(ValueError, match="confidence must be in"):
+        bootstrap.percentile_interval(np.array([1.0, 2.0]), confidence=1.5)
+    with pytest.raises(ValueError, match="at least one finite value"):
+        bootstrap.percentile_interval(np.array([]))
+
+
 def test_describe_known_values() -> None:
     stats = descriptive.describe([1.0, 2.0, 3.0, 4.0, 5.0])
     assert stats["n"] == 5.0

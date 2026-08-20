@@ -46,6 +46,7 @@ const ui = {
   resetExperiment: document.getElementById("resetExperimentButton"),
   experimentStage: document.getElementById("experimentStage"),
   experimentTarget: document.getElementById("experimentTargetDot"),
+  calibrationTarget: document.getElementById("calibrationTargetDot"),
   experimentPrompt: document.getElementById("experimentPrompt"),
   experimentCountdown: document.getElementById("experimentCountdown"),
   experimentTimerLabel: document.getElementById("experimentTimerLabel"),
@@ -1412,6 +1413,20 @@ function calibrationTargets() {
   ];
 }
 
+function showCalibrationTarget(target) {
+  if (!ui.calibrationTarget) return;
+  if (!target) {
+    ui.calibrationTarget.style.display = "none";
+    return;
+  }
+  const r = Math.max(1, state.calibrationRangeDeg || 15);
+  const left = Math.max(8, Math.min(92, 50 + (target.x / r) * 42));
+  const top = Math.max(8, Math.min(92, 50 - (target.y / r) * 42));
+  ui.calibrationTarget.style.left = `${left}%`;
+  ui.calibrationTarget.style.top = `${top}%`;
+  ui.calibrationTarget.style.display = "block";
+}
+
 async function fitCalibration() {
   if (!state.latest || state.finiteSampleCount < 1) {
     ui.calibrationStatus.textContent = "calibration: need a finite gaze sample";
@@ -1426,6 +1441,7 @@ async function fitCalibration() {
       });
       state.calibrationSessionPoints = 0;
     }
+    showCalibrationTarget(targets[state.calibrationTargetIndex]);
     const sampled = await postJson("/api/calibration/session/sample", {
       target: targets[state.calibrationTargetIndex],
       window_s: 0.35,
@@ -1436,6 +1452,7 @@ async function fitCalibration() {
     if (state.calibrationTargetIndex < targets.length) {
       ui.calibrationStatus.textContent = calibrationLabel(false);
       setChipTone(ui.calibrationStatus, "warn");
+      showCalibrationTarget(targets[state.calibrationTargetIndex]);
     } else {
       const body = await postJson("/api/calibration/session/fit");
       state.calibrationActive = Boolean(body.calibration);
@@ -1443,11 +1460,13 @@ async function fitCalibration() {
       state.calibrationTargetIndex = 0;
       ui.calibrationStatus.textContent = calibrationLabel(true);
       setChipTone(ui.calibrationStatus, "ok");
+      showCalibrationTarget(null);
     }
     updateButtons();
   } catch (error) {
     ui.calibrationStatus.textContent = error.message || "calibration fit failed";
     setChipTone(ui.calibrationStatus, "bad");
+    showCalibrationTarget(null);
   }
 }
 
@@ -1461,6 +1480,7 @@ async function resetCalibration() {
     setChipTone(ui.calibrationStatus);
     ui.calGazeX.textContent = "--";
     ui.calGazeY.textContent = "--";
+    showCalibrationTarget(null);
     updateButtons();
   } catch (error) {
     ui.calibrationStatus.textContent = error.message || "calibration reset failed";

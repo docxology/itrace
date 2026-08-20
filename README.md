@@ -230,7 +230,7 @@ is not a reference-device validation.
 
 The gallery and live UI are regenerated artifacts, not hand-drawn README art:
 
-![Live HTML browser smoke](output/live_smoke/live_browser_smoke.png)
+![Live HTML browser smoke](output/live-html/browser-smoke.png)
 
 ![Graphical abstract](output/figures/graphical_abstract.png)
 

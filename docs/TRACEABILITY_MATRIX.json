@@ -203,7 +203,7 @@
       "methods": ["src/itrace/live/analysis.py", "src/itrace/live/server.py"],
       "method_symbols": ["itrace.live.analysis.analysis_payload"],
       "tests": ["tests/test_live_html.py"],
-      "evidence": ["output/live_smoke/live_browser_smoke.png"],
+      "evidence": ["output/live-html/browser-smoke.png"],
       "boundary": "Browser Canvas/SVG is display-only; live webcam diagnostics remain plausibility checks without live reference truth."
     }
   ],

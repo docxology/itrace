@@ -32,9 +32,30 @@ def test_detection_config_rejects_invalid_values() -> None:
         DetectionConfig(smooth_pursuit_min_duration_s=-0.001)
 
 
+def test_config_classes_aoi_and_calibration() -> None:
+    from itrace.config import AOIConfig, CalibrationConfig
+
+    aoi_cfg = AOIConfig(aois=[{"name": "box", "x": 0.0, "y": 0.0, "w": 10.0, "h": 10.0}])
+    assert len(aoi_cfg.aois) == 1
+    assert aoi_cfg.to_dict()["aois"] == aoi_cfg.aois
+
+    cal_cfg = CalibrationConfig(method="polynomial", polynomial_degree=2, target_range_deg=12.0)
+    assert cal_cfg.method == "polynomial"
+    assert cal_cfg.to_dict()["target_range_deg"] == 12.0
+
+    with pytest.raises(ValueError, match="polynomial_degree"):
+        CalibrationConfig(polynomial_degree=4)
+    with pytest.raises(ValueError, match="method"):
+        CalibrationConfig(method="spline")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="target_range_deg"):
+        CalibrationConfig(target_range_deg=0.0)
+
+
 def test_other_config_validation() -> None:
     with pytest.raises(ValueError, match="smooth_window"):
         PupilConfig(smooth_window=0)
+    with pytest.raises(ValueError, match="blink_threshold"):
+        PupilConfig(blink_threshold=-0.1)
     with pytest.raises(ValueError, match="blink_pad_samples"):
         PupilConfig(blink_pad_samples=-1)
     with pytest.raises(ValueError, match="smooth_cutoff_hz"):
@@ -43,5 +64,28 @@ def test_other_config_validation() -> None:
         PupilConfig(smooth_order=0)
     with pytest.raises(ValueError, match="camera_index"):
         CaptureConfig(camera_index=-1)
+    with pytest.raises(ValueError, match="max_angle_deg"):
+        CaptureConfig(max_angle_deg=0.0)
+    with pytest.raises(ValueError, match="max_frames"):
+        CaptureConfig(max_frames=0)
     with pytest.raises(ValueError, match="dpi"):
         FigureConfig(dpi=10)
+
+
+def test_analysis_config_helpers(tmp_path) -> None:
+    from itrace.config import analysis_config_from_json, analysis_config_from_mapping
+
+    cfg = analysis_config_from_mapping({"detection": {"velocity_threshold_deg_s": 42.0}})
+    assert cfg.detection.velocity_threshold_deg_s == 42.0
+
+    p = tmp_path / "cfg.json"
+    p.write_text('{"detection": {"velocity_threshold_deg_s": 50.0}}')
+    loaded = analysis_config_from_json(p)
+    assert loaded.detection.velocity_threshold_deg_s == 50.0
+
+    with pytest.raises(ValueError, match="analysis config mapping"):
+        analysis_config_from_mapping("not a dict")  # type: ignore[arg-type]
+    p2 = tmp_path / "bad.json"
+    p2.write_text("123")
+    with pytest.raises(ValueError, match="analysis config JSON"):
+        analysis_config_from_json(p2)

@@ -11,8 +11,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 81523,
-      "sha256": "bc71cfc7f5363743993b71989699b12008aec1b1b9b4dab6f7066fb32aa60068",
+      "bytes": 91285,
+      "sha256": "7dc4ecb6c661cadade99133c16cf87156fb11d84ec7ab837be17cee785e0e449",
       "width_px": 1744,
       "height_px": 1144,
       "pixel_std": 0.1759747862815857
@@ -24,11 +24,11 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 188714,
-      "sha256": "41b5f34d41ec196c222dbb9a23f84495e3e0e8a5381447651de2fc543976da6c",
+      "bytes": 206510,
+      "sha256": "b959d4b28d9d6d8095cdf1ea6d3a9629edc9d9bbfcf7fc2af1e209a0ae047fd2",
       "width_px": 3544,
       "height_px": 1442,
-      "pixel_std": 0.2774447798728943
+      "pixel_std": 0.2774446904659271
     },
     {
       "path": "output/figures/calibration_residuals.png",
@@ -37,8 +37,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 51357,
-      "sha256": "128372492db9baac63c7b7d806f80f8b5e6e680b57f0945dd89f5552a1bed419",
+      "bytes": 57322,
+      "sha256": "3d89ee9d3e7ac77d29e11828ed89592770b1c7e7553cc90eab6636d1492374c3",
       "width_px": 1444,
       "height_px": 844,
       "pixel_std": 0.2987557351589203
@@ -64,8 +64,8 @@
       "source_data": [
         "src/itrace/scene.py"
       ],
-      "bytes": 324725,
-      "sha256": "496d05420added4a18ebfa9db109512358b9c2808cfae74f665ffbcd250bbfd1",
+      "bytes": 352405,
+      "sha256": "64c42e4b73d2a6d34d6dc347a38b3b8002f1972d74b1d2e86bb81832d4c1e9cd",
       "width_px": 4295,
       "height_px": 1478,
       "pixel_std": 0.15672093629837036
@@ -77,11 +77,11 @@
       "source_data": [
         "docs/verification_metrics.json"
       ],
-      "bytes": 152674,
-      "sha256": "d9852202e82ff828af1b8bb6b48b094ab1bd4f88d82fcd91e7743f8c6d7fed40",
+      "bytes": 160433,
+      "sha256": "5129e3b279e9eaab80483358218d192fde9d5a71d6e705a46d6d0186b1116ae9",
       "width_px": 2700,
       "height_px": 1530,
-      "pixel_std": 0.15097829699516296
+      "pixel_std": 0.15097837150096893
     },
     {
       "path": "output/figures/direction_polar.png",
@@ -90,8 +90,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 245252,
-      "sha256": "c0d52c2b36d6b1f2017fb13b37e5b6579d4f1722610fc29bc0c1beabcfd71e00",
+      "bytes": 260924,
+      "sha256": "298d8261a38dde2a37c90a0ae54073054f63ecf1c36bb6d331bbb4f858805e74",
       "width_px": 1860,
       "height_px": 1620,
       "pixel_std": 0.17623822391033173
@@ -103,8 +103,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 42948,
-      "sha256": "f9756d8b29841fa76fbcc0073e1360003af06903bd05e5ac5f83d3284fc35976",
+      "bytes": 51436,
+      "sha256": "eb40f632cce332b074df348aee85a566c8b5edf4e3ffa507c28e8e01f45bb410",
       "width_px": 2192,
       "height_px": 658,
       "pixel_std": 0.13735806941986084
@@ -116,8 +116,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 85021,
-      "sha256": "d5a3a8441c176b429a2743531001974bea543002c94910059d10e40e41b71c9d",
+      "bytes": 95388,
+      "sha256": "e1ae006796ac86a3339e2f27320e2ecca93e49272d707511a590f95e1df37fbf",
       "width_px": 1744,
       "height_px": 1144,
       "pixel_std": 0.181332066655159
@@ -127,14 +127,13 @@
       "artifact_kind": "image",
       "script": "scripts/summarize_empirical_pilot.py",
       "source_data": [
-        "docs/empirical_pilot_metrics.json",
-        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+        "docs/empirical_pilot_metrics.json"
       ],
-      "bytes": 210539,
-      "sha256": "712549a5634c1b16a1579fee68433d663a23f0c25d5028f460511f766863cbc9",
+      "bytes": 202498,
+      "sha256": "da53c1545efed76c4d4d89da3309ec4daa81040e0992ae0d277ecdc061739d67",
       "width_px": 3058,
       "height_px": 1474,
-      "pixel_std": 0.15787442028522491
+      "pixel_std": 0.1624137908220291
     },
     {
       "path": "output/figures/empirical_sessions_summary.png",
@@ -149,8 +148,8 @@
         "output/empirical_pilot/local_pilot_004/experiment/experiment_report.json",
         "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
       ],
-      "bytes": 257633,
-      "sha256": "586c2b961a9e846cd2d722e26df5d26d16174b194963fcba59f9c3072df42f25",
+      "bytes": 280791,
+      "sha256": "2d4470e47df1885e2b10ac271b6cc5806c0cc32fd05d0f930b0d3df97f34727c",
       "width_px": 3334,
       "height_px": 1594,
       "pixel_std": 0.13753286004066467
@@ -162,8 +161,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 58686,
-      "sha256": "5aa14ef54542d4ee59ebfc5f896c3f46d8963ab92227646b18512d72cc71c315",
+      "bytes": 69322,
+      "sha256": "a1a6a63f473ca3824fdf459f449be8d6dd452a7943b37c29e3497a6c0575956b",
       "width_px": 2463,
       "height_px": 814,
       "pixel_std": 0.2598573863506317
@@ -189,8 +188,8 @@
       "source_data": [
         "src/itrace/scene.py"
       ],
-      "bytes": 301425,
-      "sha256": "c19478ae822f780397cda4a6f1f135c1b6ef45ca51c04ca1c02ed89110348ea5",
+      "bytes": 320867,
+      "sha256": "6ab8b144f19285e159381ed38e95e10119da88850eb35cd2fd2726f165179bf3",
       "width_px": 3486,
       "height_px": 1548,
       "pixel_std": 0.14098471403121948
@@ -202,8 +201,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 101863,
-      "sha256": "b20cab1771d2bf4134c9a2e9cbbac9c1fdcf2f1f4532d864dbe244ce537e9d62",
+      "bytes": 112779,
+      "sha256": "7368aef544a3d57f264ae93950bd69f99ff8422c0b293e2753e214895585128b",
       "width_px": 1741,
       "height_px": 1444,
       "pixel_std": 0.48751965165138245
@@ -215,8 +214,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 109822,
-      "sha256": "1b6c588728d904a20cf1bf7d8c92e3af8ec095f7d0332f8d5eea6265dc1ec270",
+      "bytes": 117553,
+      "sha256": "f8280940656075cffa7319765e556e86b82e91b8a9d8708609e257c0f1d6cb0a",
       "width_px": 1737,
       "height_px": 1444,
       "pixel_std": 0.17405620217323303
@@ -231,11 +230,11 @@
         "LICENSE",
         "CITATION.cff"
       ],
-      "bytes": 542613,
-      "sha256": "4a87aa0812b034f00f93ed03c204f9141af09938da197098a36c6ee4ea52e333",
+      "bytes": 585606,
+      "sha256": "d0213a9ffc77254aa5830edb29d5fa6bbeb8ec89c8631779337f3ea950ff1937",
       "width_px": 4800,
       "height_px": 2700,
-      "pixel_std": 0.30392059683799744
+      "pixel_std": 0.3039204776287079
     },
     {
       "path": "output/figures/main_sequence.png",
@@ -244,8 +243,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 323364,
-      "sha256": "70743168e3e7f37bdc1bb36c9410a45ac7b500bedd7662ea183ee23d85dc881d",
+      "bytes": 352592,
+      "sha256": "ff4bd54332750343040e6a326d17b89bc4d80d9306c0d00be44cb81731dc09fe",
       "width_px": 3240,
       "height_px": 1290,
       "pixel_std": 0.18437834084033966
@@ -257,8 +256,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 170722,
-      "sha256": "6c804d8535df88c079816fbd2f96bdef533fa3e8da6a786a0742803db067b7e4",
+      "bytes": 185408,
+      "sha256": "aaab1f73c9f753a213033ef6acd68a863e64f5652c381c41c9a8c1279214030a",
       "width_px": 3241,
       "height_px": 1140,
       "pixel_std": 0.15203671157360077
@@ -270,8 +269,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 340585,
-      "sha256": "371ce2f9d6dd22e432a46a77740a2dd52c1bfa862b73ac39f9ed57d6585f6ae3",
+      "bytes": 363665,
+      "sha256": "5f07851479291b47d3c46f094185c8280125091670b98644387b8020e786b176",
       "width_px": 3103,
       "height_px": 1444,
       "pixel_std": 0.1735924780368805
@@ -284,8 +283,8 @@
         "src/itrace/power.py",
         "src/itrace/scene.py"
       ],
-      "bytes": 4528,
-      "sha256": "55d578d590b0fb6ab6fe9a906cb666d26b88e2565194dc0478dd501b4fdb1212",
+      "bytes": 4568,
+      "sha256": "16b5be304d74f5086cc1e4472d620acc945be6a65b9192b63ffb16dd43374d26",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -297,11 +296,11 @@
       "source_data": [
         "output/figures/noise_metrics.json"
       ],
-      "bytes": 649946,
-      "sha256": "b6db166a74fc5a2da795ff99444f3790ae1f653b0604302032bc41a55df637a7",
+      "bytes": 708351,
+      "sha256": "b26ece57c73271996edcc518aaaf56bfc667160e2c4287fcc60f6e47c830029f",
       "width_px": 3180,
       "height_px": 3446,
-      "pixel_std": 0.15797367691993713
+      "pixel_std": 0.15797364711761475
     },
     {
       "path": "output/figures/noise_summary.md",
@@ -323,8 +322,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 97467,
-      "sha256": "fd2d12319bf936a2df9bf3af5352557bbd4519a67f15836e1109e55e1d063509",
+      "bytes": 105469,
+      "sha256": "9c4eb963f137e707925526775bb43a343a79f56b68853b4cd02ee1252da1b81b",
       "width_px": 1741,
       "height_px": 1140,
       "pixel_std": 0.146956667304039
@@ -336,8 +335,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 193271,
-      "sha256": "98553be9acc8a87b64498448cc1b1e4f5bac60d324122c77c2aff53c8b49c72c",
+      "bytes": 206747,
+      "sha256": "11c63b27cb39a734280e22ff3d2579a6aba06f1907547a8a64d361abbcd981ee",
       "width_px": 2015,
       "height_px": 994,
       "pixel_std": 0.16465717554092407
@@ -349,8 +348,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 161609,
-      "sha256": "d53d6b0f69fc19b26173645da4ddb50c0772a5deb85c94310713c3329fd032dc",
+      "bytes": 170622,
+      "sha256": "24e779fcfa2ee95d1eb83d596c45fd0ca22db27f4b8e43c79cb82fef313a694d",
       "width_px": 2044,
       "height_px": 844,
       "pixel_std": 0.2824645936489105
@@ -362,8 +361,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 43956,
-      "sha256": "7235e0d56a195633e312b2e1aadf2d590ab03d3cf75305bea230438b2596166b",
+      "bytes": 48734,
+      "sha256": "c8bdcc7f74676ea513474ba209c8d60b46cd24de38e5340bc74d3885084eab24",
       "width_px": 2044,
       "height_px": 844,
       "pixel_std": 0.1344967782497406
@@ -375,8 +374,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 57500,
-      "sha256": "0367939ca9863219ca65c134ee184f8d5aec071e513abfdb7645375c1e2f4813",
+      "bytes": 65866,
+      "sha256": "f22c070f29b73e68c4aecdec0186bc10d55a019191d68d295870527d1058fde2",
       "width_px": 1444,
       "height_px": 844,
       "pixel_std": 0.19992974400520325
@@ -388,11 +387,11 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 133570,
-      "sha256": "1bbe8a88907aef4c360bedf27cb64232f418ab38e65c3904008e36a096682947",
+      "bytes": 145203,
+      "sha256": "a15d02fe23442bdf3edfcd8d54870e86e9e960751e545c515323c716675734ed",
       "width_px": 1744,
       "height_px": 1744,
-      "pixel_std": 0.156441330909729
+      "pixel_std": 0.15644091367721558
     },
     {
       "path": "output/figures/session_dashboard.png",
@@ -401,11 +400,11 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 869156,
-      "sha256": "a53a2979140fda451493ea945b8bdbb182df0d661d6fd1870da29606b73e4537",
+      "bytes": 936152,
+      "sha256": "e5a10568b38e39a31334cfb6b06a7863553519fa601d05afc4eb26bdfbb7c71b",
       "width_px": 4500,
       "height_px": 2400,
-      "pixel_std": 0.19899912178516388
+      "pixel_std": 0.19899898767471313
     },
     {
       "path": "output/figures/session_dashboard_synthetic.png",
@@ -414,11 +413,11 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 648077,
-      "sha256": "55c23b849fa6bf3eece2c0a9c3278edacc5e07c3a68617b35f73cfd71a9b96e2",
+      "bytes": 706697,
+      "sha256": "4f50b1774d0a9086e2ab43d98cafaabee9552281c6f0c9ce1fc78fd240c8c5c3",
       "width_px": 4444,
       "height_px": 2351,
-      "pixel_std": 0.1686345636844635
+      "pixel_std": 0.16863462328910828
     },
     {
       "path": "output/figures/statistical_diagnostics.json",
@@ -431,8 +430,8 @@
         "src/itrace/stats/scanpath_metrics.py",
         "src/itrace/stats/similarity.py"
       ],
-      "bytes": 11990,
-      "sha256": "f812a00a7777519ba34b42fe46414f3b301c862960c64f7bf8b11f23ef7e6938",
+      "bytes": 11988,
+      "sha256": "d220d161e2b825655445773c0dcc668ae365eb0b0e0308414dd56da466812a7d",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -444,8 +443,8 @@
       "source_data": [
         "output/figures/statistical_diagnostics.json"
       ],
-      "bytes": 754651,
-      "sha256": "3bc394e5f1465facc667648aef6c4e000ce78686044ec14670e018c19928966d",
+      "bytes": 818207,
+      "sha256": "627ba3d5960b30073cb6bb92f45c12792bded0f98dd4d94ec4f28ea9d8c3abab",
       "width_px": 3989,
       "height_px": 3633,
       "pixel_std": 0.33854129910469055
@@ -459,11 +458,10 @@
         "output/figures/noise_metrics.json",
         "output/figures/statistical_diagnostics.json",
         "output/figures/synthetic_empirical_range_bridge.json",
-        "src/itrace/stats/evidence.py",
-        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+        "src/itrace/stats/evidence.py"
       ],
-      "bytes": 6978,
-      "sha256": "6e7837552974aa90a1d239a6009bc325c6c11eba3ad26461a17bb90779b405f6",
+      "bytes": 6979,
+      "sha256": "b35d45db505cee5f8775c71ede2c6e010b590af8ac0d9ae72cbe2428b135322b",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -475,8 +473,8 @@
       "source_data": [
         "output/figures/statistical_interpretation_ledger.json"
       ],
-      "bytes": 838706,
-      "sha256": "8852f1578e18a3b5dfc7d43b0c35ff2055700bf44811f877386d77fc256d7351",
+      "bytes": 927370,
+      "sha256": "d90d4a587cc378074c86cfab4fe6268c903b62be2b4aaa8781cc3dc73f48767e",
       "width_px": 4734,
       "height_px": 2617,
       "pixel_std": 0.14424757659435272
@@ -490,11 +488,10 @@
         "output/synthetic_validation.json",
         "output/figures/noise_metrics.json",
         "output/figures/statistical_diagnostics.json",
-        "src/itrace/stats/range_bridge.py",
-        "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
+        "src/itrace/stats/range_bridge.py"
       ],
-      "bytes": 11785,
-      "sha256": "394bcc41401ba2d8acfab954c6579358bbd9a9c4ca20dcd844ab22acc9ebd2f7",
+      "bytes": 7751,
+      "sha256": "694a477e3b017aa19fc34fe87f07dd276ebf45229f17e04e1a4e1b8639008d4e",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -506,11 +503,11 @@
       "source_data": [
         "output/figures/synthetic_empirical_range_bridge.json"
       ],
-      "bytes": 644898,
-      "sha256": "db9bb98f39c38c136e9bf16fb4ea6fbd3584804b006d27edf2be9e9c071fe047",
-      "width_px": 4498,
+      "bytes": 642896,
+      "sha256": "e57497b4534892ec1f1a2cafdbedd272b14381c946ae632add83afbf9a9de522",
+      "width_px": 4745,
       "height_px": 2382,
-      "pixel_std": 0.14533846080303192
+      "pixel_std": 0.13832774758338928
     },
     {
       "path": "output/figures/synthetic_replay.gif",
@@ -533,8 +530,8 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 124160,
-      "sha256": "273744f3683d463b97b719e5923b513b8b138d6f44ea85376e596f8498598462",
+      "bytes": 138143,
+      "sha256": "d7be914bcb149edfc31c52262fc56655364ccaa766026036ea8b38be046c8fae",
       "width_px": 2044,
       "height_px": 994,
       "pixel_std": 0.1653529405593872

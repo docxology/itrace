@@ -77,6 +77,20 @@ def test_native_stderr_suppression_modes(capfd) -> None:
     assert "hidden-native-log" not in capfd.readouterr().err
 
 
+def test_cli_validate_recording_invokes_refactored_core(tmp_path) -> None:
+    gaze, _ = gaze_with_saccade(amplitude_deg=10.0)
+    gaze_csv = tmp_path / "gaze.csv"
+    out = tmp_path / "val.json"
+    io.write_gaze_csv(gaze, gaze_csv)
+
+    result = runner.invoke(app, ["validate-recording", str(gaze_csv), "--out", str(out)])
+    assert result.exit_code == 0, result.output
+    assert out.exists()
+    payload = json.loads(out.read_text())
+    assert payload["n_samples"] > 0
+    assert "quality" in payload
+
+
 def test_analyze_writes_json_report(tmp_path) -> None:  # ISC-49
     gaze, _ = gaze_with_saccade(amplitude_deg=10.0)
     pstream, _ = pupil_sine_with_blink()

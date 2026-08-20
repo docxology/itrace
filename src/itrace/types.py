@@ -156,6 +156,38 @@ class PSO:
 
 
 @dataclass(frozen=True, slots=True)
+class AOI:
+    """An Area of Interest (bounding box in screen or visual angle space)."""
+
+    name: str
+    x: float
+    y: float
+    w: float
+    h: float
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            msg = "AOI name must be a non-empty string"
+            raise ValueError(msg)
+        if self.w <= 0.0 or self.h <= 0.0:
+            msg = "AOI width and height must be positive"
+            raise ValueError(msg)
+
+    def contains(self, px: float, py: float) -> bool:
+        """Check if point (px, py) lies within this bounding box."""
+        return self.x <= px <= (self.x + self.w) and self.y <= py <= (self.y + self.h)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "name": self.name,
+            "x": self.x,
+            "y": self.y,
+            "w": self.w,
+            "h": self.h,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class Fixation:
     """A detected fixation (period of stable gaze)."""
 

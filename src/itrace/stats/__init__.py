@@ -46,6 +46,8 @@ from .range_bridge import (
     load_synthetic_empirical_range_bridge,
 )
 from .scanpath_metrics import (
+    aoi_dwell_statistics,
+    aoi_transition_matrix,
     bcea,
     convex_hull_area,
     direction_transition_entropy,
@@ -78,6 +80,8 @@ __all__ = [
     "DEFAULT_DIAGNOSTIC_FAMILIES",
     "FAMILIES",
     "FitResult",
+    "aoi_dwell_statistics",
+    "aoi_transition_matrix",
     "bcea",
     "best_fit",
     "blink_rate_hz",

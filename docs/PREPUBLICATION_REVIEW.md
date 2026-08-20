@@ -7,7 +7,7 @@
 
 ## Source ledgers
 
-- `docs/verification_metrics.json`: v0.4.1, 2026-06-09 gate date, 528 tests, 90.23% coverage, MIT license, `https://github.com/docxology/itrace`, `ruff`, `ruff format`, and `mypy` summaries.
+- `docs/verification_metrics.json`: v0.4.1, 2026-06-09 gate date, 543 tests, 90.49% coverage, MIT license, `https://github.com/docxology/itrace`, `ruff`, `ruff format`, and `mypy` summaries.
 - `docs/empirical_sessions_summary.json`: 5 available sessions, 5 replicate IDs, 2 conditions, 0 reference-backed rows, diagnostic-v1 ready, and future 12-session/3-condition/reference-backed validation scope.
 - `docs/empirical_sessions_manifest.json`: derived-record-only storage boundary and no current `reference_kind` beyond `none`.
 - `docs/TRACEABILITY_MATRIX.json`: claim and figure boundaries for synthetic verification, display-only UI, empirical diagnostics, and device-validation non-claims.
@@ -40,7 +40,7 @@ The verifier suite is strong but not omniscient. It currently checks stale metri
 
 Final visualization polish targeted reader-facing composites only: the range bridge, statistical interpretation ledger, statistical diagnostics composite, and empirical-session intake summary. The changes improve spacing, wrapping, and boundary labels without changing evidence values, readiness criteria, or source JSON. Regression tests now check rendered table text for severe row overlap and reject stale test counts, stale coverage, and positive device/webcam accuracy claims across public claim surfaces.
 
-RedTeam claim review after the polish treats `docs/verification_metrics.json`, `docs/empirical_sessions_summary.json`, `docs/empirical_sessions_manifest.json`, `docs/TRACEABILITY_MATRIX.json`, and `docs/figure_manifest.json` as the controlling ledgers. The canonical claim remains: v0.4.1 is MIT-licensed, openly released at `https://github.com/docxology/itrace` and archived at Zenodo DOI 10.5281/zenodo.20614909, with 528 tests, 90.23% coverage, five diagnostic sessions, two conditions, and 0 reference-backed rows. Device validation, population generality, cross-device claims, and reference-device agreement remain explicitly future scope.
+RedTeam claim review after the polish treats `docs/verification_metrics.json`, `docs/empirical_sessions_summary.json`, `docs/empirical_sessions_manifest.json`, `docs/TRACEABILITY_MATRIX.json`, and `docs/figure_manifest.json` as the controlling ledgers. The canonical claim remains: v0.4.1 is MIT-licensed, openly released at `https://github.com/docxology/itrace` and archived at Zenodo DOI 10.5281/zenodo.20614909, with 543 tests, 90.49% coverage, five diagnostic sessions, two conditions, and 0 reference-backed rows. Device validation, population generality, cross-device claims, and reference-device agreement remain explicitly future scope.
 
 ## Final gate commands
 

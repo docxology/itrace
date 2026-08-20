@@ -311,6 +311,119 @@ def test_scanpath_summary_from_session_report() -> None:
     assert out["gaze_dispersion"] > 0.0
 
 
+def test_scanpath_aoi_dict_inputs() -> None:
+    from itrace.stats.scanpath_metrics import aoi_dwell_statistics, aoi_transition_matrix
+    from itrace.types import Fixation
+
+    aoi_dict = {"name": "target", "x": 0.0, "y": 0.0, "w": 10.0, "h": 10.0}
+    fix = [
+        Fixation(
+            onset_idx=0,
+            offset_idx=5,
+            onset_t=0.0,
+            offset_t=0.5,
+            centroid_x=5.0,
+            centroid_y=5.0,
+        )
+    ]
+    stats = aoi_dwell_statistics(fix, [aoi_dict])
+    assert stats["target"]["dwell_time_s"] == 0.5
+
+    labels, _mat = aoi_transition_matrix(fix, [aoi_dict])
+    assert labels == ["target", "outside"]
+
+
+def test_scanpath_aoi_empty_and_no_match() -> None:
+    from itrace.stats.scanpath_metrics import aoi_dwell_statistics, aoi_transition_matrix
+    from itrace.types import AOI, Fixation
+
+    aoi = AOI(name="target", x=100.0, y=100.0, w=10.0, h=10.0)
+    fix = [
+        Fixation(
+            onset_idx=0,
+            offset_idx=5,
+            onset_t=0.0,
+            offset_t=0.5,
+            centroid_x=0.0,
+            centroid_y=0.0,
+        )
+    ]
+    stats = aoi_dwell_statistics(fix, [aoi])
+    assert stats["target"]["dwell_time_s"] == 0.0
+    assert stats["target"]["first_fixation_latency_s"] == -1.0
+    assert stats["outside"]["dwell_time_s"] == 0.5
+    assert stats["outside"]["first_fixation_latency_s"] == 0.0
+
+    labels, mat = aoi_transition_matrix([], [aoi])
+    assert labels == ["target", "outside"]
+    assert mat.shape == (2, 2)
+
+
 def test_scanpath_summary_missing_saccades_raises() -> None:
     with pytest.raises(ValueError, match="saccades must be provided"):
         sm.scanpath_summary([_fix(0.0, 0.0)])
+
+
+def test_aoi_dataclass_and_methods() -> None:
+    from itrace.stats.scanpath_metrics import aoi_dwell_statistics, aoi_transition_matrix
+    from itrace.types import AOI, Fixation
+
+    aoi_left = AOI(name="left_panel", x=-10.0, y=-10.0, w=10.0, h=20.0)
+    aoi_right = AOI(name="right_panel", x=0.0, y=-10.0, w=10.0, h=20.0)
+
+    assert aoi_left.contains(-5.0, 0.0) is True
+    assert aoi_left.contains(5.0, 0.0) is False
+    assert aoi_right.contains(5.0, 0.0) is True
+
+    fixations = [
+        Fixation(
+            onset_idx=0,
+            offset_idx=10,
+            onset_t=0.0,
+            offset_t=0.3,
+            centroid_x=-5.0,
+            centroid_y=0.0,
+        ),
+        Fixation(
+            onset_idx=11,
+            offset_idx=20,
+            onset_t=0.35,
+            offset_t=0.75,
+            centroid_x=5.0,
+            centroid_y=0.0,
+        ),
+        Fixation(
+            onset_idx=21,
+            offset_idx=30,
+            onset_t=0.8,
+            offset_t=1.0,
+            centroid_x=-5.0,
+            centroid_y=0.0,
+        ),
+        Fixation(
+            onset_idx=31,
+            offset_idx=40,
+            onset_t=1.05,
+            offset_t=1.25,
+            centroid_x=50.0,
+            centroid_y=50.0,
+        ),
+    ]
+
+    stats = aoi_dwell_statistics(fixations, [aoi_left, aoi_right])
+    assert stats["left_panel"]["fixation_count"] == 2.0
+    assert stats["left_panel"]["dwell_time_s"] == pytest.approx(0.5)
+    assert stats["left_panel"]["first_fixation_latency_s"] == pytest.approx(0.0)
+    assert stats["right_panel"]["fixation_count"] == 1.0
+    assert stats["right_panel"]["dwell_time_s"] == pytest.approx(0.4)
+    assert stats["right_panel"]["first_fixation_latency_s"] == pytest.approx(0.35)
+    assert stats["outside"]["fixation_count"] == 1.0
+    assert stats["outside"]["dwell_time_s"] == pytest.approx(0.2)
+
+    labels, matrix = aoi_transition_matrix(fixations, [aoi_left, aoi_right])
+    assert labels == ["left_panel", "right_panel", "outside"]
+    # Transitions: left -> right (1), right -> left (1), left -> outside (1)
+    assert matrix.shape == (3, 3)
+    assert matrix[0, 1] == pytest.approx(0.5)  # from left, 1 to right and 1 to outside
+    assert matrix[0, 2] == pytest.approx(0.5)
+    assert matrix[1, 0] == pytest.approx(1.0)  # from right, 1 to left

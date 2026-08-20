@@ -103,6 +103,19 @@ def test_synthetic_validation_cli_writes_json(tmp_path) -> None:
     assert payload["cross_domain"]["worst_domain"]
 
 
+def test_recording_validation_payload_edge_cases() -> None:
+    from itrace.types import GazeStream, PupilStream
+    from itrace.validation import recording_validation_payload
+
+    # Empty / short gaze
+    gaze = GazeStream(t=np.array([0.0, 0.033]), x=np.array([0.0, 0.0]), y=np.array([0.0, 0.0]))
+    pupil = PupilStream(t=np.array([0.0, 0.033]), size=np.array([0.2, 0.2]))
+    payload = recording_validation_payload(gaze, pupil)
+    assert payload["n_samples"] == 2
+    assert "warnings" in payload
+    assert "errors" in payload
+
+
 def test_validation_module_keeps_io_roundtrip_independent(tmp_path) -> None:
     gaze, _pupil, _truth = synthetic_session(SyntheticSessionSpec(seed=8, n_saccades=1))
     path = io.write_gaze_csv(gaze, tmp_path / "gaze.csv")

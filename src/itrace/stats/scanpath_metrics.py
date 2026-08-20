@@ -22,13 +22,15 @@ Everything is pure NumPy/SciPy and deterministic: the only randomness lives in
 from __future__ import annotations
 
 from itertools import pairwise
+from typing import Any
 
 import numpy as np
 from scipy.spatial import ConvexHull, QhullError
 
+from itrace.types import AOI, Fixation, FloatArray, Saccade, SessionReport
+
 from .. import mainsequence
 from ..encoding import encode_directions
-from ..types import Fixation, FloatArray, Saccade, SessionReport
 from .bootstrap import percentile_interval
 
 
@@ -454,3 +456,107 @@ def raw_gaze_spatial_summary(
         "convex_hull_area_deg2": convex_hull_area(x, y),
         "bcea_deg2": bcea(x, y),
     }
+
+
+def aoi_dwell_statistics(
+    fixations: list[Fixation],
+    aois: list[AOI | dict[str, Any]],
+) -> dict[str, dict[str, float]]:
+    """Compute detailed fixation dwell and count statistics for each AOI.
+
+    Returns a dict mapping each AOI name (and 'outside') to a dict containing:
+    - 'dwell_time_s': total fixation duration inside AOI.
+    - 'dwell_fraction': fraction of total fixation duration.
+    - 'fixation_count': number of fixations falling in AOI.
+    - 'fixation_fraction': fraction of all fixations.
+    - 'first_fixation_latency_s': onset time of first fixation in AOI (or -1.0 if unvisited).
+    """
+    aoi_objs = [
+        aoi
+        if isinstance(aoi, AOI)
+        else AOI(
+            name=str(aoi["name"]),
+            x=float(aoi["x"]),
+            y=float(aoi["y"]),
+            w=float(aoi["w"]),
+            h=float(aoi["h"]),
+        )
+        for aoi in aois
+    ]
+    names = [a.name for aoi in [aoi_objs] for a in aoi]
+    names.append("outside")
+
+    dwell_map: dict[str, float] = dict.fromkeys(names, 0.0)
+    count_map: dict[str, int] = dict.fromkeys(names, 0)
+    first_latency_map: dict[str, float] = dict.fromkeys(names, -1.0)
+
+    total_dwell = sum(f.duration_s for f in fixations)
+    total_fix = len(fixations)
+
+    for fix in fixations:
+        matched_name = "outside"
+        for aoi in aoi_objs:
+            if aoi.contains(fix.centroid_x, fix.centroid_y):
+                matched_name = aoi.name
+                break
+        dwell_map[matched_name] += fix.duration_s
+        count_map[matched_name] += 1
+        if first_latency_map[matched_name] < 0:
+            first_latency_map[matched_name] = fix.onset_t
+
+    return {
+        name: {
+            "dwell_time_s": dwell_map[name],
+            "dwell_fraction": dwell_map[name] / total_dwell if total_dwell > 0 else 0.0,
+            "fixation_count": float(count_map[name]),
+            "fixation_fraction": count_map[name] / total_fix if total_fix > 0 else 0.0,
+            "first_fixation_latency_s": first_latency_map[name],
+        }
+        for name in names
+    }
+
+
+def aoi_transition_matrix(
+    fixations: list[Fixation],
+    aois: list[AOI | dict[str, Any]],
+) -> tuple[list[str], FloatArray]:
+    """Compute the 1st-order transition probability matrix between AOIs.
+
+    Returns (labels, matrix) where labels include AOI names plus 'outside'.
+    """
+    aoi_objs = [
+        aoi
+        if isinstance(aoi, AOI)
+        else AOI(
+            name=str(aoi["name"]),
+            x=float(aoi["x"]),
+            y=float(aoi["y"]),
+            w=float(aoi["w"]),
+            h=float(aoi["h"]),
+        )
+        for aoi in aois
+    ]
+    labels = [a.name for a in aoi_objs]
+    labels.append("outside")
+    name_to_idx = {name: i for i, name in enumerate(labels)}
+
+    n = len(labels)
+    mat = np.zeros((n, n), dtype=np.float64)
+
+    seq: list[int] = []
+    for fix in fixations:
+        matched_idx = name_to_idx["outside"]
+        for aoi in aoi_objs:
+            if aoi.contains(fix.centroid_x, fix.centroid_y):
+                matched_idx = name_to_idx[aoi.name]
+                break
+        seq.append(matched_idx)
+
+    for i in range(len(seq) - 1):
+        mat[seq[i], seq[i + 1]] += 1.0
+
+    row_sums = mat.sum(axis=1, keepdims=True)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        prob_mat = np.where(row_sums > 0, mat / row_sums, 0.0)
+
+    return labels, prob_mat

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 
@@ -123,8 +124,98 @@ class AffineCalibration:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class PolynomialCalibration:
+    """2D Polynomial (2nd degree) gaze calibration.
+
+    The model maps (x, y) to targets via 6 basis terms:
+    ``[1, x, y, x^2, x*y, y^2]``.
+    """
+
+    x_coefficients: tuple[float, float, float, float, float, float]
+    y_coefficients: tuple[float, float, float, float, float, float]
+    n_points: int
+    rms_error_deg: float
+
+    @classmethod
+    def fit(
+        cls,
+        raw_x: Iterable[float],
+        raw_y: Iterable[float],
+        target_x: Iterable[float],
+        target_y: Iterable[float],
+        *,
+        ridge: float = 1e-4,
+    ) -> PolynomialCalibration:
+        """Fit a quadratic 2D polynomial calibration from raw gaze to targets."""
+        rx = _as_float_vector("raw_x", raw_x)
+        ry = _as_float_vector("raw_y", raw_y)
+        tx = _as_float_vector("target_x", target_x)
+        ty = _as_float_vector("target_y", target_y)
+        _check_equal_lengths(rx, ry, tx, ty)
+        if rx.size < 6:
+            msg = "polynomial calibration needs at least 6 points"
+            raise ValueError(msg)
+        if not (np.all(np.isfinite(rx)) and np.all(np.isfinite(ry))):
+            msg = "raw calibration coordinates must be finite"
+            raise ValueError(msg)
+        if not (np.all(np.isfinite(tx)) and np.all(np.isfinite(ty))):
+            msg = "target calibration coordinates must be finite"
+            raise ValueError(msg)
+        if ridge < 0.0:
+            msg = "ridge must be non-negative"
+            raise ValueError(msg)
+
+        design = np.column_stack([np.ones_like(rx), rx, ry, rx**2, rx * ry, ry**2])
+        if ridge == 0.0:
+            x_coef, *_ = np.linalg.lstsq(design, tx, rcond=None)
+            y_coef, *_ = np.linalg.lstsq(design, ty, rcond=None)
+        else:
+            penalty = ridge * np.eye(6)
+            penalty[0, 0] = 0.0  # do not regularize bias
+            lhs = design.T @ design + penalty
+            x_coef = np.linalg.solve(lhs, design.T @ tx)
+            y_coef = np.linalg.solve(lhs, design.T @ ty)
+
+        px = design @ x_coef
+        py = design @ y_coef
+        err = np.hypot(px - tx, py - ty)
+        x_c = tuple(float(v) for v in x_coef)
+        y_c = tuple(float(v) for v in y_coef)
+        return cls(
+            x_coefficients=cast(tuple[float, float, float, float, float, float], x_c),
+            y_coefficients=cast(tuple[float, float, float, float, float, float], y_c),
+            n_points=int(rx.size),
+            rms_error_deg=float(np.sqrt(np.mean(err**2))),
+        )
+
+    def apply(self, x: Iterable[float], y: Iterable[float]) -> tuple[FloatArray, FloatArray]:
+        """Apply polynomial calibration to coordinate vectors."""
+        rx = _as_float_vector("x", x)
+        ry = _as_float_vector("y", y)
+        _check_equal_lengths(rx, ry)
+        design = np.column_stack([np.ones_like(rx), rx, ry, rx**2, rx * ry, ry**2])
+        xc = np.array(self.x_coefficients, dtype=np.float64)
+        yc = np.array(self.y_coefficients, dtype=np.float64)
+        return design @ xc, design @ yc
+
+    def apply_stream(self, stream: GazeStream) -> GazeStream:
+        """Return a calibrated copy of a :class:`GazeStream`."""
+        x, y = self.apply(stream.x, stream.y)
+        return GazeStream(t=stream.t, x=x, y=y)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "model_type": "polynomial",
+            "x_coefficients": list(self.x_coefficients),
+            "y_coefficients": list(self.y_coefficients),
+            "n_points": self.n_points,
+            "rms_error_deg": self.rms_error_deg,
+        }
+
+
 def calibration_error(
-    calibration: AffineCalibration,
+    calibration: AffineCalibration | PolynomialCalibration,
     raw_x: Iterable[float],
     raw_y: Iterable[float],
     target_x: Iterable[float],

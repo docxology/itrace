@@ -23,8 +23,6 @@ from . import benchmark, experiments, io, pipeline, saccades, validation
 from .calibration import (
     AffineCalibration,
     calibration_error,
-    interpolate_gaze_gaps,
-    robust_gaze_quality,
 )
 from .capture import (
     CaptureSample,
@@ -35,7 +33,6 @@ from .capture import (
     native_stderr as _native_stderr,
 )
 from .config import AnalysisConfig, analysis_config_from_json
-from .pupil import quality_summary
 from .reporting import validate_report_payload
 from .stats import bootstrap, descriptive, distributions, scanpath_metrics
 from .synthetic import gaze_with_saccade, pupil_sine_with_blink
@@ -257,77 +254,18 @@ def validate_recording(
     gaze = io.read_gaze_csv(gaze_csv)
     pstream = io.read_pupil_csv(pupil_csv) if pupil_csv is not None else None
     cfg = load_analysis_config(config_json)
-    quality = robust_gaze_quality(gaze)
-    original_finite = int(np.sum(np.isfinite(gaze.x) & np.isfinite(gaze.y) & np.isfinite(gaze.t)))
-    preprocessing: dict[str, object] = {
-        "short_gap_interpolation_used": False,
-        "short_gap_max_s": 0.05,
-    }
-    try:
-        analysis_gaze = interpolate_gaze_gaps(gaze, max_gap_s=0.05)
-        interpolated_finite = int(
-            np.sum(
-                np.isfinite(analysis_gaze.x)
-                & np.isfinite(analysis_gaze.y)
-                & np.isfinite(analysis_gaze.t)
-            )
-        )
-        preprocessing["short_gap_interpolation_used"] = interpolated_finite > original_finite
-    except ValueError:
-        analysis_gaze = gaze
-        preprocessing["short_gap_interpolation_used"] = False
-    try:
-        report = pipeline.analyze_session(analysis_gaze, pstream, config=cfg)
-        report_validation = validate_report_payload(report.to_dict())
-    except ValueError as exc:
-        report = None
-        report_validation = {"valid": False, "errors": [str(exc)], "warnings": []}
-    warnings: list[str] = []
-    errors: list[str] = []
-    if quality["dropout_fraction"] > 0.0:
-        warnings.append("gaze contains non-finite samples")
-    if quality["valid_sample_fraction"] < 0.85:
-        warnings.append("low finite gaze fraction")
-    if quality["nonmonotonic_timestamp_count"] > 0.0:
-        errors.append("gaze timestamps are nonmonotonic")
-    if quality["large_gap_count"] > 0.0:
-        warnings.append("gaze contains large timestamp gaps")
-    if report is None:
-        errors.append("recording could not be analyzed with current configuration")
-    elif len(report.saccades) == 0:
-        warnings.append("no saccades detected with current configuration")
-    pupil_payload: dict[str, float] = {}
-    if pstream is not None:
-        pupil_payload = quality_summary(pstream, min_valid=max(cfg.pupil.blink_threshold, 1e-6))
-        if pupil_payload.get("blink_fraction", 0.0) > 0.0:
-            warnings.append("pupil trace contains blink or invalid samples")
-        if pupil_payload.get("valid_sample_fraction", 1.0) < 0.5:
-            warnings.append("low pupil-valid fraction")
-    payload = {
-        "n_samples": len(gaze),
-        "duration_s": float(gaze.t[-1] - gaze.t[0]) if len(gaze) >= 2 else 0.0,
-        "preprocessing": preprocessing,
-        "quality": quality,
-        "events": {
-            "n_fixations": len(report.fixations) if report is not None else 0,
-            "n_saccades": len(report.saccades) if report is not None else 0,
-            "n_microsaccades": len(report.microsaccades) if report is not None else 0,
-            "n_smooth_pursuits": len(report.smooth_pursuits) if report is not None else 0,
-            "n_psos": len(report.psos) if report is not None else 0,
-        },
-        "pupil": pupil_payload,
-        "event_ci": _event_ci(report) if report is not None else {},
-        "calibration": {
-            "available": calibration_json is not None and calibration_json.exists(),
-            "path": str(calibration_json) if calibration_json is not None else None,
-        },
-        "warnings": warnings,
-        "errors": errors,
-        "report_validation": report_validation,
-        "config": report.config if report is not None else cfg.to_dict(),
-    }
+    payload = validation.recording_validation_payload(
+        gaze,
+        pstream,
+        config=cfg,
+        calibration_json=calibration_json,
+    )
+    warnings = payload.get("warnings")
+    errors = payload.get("errors")
+    n_warnings = len(warnings) if isinstance(warnings, list) else 0
+    n_errors = len(errors) if isinstance(errors, list) else 0
     out.write_text(json.dumps(payload, indent=2))
-    typer.echo(f"wrote {out} ({len(warnings)} warnings, {len(errors)} errors)")
+    typer.echo(f"wrote {out} ({n_warnings} warnings, {n_errors} errors)")
 
 
 @app.command("synthetic-validation")

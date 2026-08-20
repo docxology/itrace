@@ -107,6 +107,26 @@ def test_empty_and_short_streams() -> None:
     assert saccades.detect_microsaccades(empty) == []
 
 
+def test_detect_ivt_additional_branch_coverage() -> None:
+    from itrace.types import GazeStream
+
+    gaze = GazeStream(t=np.linspace(0, 1, 100), x=np.zeros(100), y=np.zeros(100))
+    # Test min inter event gap, max saccade duration, edge rejection
+    fixations, saccades_res = saccades.detect_ivt(
+        gaze,
+        velocity_threshold_deg_s=10.0,
+        min_inter_event_gap_s=0.05,
+        max_saccade_duration_s=0.5,
+        reject_edge_events=True,
+    )
+    assert isinstance(fixations, list)
+    assert isinstance(saccades_res, list)
+    with pytest.raises(ValueError, match="min_inter_event_gap_s"):
+        saccades.detect_ivt(gaze, min_inter_event_gap_s=-0.1)
+    with pytest.raises(ValueError, match="max_saccade_duration_s"):
+        saccades.detect_ivt(gaze, max_saccade_duration_s=0.0)
+
+
 def test_detect_ivt_rejects_invalid_threshold_and_duration_knobs() -> None:
     stream, _ = gaze_with_saccade(amplitude_deg=8.0)
     with pytest.raises(ValueError, match="velocity_threshold"):

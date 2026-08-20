@@ -2,12 +2,10 @@
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
 \documentclass[
 ]{article}
-\usepackage{xcolor}
-\usepackage[margin=0.42in]{geometry}
 \usepackage{amsmath,amssymb}
-\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
@@ -38,8 +36,9 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
+\usepackage{xcolor}
+\usepackage[margin=0.42in]{geometry}
 \usepackage{longtable,booktabs,array}
-\newcounter{none} % for unnumbered tables
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -51,19 +50,21 @@
 \makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
-\newsavebox\pandoc@box
-\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
-  \sbox\pandoc@box{#1}%
-  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
-  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
-  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
-  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
-  \else\usebox{\pandoc@box}%
-  \fi%
-}
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 % Set default figure placement to htbp
+\makeatletter
 \def\fps@figure{htbp}
 \makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
 % definitions for citeproc citations
 \NewDocumentCommand\citeproctext{}{}
 \NewDocumentCommand\citeproc{mm}{%
@@ -97,16 +98,13 @@
 \newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 % Standalone-render preamble: load the same packages the template's
 % manuscript/preamble.md declares (siunitx for \SI, booktabs for tables) and map
 % the Unicode glyphs used in prose to LaTeX so the default Latin Modern font
 % renders them. (The template pipeline uses a Unicode-font engine; this keeps the
 % working/ standalone render faithful.)
-\usepackage{siunitx}
 \usepackage{booktabs}
+\IfFileExists{siunitx.sty}{\usepackage{siunitx}}{}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{newunicodechar}
@@ -155,11 +153,14 @@
   \end{titlepage}
 }
 \makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={iTrace: an algorithmically verified open-source core for webcam gaze{,} saccade{,} and pupil analysis},
+  pdftitle={iTrace: an algorithmically verified open-source core for webcam gaze, saccade, and pupil analysis},
   pdfauthor={Daniel Ari Friedman (Active Inference Institute; ORCID: 0000-0001-6232-9096)},
   colorlinks=true,
   linkcolor={red},
@@ -209,8 +210,8 @@ velocity-thresholded saccade recovery falls below F1 = 0.8 near sigma
 because its noise-sweep robustness follows from the modelling assumption
 used to inject pupil noise. iTrace also ships a typer CLI, Streamlit
 dashboard, local HTML/WebSocket orchestrator, guided derived-record
-empirical workflow, and publication-figure scripts, all under 528 tests
-at 90.23\% coverage. Its contribution is not a claim that webcams are
+empirical workflow, and publication-figure scripts, all under 543 tests
+at 90.49\% coverage. Its contribution is not a claim that webcams are
 validated eye trackers; it is a verification-first reference
 implementation whose evidence boundaries are visible in the code,
 figures, reports, and manuscript. iTrace is MIT-licensed and openly
@@ -235,24 +236,25 @@ imperfect inputs: browser trackers such as WebGazer
 (\citeproc{ref-papoutsaki2016webgazer}{Papoutsaki et al. 2016}), large
 webcam and mobile gaze datasets such as GazeCapture
 (\citeproc{ref-krafka2016gazecapture}{Krafka et al. 2016}) and MPIIGaze
-(\citeproc{ref-zhang2017mpiigaze}{Zhang et al. 2017}), appearance-based
-gaze estimators such as L2CS-Net
+(\citeproc{ref-zhang2017mpiigaze}{X. Zhang et al. 2017}),
+appearance-based gaze estimators such as L2CS-Net
 (\citeproc{ref-hempel2022l2cs}{Abdelrahman et al. 2022}), landmark-based
 capture stacks such as MediaPipe Iris
 (\citeproc{ref-vakunov2020mediapipeiris}{Vakunov et al. 2020}),
 velocity- and dispersion-threshold event classifiers
 (\citeproc{ref-salvucci2000identifying}{Salvucci and Goldberg 2000};
 \citeproc{ref-nystrom2010adaptive}{Nyström and Holmqvist 2010};
-\citeproc{ref-dar2021remodnav}{Dar et al. 2021}), microsaccade detectors
-(\citeproc{ref-engbert2003microsaccades}{Engbert and Kliegl 2003}),
-file-oriented processing and quality-reporting pipelines
-(\citeproc{ref-krause2023pymovements}{Krakowczyk et al. 2023};
-\citeproc{ref-jakobi2024quality}{Jakobi et al. 2024}), and webcam or
-offline pupillometry tools (\citeproc{ref-shah2024eyedentify}{Shah et
-al. 2025}; \citeproc{ref-zandi2021pupilext}{Zandi et al. 2021};
+\citeproc{ref-dar2021remodnav}{Dar, Wagner, and Hanke 2021}),
+microsaccade detectors (\citeproc{ref-engbert2003microsaccades}{Engbert
+and Kliegl 2003}), file-oriented processing and quality-reporting
+pipelines (\citeproc{ref-krause2023pymovements}{Krakowczyk et al. 2023};
+\citeproc{ref-jakobi2024quality}{Jakobi, Krakowczyk, and Jäger 2024}),
+and webcam or offline pupillometry tools
+(\citeproc{ref-shah2024eyedentify}{Shah et al. 2025};
+\citeproc{ref-zandi2021pupilext}{Zandi et al. 2021};
 \citeproc{ref-fuhl2015else}{Fuhl et al. 2015};
-\citeproc{ref-santini2018pure}{Santini et al. 2018};
-\citeproc{ref-zhang2026pupeyes}{Zhang and Jonides 2026};
+\citeproc{ref-santini2018pure}{Santini, Fuhl, and Kasneci 2018};
+\citeproc{ref-zhang2026pupeyes}{H. Zhang and Jonides 2026};
 \citeproc{ref-mittner2020pypillometry}{Mittner 2020};
 \citeproc{ref-cai2024opendpsm}{Cai et al. 2024}).
 
@@ -260,10 +262,10 @@ Two problems recur across these tools. First, the \emph{capture} layer
 (camera drivers, MediaPipe, browser WebRTC
 (\citeproc{ref-papoutsaki2016webgazer}{Papoutsaki et al. 2016}),
 integrated open-source platforms such as Pupil
-(\citeproc{ref-kassner2014pupil}{Kassner et al. 2014})) is tightly
-coupled to the \emph{analysis} layer, so the scientific algorithms
-cannot be exercised or checked without hardware --- which makes
-continuous integration, regression testing, and reproducible
+(\citeproc{ref-kassner2014pupil}{Kassner, Patera, and Bulling 2014})) is
+tightly coupled to the \emph{analysis} layer, so the scientific
+algorithms cannot be exercised or checked without hardware --- which
+makes continuous integration, regression testing, and reproducible
 benchmarking awkward. Second, ``validation'' is often demonstrated on
 recorded data without a ground-truth oracle, so a detector that silently
 mis-handles noise, blinks, or NaNs can pass unnoticed.
@@ -275,32 +277,33 @@ pioneered in-browser webcam gaze but fuses capture, calibration, and
 estimation into one runtime. GazeCapture and MPIIGaze provide the
 public-data substrate for real-frame gaze evaluation
 (\citeproc{ref-krafka2016gazecapture}{Krafka et al. 2016};
-\citeproc{ref-zhang2017mpiigaze}{Zhang et al. 2017}), while L2CS-Net
+\citeproc{ref-zhang2017mpiigaze}{X. Zhang et al. 2017}), while L2CS-Net
 demonstrates how appearance models can predict pitch/yaw from
 unconstrained images (\citeproc{ref-hempel2022l2cs}{Abdelrahman et al.
 2022}). pymovements (\citeproc{ref-krause2023pymovements}{Krakowczyk et
 al. 2023}) offers a mature, file-oriented processing pipeline and now
 anchors explicit data-quality reporting standards
-(\citeproc{ref-jakobi2024quality}{Jakobi et al. 2024}), but it assumes
-the gaze samples already exist. REMoDNaV
-(\citeproc{ref-dar2021remodnav}{Dar et al. 2021}) is a strong event
-classifier whose four-class fixation / saccade / smooth-pursuit /
-post-saccadic-oscillation output is richer than ours, but it classifies
-an input signal rather than reasoning about how that signal was
-estimated from a camera. PupilSense/EyeDentify
+(\citeproc{ref-jakobi2024quality}{Jakobi, Krakowczyk, and Jäger 2024}),
+but it assumes the gaze samples already exist. REMoDNaV
+(\citeproc{ref-dar2021remodnav}{Dar, Wagner, and Hanke 2021}) is a
+strong event classifier whose four-class fixation / saccade /
+smooth-pursuit / post-saccadic-oscillation output is richer than ours,
+but it classifies an input signal rather than reasoning about how that
+signal was estimated from a camera. PupilSense/EyeDentify
 (\citeproc{ref-shah2024eyedentify}{Shah et al. 2025}) addresses webcam
 pupil diameter with learned models and a dataset; PupilEXT, ElSe, and
 PuRe represent mature pupil-detection platform and algorithm lines
 (\citeproc{ref-zandi2021pupilext}{Zandi et al. 2021};
 \citeproc{ref-fuhl2015else}{Fuhl et al. 2015};
-\citeproc{ref-santini2018pure}{Santini et al. 2018}); PupEyes and
-pypillometry focus on reproducible pupil preprocessing and analysis
-after samples have been recorded (\citeproc{ref-zhang2026pupeyes}{Zhang
-and Jonides 2026}; \citeproc{ref-mittner2020pypillometry}{Mittner
-2020}); Open-DPSM models luminance-driven pupil responses in dynamic
-stimuli (\citeproc{ref-cai2024opendpsm}{Cai et al. 2024}). iTrace does
-not try to out-measure any of these on real eyes. It occupies a narrower
-gap: a \emph{verification-first}, hardware-decoupled implementation of
+\citeproc{ref-santini2018pure}{Santini, Fuhl, and Kasneci 2018});
+PupEyes and pypillometry focus on reproducible pupil preprocessing and
+analysis after samples have been recorded
+(\citeproc{ref-zhang2026pupeyes}{H. Zhang and Jonides 2026};
+\citeproc{ref-mittner2020pypillometry}{Mittner 2020}); Open-DPSM models
+luminance-driven pupil responses in dynamic stimuli
+(\citeproc{ref-cai2024opendpsm}{Cai et al. 2024}). iTrace does not try
+to out-measure any of these on real eyes. It occupies a narrower gap: a
+\emph{verification-first}, hardware-decoupled implementation of
 established gaze, saccade, microsaccade, pupil, and descriptive scanpath
 algorithms whose correctness is pinned to constructed ground truth and
 whose outputs can later be compared against public datasets, reference
@@ -427,7 +430,7 @@ The geometry layer turns raw image measurements into calibrated
 quantities in degrees of visual angle (dva). Pixel offsets from screen
 centre are converted by the exact relation
 
-\begin{equation}\protect\phantomsection\label{eq:pix2deg}{ \theta = \arctan(s_\text{cm} / d_\text{cm}) }\end{equation}
+\begin{equation}\phantomsection\label{eq:pix2deg}{ \theta = \arctan(s_\text{cm} / d_\text{cm}) }\end{equation}
 
 where \(s_{\mathrm{cm}}\) is the offset in centimetres (pixels times the
 screen's cm-per-pixel) and \(d_{\mathrm{cm}}\) the viewing distance. The
@@ -438,7 +441,7 @@ tolerance.
 For appearance-based capture, normalised iris displacement within the
 eye aperture is mapped to eyeball rotation through a sphere model,
 
-\begin{equation}\protect\phantomsection\label{eq:iris}{ \theta_{\mathrm{gaze}} = \arcsin\!\big(o \cdot \sin\theta_{\max}\big) }\end{equation}
+\begin{equation}\phantomsection\label{eq:iris}{ \theta_{\mathrm{gaze}} = \arcsin\!\big(o \cdot \sin\theta_{\max}\big) }\end{equation}
 
 with \(o \in [-1, 1]\) the normalised iris offset and \(\theta_{\max}\)
 the angle at full deflection; the map (eq.~\ref{eq:iris}) is monotone
@@ -493,7 +496,7 @@ Microsaccades follow Engbert and Kliegl
 (\citeproc{ref-engbert2003microsaccades}{2003}). Velocity uses their
 five-sample moving-average estimator, and a per-axis elliptic threshold
 
-\begin{equation}\protect\phantomsection\label{eq:ek}{ (v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1 }\end{equation}
+\begin{equation}\phantomsection\label{eq:ek}{ (v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1 }\end{equation}
 
 (eq.~\ref{eq:ek}) flags an event when held for at least a minimum number
 of samples. The threshold \(\eta = \lambda\sigma\) uses the
@@ -513,9 +516,9 @@ velocity. The amplitude--peak-velocity relationship --- the \emph{main
 sequence} --- is fit to two standard parameterisations: a saturating
 exponential
 
-\begin{equation}\protect\phantomsection\label{eq:mainseq}{ V = V_{\max}\,\big(1 - e^{-A/C}\big) }\end{equation}
+\begin{equation}\phantomsection\label{eq:mainseq}{ V = V_{\max}\,\big(1 - e^{-A/C}\big) }\end{equation}
 
-(eq.~\ref{eq:mainseq}; Bahill et al.
+(eq.~\ref{eq:mainseq}; Bahill, Clark, and Stark
 (\citeproc{ref-bahill1975main}{1975})) by non-linear least squares, and
 a power law \(V = aA^b\) by linear regression in log-log space,
 reporting the coefficient of determination. A physiological oculomotor
@@ -539,7 +542,7 @@ The pupil pipeline is a sequence of pure transforms over a
 conservative preprocessing vocabulary common to open pupil-analysis
 tools: blink handling, interpolation, baseline-correction, quality
 reporting, and transparent preprocessing records
-(\citeproc{ref-zhang2026pupeyes}{Zhang and Jonides 2026};
+(\citeproc{ref-zhang2026pupeyes}{H. Zhang and Jonides 2026};
 \citeproc{ref-mittner2020pypillometry}{Mittner 2020}). Blinks are
 detected as runs of NaN or sub-threshold samples and removed by linear
 interpolation with edge padding, so the partial-occlusion ramp on either
@@ -577,7 +580,7 @@ confidence, and converts that segmentation into either a
 iris-radius normalizer is supplied. This deliberately does less than
 established pupil detectors and platforms such as ElSe, PuRe, or
 PupilEXT (\citeproc{ref-fuhl2015else}{Fuhl et al. 2015};
-\citeproc{ref-santini2018pure}{Santini et al. 2018};
+\citeproc{ref-santini2018pure}{Santini, Fuhl, and Kasneci 2018};
 \citeproc{ref-zandi2021pupilext}{Zandi et al. 2021}): it is a pure-core
 fixture-verified path for pixels/relative measurements, not a millimetre
 calibration or device validation claim.
@@ -762,7 +765,7 @@ MPIIGaze, and L2CS-Net makes the same practical point from the opposite
 direction: real-frame accuracy depends on dataset, camera, illumination,
 head pose, and calibration conditions, not just on the downstream event
 detector (\citeproc{ref-krafka2016gazecapture}{Krafka et al. 2016};
-\citeproc{ref-zhang2017mpiigaze}{Zhang et al. 2017};
+\citeproc{ref-zhang2017mpiigaze}{X. Zhang et al. 2017};
 \citeproc{ref-hempel2022l2cs}{Abdelrahman et al. 2022}). Pupil-size
 measurement, which a real pipeline derives from a separate segmentation
 we do not implement, carries its own observation noise scaled with
@@ -825,7 +828,8 @@ eye-tracking standards work, the live HTML interface therefore reports
 sampling regularity, finite gaze fraction, pupil-valid fraction, path
 length, dispersion, and warnings, but deliberately leaves recovery F1
 undefined unless a future reference-device or public-dataset path
-supplies truth (\citeproc{ref-jakobi2024quality}{Jakobi et al. 2024}).
+supplies truth (\citeproc{ref-jakobi2024quality}{Jakobi, Krakowczyk, and
+Jäger 2024}).
 
 \section{Methods: descriptive and distribution
 statistics}\label{sec:diststats}
@@ -1059,11 +1063,12 @@ saccade. \texttt{detection.detect\_pso} scans the samples immediately
 after each detected saccade offset for a short, lower-amplitude velocity
 excursion in the settling window and tags it as a PSO rather than a
 movement, in the spirit of the glissade/PSO class that REMoDNaV adds to
-the saccade/fixation dichotomy (\citeproc{ref-dar2021remodnav}{Dar et
-al. 2021}). iTrace does not yet claim REMoDNaV's full four-class
-smooth-pursuit classification --- that is named as future work in
-sec.~\ref{sec:limitations} --- so the PSO tag is reported as a labelled
-sub-event of the saccade it follows, not as an independent event class.
+the saccade/fixation dichotomy (\citeproc{ref-dar2021remodnav}{Dar,
+Wagner, and Hanke 2021}). iTrace does not yet claim REMoDNaV's full
+four-class smooth-pursuit classification --- that is named as future
+work in sec.~\ref{sec:limitations} --- so the PSO tag is reported as a
+labelled sub-event of the saccade it follows, not as an independent
+event class.
 
 Two further quantities describe the \emph{dynamics} the fixed detectors
 leave on the floor. \texttt{detection.intersaccadic\_intervals} returns
@@ -1107,8 +1112,8 @@ cosine similarity over their shared vocabulary, giving a value in
 \([0, 1]\) that is high when two recordings share the same
 characteristic short sequences regardless of where they occur, following
 the vector-space comparison logic used in information retrieval
-(\citeproc{ref-salton1975vector}{Salton et al. 1975}). Either vector
-being empty (a recording with fewer than \(n\) saccades) yields a
+(\citeproc{ref-salton1975vector}{Salton, Wong, and Yang 1975}). Either
+vector being empty (a recording with fewer than \(n\) saccades) yields a
 defined similarity of zero rather than a division by zero.
 
 The \textbf{transition matrix} is the raw material both similarities are
@@ -1159,7 +1164,7 @@ evidence boundaries; it is not a validation figure for webcam accuracy.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Graphical abstract of the iTrace eye-to-code evidence pipeline. A stylized observed eye feeds typed gaze, saccade, pupil, and quality records into the pure Python core, which then produces reports, figures, and live displays from Python-computed payloads. Three badges summarise the current verification gate, the five-session diagnostic v1 release scope, and the no-reference-device-claim boundary. The footer states MIT License, github.com/docxology/itrace, and the Zenodo DOI 10.5281/zenodo.20614909; the figure describes architecture and evidence boundaries, not webcam accuracy validation.}]{../output/figures/graphical_abstract.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/graphical_abstract.png}
 \caption{Graphical abstract of the iTrace eye-to-code evidence pipeline.
 A stylized observed eye feeds typed gaze, saccade, pupil, and quality
 records into the pure Python core, which then produces reports, figures,
@@ -1208,13 +1213,13 @@ amplitude and peak velocity fall on a tight, low-amplitude main-sequence
 cluster, distinct from the large-saccade branch --- the expected
 separation of the two scales rather than a fitted claim. The
 main-sequence fit recovers the saturating \(V_{\max}\) and \(C\) of a
-synthetic relationship (\citeproc{ref-bahill1975main}{Bahill et al.
-1975}) to within 10\% and returns a power-law exponent inside the
+synthetic relationship (\citeproc{ref-bahill1975main}{Bahill, Clark, and
+Stark 1975}) to within 10\% and returns a power-law exponent inside the
 physiological 0.4--0.9 range (fig.~\ref{fig:mainseq}).
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Main-sequence recovery from a synthetic multi-amplitude recording. Panel A plots detected saccades by amplitude, peak velocity, and direction, with the fitted saturating curve and recovered parameters. Panel B repeats the same detections on log-log axes with the fitted power law, making the exponent and goodness-of-fit explicit. The evidence is recovery of a seeded synthetic relationship and detector property extraction; it is not a physiological population estimate or real-device validation.}]{../output/figures/main_sequence.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/main_sequence.png}
 \caption{Main-sequence recovery from a synthetic multi-amplitude
 recording. Panel A plots detected saccades by amplitude, peak velocity,
 and direction, with the fitted saturating curve and recovered
@@ -1251,7 +1256,7 @@ sessions are summarised as polar histograms (fig.~\ref{fig:polar}).
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\linewidth,height=\textheight,keepaspectratio,alt={Saccade direction distribution over the synthetic multi-saccade recording. The polar convention is printed in the figure (0° = right, +90° = up), bars encode counts over 16 angular bins, and the orange resultant vector summarises directional balance. The panel verifies the package-wide direction convention and recovered event directions on synthetic data; it does not infer natural viewing bias.}]{../output/figures/direction_polar.png}
+\includegraphics[width=0.75\textwidth,height=\textheight]{../output/figures/direction_polar.png}
 \caption{Saccade direction distribution over the synthetic multi-saccade
 recording. The polar convention is printed in the figure (0° = right,
 +90° = up), bars encode counts over 16 angular bins, and the orange
@@ -1290,7 +1295,7 @@ system.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Closed-loop recovery on the default synthetic scene. Panel A shows the projected binocular landmark geometry and the two iris-centre paths. Panel B overlays true and recovered yaw/pitch, with scripted and detected saccade intervals shaded. Panel C overlays true and recovered pupil dynamics after normalisation, with the blink interval shaded. The figure verifies consistency between an independent 3-D generator and the estimator; shared idealisations mean the residual is a lower bound, not a measured webcam error.}]{../output/figures/closed_loop_summary.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/closed_loop_summary.png}
 \caption{Closed-loop recovery on the default synthetic scene. Panel A
 shows the projected binocular landmark geometry and the two iris-centre
 paths. Panel B overlays true and recovered yaw/pitch, with scripted and
@@ -1307,7 +1312,7 @@ floating 3-D eyeball orbs (fig.~\ref{fig:orbs}).
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Synthetic truth and recovered signals rendered together. The 3-D panel shows the true eyeball orientation, gaze rays, iris, and pupil state at one representative frame; the trace panels repeat the recovered yaw, pitch, and pupil signals with true values, saccades, and the blink interval visible for audit. This panel is a visual audit of the synthetic scene and recovery path, not evidence from a recorded participant.}]{../output/figures/eye_orbs_still.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/eye_orbs_still.png}
 \caption{Synthetic truth and recovered signals rendered together. The
 3-D panel shows the true eyeball orientation, gaze rays, iris, and pupil
 state at one representative frame; the trace panels repeat the recovered
@@ -1322,7 +1327,7 @@ participant.}\label{fig:orbs}
 Sweeping the landmark-noise standard deviation \(\sigma\) from 0 to
 0.016 (normalised image units), 25 seeded trials per level, gives a
 clear and differentiated degradation of the three signals
-(fig.~\ref{fig:power}, tbl.~\ref{tbl:noise}). The sweep is intentionally
+(fig.~\ref{fig:power}, tbl.~1). The sweep is intentionally
 idealised: it injects independent landmark noise into the same synthetic
 scene rather than replaying real MediaPipe failures, so its value is to
 rank algorithmic fragilities under controlled perturbation.
@@ -1365,7 +1370,7 @@ reference-device gaze accuracy.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Recovery vs idealised webcam observation noise. Each panel reports the Monte-Carlo mean and 95\% bootstrap confidence band for one recovered signal, with the manuscript usability bound drawn as a horizontal line and the interpolated bound crossing annotated in both normalised σ and approximate pixels at 640 px width. Colour, marker, and line style all encode the signal so the figure remains legible in greyscale. The figure supports an algorithmic fragility ordering under iid landmark perturbations; it does not measure MediaPipe, lens, illumination, head-pose, or calibration error on real frames.}]{../output/figures/noise_power.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/noise_power.png}
 \caption{Recovery vs idealised webcam observation noise. Each panel
 reports the Monte-Carlo mean and 95\% bootstrap confidence band for one
 recovered signal, with the manuscript usability bound drawn as a
@@ -1379,18 +1384,18 @@ frames.}\label{fig:power}
 \end{figure}
 
 The same numbers, with per-cell uncertainty, are the generated
-statistics table (tbl.~\ref{tbl:noise}); it and the figure are generated
+statistics table (tbl.~1); it and the figure are generated
 from one sweep so they never drift. (Snapshot at \(n=25\); regenerate
 with \texttt{scripts/generate\_power\_figure.py}.)
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\caption{Recovery vs landmark noise σ (mean ± 95\% half-CI,
-\(n=25\)).}\label{tbl:noise}\tabularnewline
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{Recovery vs landmark noise σ (mean ± 95\% half-CI, \(n=25\)).
+\{\#tbl:noise\}}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 sigma (norm)
@@ -1442,8 +1447,8 @@ and the published algorithm definitions, so agreement is evidence the
 implementation matches the algorithm, not that two copies of one mistake
 agree.
 
-The complete toolchain is green and reproducible: 528 no-mocks tests
-pass with 90.23\% statement-and-branch coverage, \texttt{ruff} and
+The complete toolchain is green and reproducible: 543 no-mocks tests
+pass with 90.49\% statement-and-branch coverage, \texttt{ruff} and
 \texttt{ruff\ format} report no issues, and \texttt{mypy\ -\/-strict}
 finds no type errors across the source tree. The test count, coverage,
 version, gate date, and render evidence are stored once in
@@ -1528,7 +1533,7 @@ rather than filling a guessed value.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={N=1 empirical session summary generated from the derived experiment report. The cards report finite-gaze fraction, sampling rate, sampling regularity, drift, held-out target residuals, and target acquisition latency as order-of-magnitude session diagnostics when a local pilot export exists; pending fields remain visible before recording. The figure demonstrates the package workflow and current-session quality ledger, not reference-device validation.}]{../output/figures/empirical_pilot_summary.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/empirical_pilot_summary.png}
 \caption{N=1 empirical session summary generated from the derived
 experiment report. The cards report finite-gaze fraction, sampling rate,
 sampling regularity, drift, held-out target residuals, and target
@@ -1575,15 +1580,15 @@ by a valid artifact.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Empirical-session intake summary generated from docs/empirical\_sessions\_manifest.json. The figure reports available sessions, distinct replicates, conditions, reference-evidence count, participant/device scope, held-out residual scale, finite-gaze fraction, total derived samples, and current diagnostic-v1 status. The five-session prompt-only ledger is sufficient for diagnostic v1 readiness while population, cross-device, and device-accuracy claims remain future reference-backed validation scope.}]{../output/figures/empirical_sessions_summary.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/empirical_sessions_summary.png}
 \caption{Empirical-session intake summary generated from
-\protect\texttt{docs/empirical\_sessions\_manifest.json}. The figure
-reports available sessions, distinct replicates, conditions,
-reference-evidence count, participant/device scope, held-out residual
-scale, finite-gaze fraction, total derived samples, and current
-diagnostic-v1 status. The five-session prompt-only ledger is sufficient
-for diagnostic v1 readiness while population, cross-device, and
-device-accuracy claims remain future reference-backed validation
+\texttt{docs/empirical\_sessions\_manifest.json}. The figure reports
+available sessions, distinct replicates, conditions, reference-evidence
+count, participant/device scope, held-out residual scale, finite-gaze
+fraction, total derived samples, and current diagnostic-v1 status. The
+five-session prompt-only ledger is sufficient for diagnostic v1
+readiness while population, cross-device, and device-accuracy claims
+remain future reference-backed validation
 scope.}\label{fig:empirical-sessions-summary}
 \end{figure}
 
@@ -1610,12 +1615,12 @@ comparison from a generated JSON sidecar so the visual and prose share
 one evidence boundary:
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2308}}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3077}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2308}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2308}}@{}}
-\caption{N=1 pilot scale compared with synthetic/model
-variables.}\label{tbl:empirical-synthetic-range}\tabularnewline
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2308}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3077}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2308}}@{}}
+\caption{N=1 pilot scale compared with synthetic/model variables.
+\{\#tbl:empirical-synthetic-range\}}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pilot diagnostic
@@ -1667,10 +1672,10 @@ protocol; it is not physiological saccade latency. \\
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Synthetic-to-empirical range bridge generated from output/figures/synthetic\_empirical\_range\_bridge.json. The rows place N=1 empirical session values beside synthetic-domain summaries, idealized landmark-noise sweep values, or descriptive statistical diagnostics, and each row is labelled as observed local scale, stress-domain only, or not directly comparable. The figure uses the pilot to contextualize synthetic defaults and stress ranges; it does not validate device accuracy, device performance, or webcam generality.}]{../output/figures/synthetic_empirical_range_bridge.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/synthetic_empirical_range_bridge.png}
 \caption{Synthetic-to-empirical range bridge generated from
-\protect\texttt{output/figures/synthetic\_empirical\_range\_bridge.json}.
-The rows place N=1 empirical session values beside synthetic-domain
+\texttt{output/figures/synthetic\_empirical\_range\_bridge.json}. The
+rows place N=1 empirical session values beside synthetic-domain
 summaries, idealized landmark-noise sweep values, or descriptive
 statistical diagnostics, and each row is labelled as observed local
 scale, stress-domain only, or not directly comparable. The figure uses
@@ -1759,7 +1764,7 @@ untracked matplotlib-only calculation.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Statistical diagnostics over a deterministic synthetic session. Panel A ranks amplitude-distribution families by delta AIC while carrying Akaike weights, AICc, BIC, Kolmogorov-Smirnov descriptors, bootstrap lowest-AIC winner stability, robust median/IQR shape summaries with seeded bootstrap intervals, Bowley quartile skewness, and IQR outside-value counts; panel B plots empirical amplitude quantiles against fitted quantiles for the lowest-AIC family, reports QQ residual scale, and adds a P-P/CDF residual inset with integrated and Anderson-Darling-style tail-weighted CDF distances plus a DKW/Massart reference band; panel C shows the seeded bootstrap interval for the main-sequence exponent; panel D overlays fixation centroids with a BCEA-style ellipse and spatial-spread summaries; panel E renders the row-normalised scanpath transition matrix. The figure visualizes tested core descriptors and relative model diagnostics, not real-eye accuracy, population inference, or proof that a fitted family is true.}]{../output/figures/statistical_diagnostics.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/statistical_diagnostics.png}
 \caption{Statistical diagnostics over a deterministic synthetic session.
 Panel A ranks amplitude-distribution families by delta AIC while
 carrying Akaike weights, AICc, BIC, Kolmogorov-Smirnov descriptors,
@@ -1792,11 +1797,11 @@ rather than device validation.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Statistical interpretation ledger generated from output/figures/statistical\_interpretation\_ledger.json. The rows map robust shape summaries, relative distribution comparison, CDF residual checks, bootstrap main-sequence uncertainty, spatial descriptors, scanpath transitions, idealized noise sensitivity, and the synthetic-to-empirical range bridge to their source artifacts, estimands, and explicit non-claims. The figure improves statistical readability without adding new evidence; it states what each statistic does not prove, including population physiology, posterior model truth, real-eye accuracy, and device validation.}]{../output/figures/statistical_interpretation_ledger.png}
+\includegraphics[width=1\textwidth,height=\textheight]{../output/figures/statistical_interpretation_ledger.png}
 \caption{Statistical interpretation ledger generated from
-\protect\texttt{output/figures/statistical\_interpretation\_ledger.json}.
-The rows map robust shape summaries, relative distribution comparison,
-CDF residual checks, bootstrap main-sequence uncertainty, spatial
+\texttt{output/figures/statistical\_interpretation\_ledger.json}. The
+rows map robust shape summaries, relative distribution comparison, CDF
+residual checks, bootstrap main-sequence uncertainty, spatial
 descriptors, scanpath transitions, idealized noise sensitivity, and the
 synthetic-to-empirical range bridge to their source artifacts,
 estimands, and explicit non-claims. The figure improves statistical
@@ -1855,8 +1860,8 @@ fragility that the saccade-F1 collapse of sec.~\ref{sec:noiseresults}
 makes quantitative. The point is a cross-check between two independent
 detector designs on a shared, known-truth signal --- the kind of
 agreement an event-classification reference implementation is meant to
-provide (\citeproc{ref-dar2021remodnav}{Dar et al. 2021}) --- not a
-claim that either threshold is correct for real webcam data.
+provide (\citeproc{ref-dar2021remodnav}{Dar, Wagner, and Hanke 2021})
+--- not a claim that either threshold is correct for real webcam data.
 
 \subsection{Windowed event rates expose temporal
 structure}\label{windowed-event-rates-expose-temporal-structure}
@@ -1950,12 +1955,12 @@ pymovements, PupEyes, pypillometry, ElSe, PuRe, or PupilEXT?'' but
 those systems can be benchmarked against it on shared fixtures or public
 datasets?'' (\citeproc{ref-papoutsaki2016webgazer}{Papoutsaki et al.
 2016}; \citeproc{ref-hempel2022l2cs}{Abdelrahman et al. 2022};
-\citeproc{ref-dar2021remodnav}{Dar et al. 2021};
+\citeproc{ref-dar2021remodnav}{Dar, Wagner, and Hanke 2021};
 \citeproc{ref-krause2023pymovements}{Krakowczyk et al. 2023};
-\citeproc{ref-zhang2026pupeyes}{Zhang and Jonides 2026};
+\citeproc{ref-zhang2026pupeyes}{H. Zhang and Jonides 2026};
 \citeproc{ref-mittner2020pypillometry}{Mittner 2020};
 \citeproc{ref-fuhl2015else}{Fuhl et al. 2015};
-\citeproc{ref-santini2018pure}{Santini et al. 2018};
+\citeproc{ref-santini2018pure}{Santini, Fuhl, and Kasneci 2018};
 \citeproc{ref-zandi2021pupilext}{Zandi et al. 2021}). The guided
 empirical workflow sits in the same category: it makes a local session
 auditable by writing derived records and a summary report, while leaving
@@ -1971,7 +1976,7 @@ pilot shows what one ordinary live run looked like in sampling rate,
 sampling regularity, drift, prompted-target residuals, and target
 acquisition latency. Those numbers are therefore best read as context
 for expectations and future benchmarks, not as population estimates. In
-practical terms, tbl.~\ref{tbl:empirical-synthetic-range} and
+practical terms, tbl.~2 and
 fig.~\ref{fig:synthetic-empirical-range-bridge} separate which synthetic
 defaults are contextualized by a local demonstration from which remain
 deliberate stress ranges: clean finite capture and webcam-rate timing
@@ -2049,7 +2054,7 @@ strongly on the dataset, camera, lighting, pose, calibration, and model
 class; large public benchmarks report errors in physical screen units or
 degrees under their own protocols rather than a universal webcam
 constant (\citeproc{ref-krafka2016gazecapture}{Krafka et al. 2016};
-\citeproc{ref-zhang2017mpiigaze}{Zhang et al. 2017};
+\citeproc{ref-zhang2017mpiigaze}{X. Zhang et al. 2017};
 \citeproc{ref-hempel2022l2cs}{Abdelrahman et al. 2022}). iTrace's
 noise-sensitivity result sharpens the method-level risk:
 sec.~\ref{sec:noiseresults} shows saccade \emph{timing} breaks down at a
@@ -2061,19 +2066,18 @@ head-pose, landmark-bias, and calibration effects are added.
 and dataset work (\citeproc{ref-shah2024eyedentify}{Shah et al. 2025}),
 mature pupil-detection algorithms and platforms
 (\citeproc{ref-fuhl2015else}{Fuhl et al. 2015};
-\citeproc{ref-santini2018pure}{Santini et al. 2018};
+\citeproc{ref-santini2018pure}{Santini, Fuhl, and Kasneci 2018};
 \citeproc{ref-zandi2021pupilext}{Zandi et al. 2021}), and downstream
 packages for transparent preprocessing, visualization, and statistical
-modelling once pupil samples exist
-(\citeproc{ref-zhang2026pupeyes}{Zhang and Jonides 2026};
-\citeproc{ref-mittner2020pypillometry}{Mittner 2020}). iTrace now
-includes a pure eye-crop segmentation helper, but it reports image
-pixels or pupil/iris-relative values only. It does not implement an
-absolute millimetre calibration path, and its live MediaPipe pupil
-channel remains a relative proxy. The package surfaces this rather than
-implying IR-grade precision, and the pupil noise-sensitivity result is
-conditional on a modelling assumption (sec.~\ref{sec:noisemodel}), not
-measured.
+modelling once pupil samples exist (\citeproc{ref-zhang2026pupeyes}{H.
+Zhang and Jonides 2026}; \citeproc{ref-mittner2020pypillometry}{Mittner
+2020}). iTrace now includes a pure eye-crop segmentation helper, but it
+reports image pixels or pupil/iris-relative values only. It does not
+implement an absolute millimetre calibration path, and its live
+MediaPipe pupil channel remains a relative proxy. The package surfaces
+this rather than implying IR-grade precision, and the pupil
+noise-sensitivity result is conditional on a modelling assumption
+(sec.~\ref{sec:noisemodel}), not measured.
 
 \textbf{The expanded analysis layer describes, it does not validate.}
 The descriptive statistics, distribution fits, scanpath spread and
@@ -2134,9 +2138,10 @@ absolute-diameter pupil model trained on PupilSense/EyeDentify data
 against PupilEXT-style measurement protocols
 (\citeproc{ref-zandi2021pupilext}{Zandi et al. 2021}), smooth-pursuit
 and post-saccadic-oscillation classification to match REMoDNaV's
-four-class output (\citeproc{ref-dar2021remodnav}{Dar et al. 2021}),
-screen-space calibration, and binocular disparity each slot in behind
-the existing typed interfaces without disturbing the verified core.
+four-class output (\citeproc{ref-dar2021remodnav}{Dar, Wagner, and Hanke
+2021}), screen-space calibration, and binocular disparity each slot in
+behind the existing typed interfaces without disturbing the verified
+core.
 
 \section{Conclusion}\label{sec:conclusion}
 
@@ -2165,13 +2170,13 @@ upper bound on error those would finally establish.
 
 \section{References}\label{sec:references}
 
-\protect\phantomsection\label{refs}
-\begin{CSLReferences}{1}{1}
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
 \bibitem[\citeproctext]{ref-hempel2022l2cs}
 Abdelrahman, Ahmed A., Thorsten Hempel, Aly Khalifa, and Ayoub
 Al-Hamadi. 2022. {``L2CS-Net: Fine-Grained Gaze Estimation in
-Unconstrained Environments.''} \emph{arXiv Preprint arXiv:2203.03339},
-ahead of print. \url{https://doi.org/10.48550/arXiv.2203.03339}.
+Unconstrained Environments.''} \emph{arXiv Preprint arXiv:2203.03339}.
+\url{https://doi.org/10.48550/arXiv.2203.03339}.
 
 \bibitem[\citeproctext]{ref-akaike1974new}
 Akaike, Hirotugu. 1974. {``A New Look at the Statistical Model
@@ -2197,13 +2202,14 @@ and Its Applications} 331 (1-2): 207--18.
 \url{https://doi.org/10.1016/j.physa.2003.09.011}.
 
 \bibitem[\citeproctext]{ref-bowley1901elements}
-Bowley, Arthur Lyon. 1901. \emph{Elements of Statistics}. P. S. King.
+Bowley, Arthur Lyon. 1901. \emph{Elements of Statistics}. London: P. S.
+King.
 \url{https://openlibrary.org/books/OL6904986M/Elements_of_statistics}.
 
 \bibitem[\citeproctext]{ref-burnham2002model}
 Burnham, Kenneth P., and David R. Anderson. 2002. \emph{Model Selection
 and Multimodel Inference: A Practical Information-Theoretic Approach}.
-2nd ed. Springer. \url{https://doi.org/10.1007/b97636}.
+2nd ed. New York: Springer. \url{https://doi.org/10.1007/b97636}.
 
 \bibitem[\citeproctext]{ref-butterworth1930theory}
 Butterworth, Stephen. 1930. {``On the Theory of Filter Amplifiers.''}
@@ -2240,8 +2246,8 @@ Orientation of Covert Attention.''} \emph{Vision Research} 43 (9):
 \bibitem[\citeproctext]{ref-fuhl2015else}
 Fuhl, Wolfgang, Thiago C. Santini, Thomas Kübler, and Enkelejda Kasneci.
 2015. {``ElSe: Ellipse Selection for Robust Pupil Detection in
-Real-World Environments.''} \emph{arXiv Preprint arXiv:1511.06575},
-ahead of print. \url{https://doi.org/10.48550/arXiv.1511.06575}.
+Real-World Environments.''} \emph{arXiv Preprint arXiv:1511.06575}.
+\url{https://doi.org/10.48550/arXiv.1511.06575}.
 
 \bibitem[\citeproctext]{ref-holmqvist2011eye}
 Holmqvist, Kenneth, Marcus Nyström, Richard Andersson, Richard Dewhurst,
@@ -2250,7 +2256,7 @@ Comprehensive Guide to Methods and Measures}. Oxford University Press.
 
 \bibitem[\citeproctext]{ref-jakobi2024quality}
 Jakobi, Deborah N., Daniel G. Krakowczyk, and Lena A. Jäger. 2024.
-{``Reporting Eye-Tracking Data Quality: Towards a New Standard.''}
+{``Reporting Eye-Tracking Data Quality: Towards a New Standard.''} In
 \emph{Proceedings of the 2024 Symposium on Eye Tracking Research \&
 Applications}, 47:1--3. \url{https://doi.org/10.1145/3649902.3655658}.
 
@@ -2262,22 +2268,25 @@ Conference on Pervasive and Ubiquitous Computing: Adjunct Publication},
 1151--60. \url{https://doi.org/10.1145/2638728.2641695}.
 
 \bibitem[\citeproctext]{ref-krafka2016gazecapture}
-Krafka, Kyle, Aditya Khosla, Petr Kellnhofer, et al. 2016. {``Eye
-Tracking for Everyone.''} \emph{Proceedings of the IEEE Conference on
+Krafka, Kyle, Aditya Khosla, Petr Kellnhofer, Harini Kannan, Suchendra
+Bhandarkar, Wojciech Matusik, and Antonio Torralba. 2016. {``Eye
+Tracking for Everyone.''} In \emph{Proceedings of the IEEE Conference on
 Computer Vision and Pattern Recognition}, 2176--84.
 \url{https://openaccess.thecvf.com/content_cvpr_2016/html/Krafka_Eye_Tracking_for_CVPR_2016_paper.html}.
 
 \bibitem[\citeproctext]{ref-krause2023pymovements}
-Krakowczyk, Daniel G., David R. Reich, Jakob Chwastek, et al. 2023.
-{``Pymovements: A Python Package for Eye Movement Data Processing.''}
-\emph{arXiv Preprint arXiv:2304.09859}, ahead of print.
+Krakowczyk, Daniel G., David R. Reich, Jakob Chwastek, Deborah N.
+Jakobi, Paul Prasse, Assunta Süss, Oleksii Turuta, Paweł Kasprowski, and
+Lena A. Jäger. 2023. {``Pymovements: A Python Package for Eye Movement
+Data Processing.''} \emph{arXiv Preprint arXiv:2304.09859}.
 \url{https://doi.org/10.48550/arXiv.2304.09859}.
 
 \bibitem[\citeproctext]{ref-kronemer2024rtpupilphase}
-Kronemer, Sharif I., Victoria E. Gobo, Catherine R. Walsh, et al. 2025.
-{``Cross-Species Real-Time Detection of Trends in Pupil Size
-Fluctuation.''} \emph{Behavior Research Methods} 57: 9.
-\url{https://doi.org/10.3758/s13428-024-02545-7}.
+Kronemer, Sharif I., Victoria E. Gobo, Catherine R. Walsh, Joshua B.
+Teves, Diana C. Burk, Somayeh Shahsavarani, Javier Gonzalez-Castillo,
+and Peter A. Bandettini. 2025. {``Cross-Species Real-Time Detection of
+Trends in Pupil Size Fluctuation.''} \emph{Behavior Research Methods}
+57: 9. \url{https://doi.org/10.3758/s13428-024-02545-7}.
 
 \bibitem[\citeproctext]{ref-levenshtein1966binary}
 Levenshtein, Vladimir I. 1966. {``Binary Codes Capable of Correcting
@@ -2286,7 +2295,7 @@ Deletions, Insertions, and Reversals.''} \emph{Soviet Physics Doklady}
 
 \bibitem[\citeproctext]{ref-luce1986response}
 Luce, R. Duncan. 1986. \emph{Response Times: Their Role in Inferring
-Elementary Mental Organization}. Oxford University Press.
+Elementary Mental Organization}. New York: Oxford University Press.
 
 \bibitem[\citeproctext]{ref-massart1990tight}
 Massart, Pascal. 1990. {``The Tight Constant in the
@@ -2313,7 +2322,7 @@ for Fixation, Saccade, and Glissade Detection in Eyetracking Data.''}
 \bibitem[\citeproctext]{ref-papoutsaki2016webgazer}
 Papoutsaki, Alexandra, Nediyana Daskalova, Patsorn Sangkloy, Jeff Huang,
 James Laskey, and James Hays. 2016. {``WebGazer: Scalable Webcam Eye
-Tracking Using User Interactions.''} \emph{Proceedings of the
+Tracking Using User Interactions.''} In \emph{Proceedings of the
 Twenty-Fifth International Joint Conference on Artificial Intelligence},
 3839--45. \url{https://www.ijcai.org/Proceedings/16/Papers/540.pdf}.
 
@@ -2353,7 +2362,7 @@ Schwarz, Gideon. 1978. {``Estimating the Dimension of a Model.''}
 \bibitem[\citeproctext]{ref-shah2024eyedentify}
 Shah, Vijul, Ko Watanabe, Brian B. Moser, and Andreas Dengel. 2025.
 {``PupilSense: A Novel Application for Webcam-Based Pupil Diameter
-Estimation.''} \emph{arXiv Preprint arXiv:2407.11204}, ahead of print.
+Estimation.''} \emph{arXiv Preprint arXiv:2407.11204}.
 \url{https://doi.org/10.48550/arXiv.2407.11204}.
 
 \bibitem[\citeproctext]{ref-steinman1965effect}
@@ -2362,13 +2371,14 @@ Monocular Fixation.''} \emph{Journal of the Optical Society of America}
 55 (9): 1158--65. \url{https://doi.org/10.1364/JOSA.55.001158}.
 
 \bibitem[\citeproctext]{ref-tukey1977exploratory}
-Tukey, John W. 1977. \emph{Exploratory Data Analysis}. Addison-Wesley.
+Tukey, John W. 1977. \emph{Exploratory Data Analysis}. Reading, MA:
+Addison-Wesley.
 \url{https://openlibrary.org/books/OL4877620M/Exploratory_data_analysis}.
 
 \bibitem[\citeproctext]{ref-vakunov2020mediapipeiris}
 Vakunov, Andrey, Dmitry Lagun, Chuo-Ling Chang, and Matthias Grundmann.
-2020. \emph{MediaPipe Iris: Real-Time Iris Tracking and Depth
-Estimation}. Google Research Blog.
+2020. {``MediaPipe Iris: Real-Time Iris Tracking and Depth
+Estimation.''} Google Research Blog.
 \url{https://research.google/blog/mediapipe-iris-real-time-iris-tracking-depth-estimation/}.
 
 \bibitem[\citeproctext]{ref-wilk1968probability}
@@ -2391,7 +2401,7 @@ Methods} 58 (1): 29. \url{https://doi.org/10.3758/s13428-025-02830-z}.
 \bibitem[\citeproctext]{ref-zhang2017mpiigaze}
 Zhang, Xucong, Yusuke Sugano, Mario Fritz, and Andreas Bulling. 2017.
 {``MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze
-Estimation.''} \emph{arXiv Preprint arXiv:1711.09017}, ahead of print.
+Estimation.''} \emph{arXiv Preprint arXiv:1711.09017}.
 \url{https://doi.org/10.48550/arXiv.1711.09017}.
 
 \end{CSLReferences}
@@ -2461,7 +2471,7 @@ physical units uses \texttt{sigma\_to\_pixels(σ,\ image\_width)}
 
 \subsection{One source of truth}\label{one-source-of-truth}
 
-The figure (fig.~\ref{fig:power}) and the table (tbl.~\ref{tbl:noise})
+The figure (fig.~\ref{fig:power}) and the table (tbl.~1)
 are both rendered from a single \texttt{NoiseSweepResult} via
 \texttt{power.summary\_records} / \texttt{format\_summary\_markdown}, so
 prose, plot, and table cannot drift apart --- verified by a
@@ -2471,11 +2481,10 @@ cell-for-cell match in the documentation audit.
 
 \subsection{Module map}\label{module-map}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2581}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2258}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.5161}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2581}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2258}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5161}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Module
@@ -2526,7 +2535,6 @@ bootstrap metrics \\
 extra) \\
 \texttt{cli} & shell & typer command-line interface \\
 \end{longtable}
-}
 
 \subsection{Dependency contract}\label{dependency-contract}
 

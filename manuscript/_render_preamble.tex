@@ -3,8 +3,8 @@
 % the Unicode glyphs used in prose to LaTeX so the default Latin Modern font
 % renders them. (The template pipeline uses a Unicode-font engine; this keeps the
 % working/ standalone render faithful.)
-\usepackage{siunitx}
 \usepackage{booktabs}
+\IfFileExists{siunitx.sty}{\usepackage{siunitx}}{}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{newunicodechar}

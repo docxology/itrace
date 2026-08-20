@@ -8,7 +8,7 @@ features kept behind their extras.
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 from typing import Any, Literal, cast
 
@@ -173,6 +173,9 @@ def analysis_config_from_mapping(values: dict[str, object]) -> AnalysisConfig:
     Only ``detection`` and ``pupil`` sections are accepted. Unknown keys fail
     loudly so a misspelled method setting cannot silently fall back to defaults.
     """
+    if not isinstance(values, dict):
+        msg = "analysis config mapping must be a dict"
+        raise ValueError(msg)
     allowed = {"detection", "pupil"}
     unknown = sorted(set(values) - allowed)
     if unknown:
@@ -193,6 +196,39 @@ def analysis_config_from_json(path: str | Path) -> AnalysisConfig:
         msg = "analysis config JSON must contain an object"
         raise ValueError(msg)
     return analysis_config_from_mapping(payload)
+
+
+@dataclass(frozen=True, slots=True)
+class AOIConfig:
+    """Area of Interest list configuration for spatial gaze analysis."""
+
+    aois: list[dict[str, object]] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        return {"aois": self.aois}
+
+
+@dataclass(frozen=True, slots=True)
+class CalibrationConfig:
+    """Gaze calibration settings."""
+
+    method: Literal["affine", "polynomial"] = "affine"
+    polynomial_degree: int = 2
+    target_range_deg: float = 15.0
+
+    def __post_init__(self) -> None:
+        if self.method not in {"affine", "polynomial"}:
+            msg = f"method must be 'affine' or 'polynomial'; got {self.method!r}"
+            raise ValueError(msg)
+        if self.polynomial_degree not in {2, 3}:
+            msg = "polynomial_degree must be 2 or 3"
+            raise ValueError(msg)
+        if self.target_range_deg <= 0.0:
+            msg = "target_range_deg must be positive"
+            raise ValueError(msg)
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
 
 
 @dataclass(frozen=True, slots=True)

@@ -37,6 +37,7 @@ from . import (
 )
 from .pupilphase import Phase, PhaseDetector
 from .types import (
+    AOI,
     PSO,
     BinocularGazeSample,
     EventType,
@@ -55,6 +56,7 @@ from .types import (
 from .version import __version__
 
 __all__ = [
+    "AOI",
     "PSO",
     "BinocularGazeSample",
     "EventType",

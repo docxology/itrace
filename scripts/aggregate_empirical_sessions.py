@@ -212,7 +212,14 @@ def write_empirical_session_outputs(
     figure_out: Path = DEFAULT_FIGURE,
 ) -> dict[str, Path]:
     """Write aggregate empirical-session JSON and figure outputs."""
-    summary = aggregate_empirical_sessions(manifest_path=manifest_path)
+    try:
+        summary = aggregate_empirical_sessions(manifest_path=manifest_path)
+    except ValueError:
+        # Fall back to checked-in summary if raw report directories are absent in fresh clone
+        if summary_out.exists():
+            summary = json.loads(summary_out.read_text(encoding="utf-8"))
+        else:
+            raise
     return {
         "summary": write_summary(summary, summary_out),
         "figure": generate_empirical_sessions_figure(summary, figure_out),

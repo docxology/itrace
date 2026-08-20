@@ -56,6 +56,20 @@ def test_pupilstream_rejects_mismatched_lengths() -> None:  # ISC-10
         PupilStream(t=np.zeros(3), size=np.zeros(4))
 
 
+def test_aoi_dataclass_validation() -> None:
+    from itrace.types import AOI
+
+    with pytest.raises(ValueError, match="non-empty string"):
+        AOI(name="  ", x=0.0, y=0.0, w=10.0, h=10.0)
+    with pytest.raises(ValueError, match="positive"):
+        AOI(name="valid", x=0.0, y=0.0, w=0.0, h=10.0)
+    with pytest.raises(ValueError, match="positive"):
+        AOI(name="valid", x=0.0, y=0.0, w=10.0, h=-1.0)
+
+    aoi = AOI(name="test", x=1.0, y=2.0, w=3.0, h=4.0)
+    assert aoi.to_dict() == {"name": "test", "x": 1.0, "y": 2.0, "w": 3.0, "h": 4.0}
+
+
 def test_streams_reject_2d() -> None:
     with pytest.raises(ValueError, match="1-D"):
         GazeStream(t=np.zeros((2, 2)), x=np.zeros((2, 2)), y=np.zeros((2, 2)))

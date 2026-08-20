@@ -46,7 +46,7 @@ accuracy still needs reference eye-tracker or public-dataset validation.
 
 - [x] Add a reusable calibration-session workflow: backend-owned per-target
   sampling, affine fit, calibration diagnostics, and JSON export.
-- [ ] Add visible target presentation to the live calibration workflow.
+- [x] Add visible target presentation to the live calibration workflow.
 - [x] Add calibration-aware live HTML mode that fits `AffineCalibration` from
   recent raw samples, applies it to subsequent gaze samples, exports
   calibration artifacts, and displays calibrated vs raw coordinates.
@@ -89,6 +89,9 @@ accuracy still needs reference eye-tracker or public-dataset validation.
 
 ## Large Improvements
 
+- [x] Add 2D polynomial calibration with cross terms and regularisation for higher-order screen-space mapping.
+- [x] Add first-class Area of Interest (AOI) dataclasses, configs, dwell statistics, and transition matrices.
+- [x] Refactor recording validation payload generation out of CLI into core validation module.
 - [ ] Run a public-dataset validation study on webcam gaze data such as MPIIGaze
   or GazeCapture, with subject/session splits and explicit device-validation
   language.

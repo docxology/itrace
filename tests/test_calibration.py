@@ -9,7 +9,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from itrace.calibration import AffineCalibration, calibration_error, robust_gaze_quality
+from itrace.calibration import (
+    AffineCalibration,
+    PolynomialCalibration,
+    calibration_error,
+    robust_gaze_quality,
+)
 from itrace.types import GazeStream
 
 FIXTURES = Path(__file__).parent / "fixtures" / "calibration"
@@ -105,6 +110,74 @@ def test_robust_gaze_quality_summarizes_dropouts_jitter_and_gaps() -> None:
     assert summary["longest_gap_s"] == pytest.approx(0.06)
     assert summary["large_gap_count"] == 1.0
     assert summary["sampling_jitter_s"] > 0.0
+
+
+def test_polynomial_calibration_recovers_quadratic_transform() -> None:
+    # True mapping with quadratic & interaction terms
+    # target_x = 1.0 + 2.0*x - 0.5*y + 0.1*x^2 + 0.05*x*y - 0.08*y^2
+    # target_y = -0.5 + 0.2*x + 1.8*y - 0.03*x^2 + 0.04*x*y + 0.06*y^2
+    grid_x, grid_y = np.meshgrid(np.linspace(-10, 10, 5), np.linspace(-10, 10, 5))
+    rx = grid_x.ravel()
+    ry = grid_y.ravel()
+    tx = 1.0 + 2.0 * rx - 0.5 * ry + 0.1 * rx**2 + 0.05 * rx * ry - 0.08 * ry**2
+    ty = -0.5 + 0.2 * rx + 1.8 * ry - 0.03 * rx**2 + 0.04 * rx * ry + 0.06 * ry**2
+
+    cal = PolynomialCalibration.fit(rx, ry, tx, ty, ridge=0.0)
+    assert cal.n_points == len(rx)
+    assert cal.rms_error_deg < 1e-6
+
+    px, py = cal.apply(rx, ry)
+    np.testing.assert_allclose(px, tx, atol=1e-5)
+    np.testing.assert_allclose(py, ty, atol=1e-5)
+
+    stream = GazeStream(t=np.linspace(0, 1, len(rx)), x=rx, y=ry)
+    cal_stream = cal.apply_stream(stream)
+    np.testing.assert_allclose(cal_stream.x, tx, atol=1e-5)
+    np.testing.assert_allclose(cal_stream.y, ty, atol=1e-5)
+
+    err = calibration_error(cal, rx, ry, tx, ty)
+    assert err["rms_error_deg"] < 1e-5
+    assert cal.to_dict()["model_type"] == "polynomial"
+
+
+def test_polynomial_calibration_edge_cases() -> None:
+    # NaN/Inf rejection, negative ridge
+    with pytest.raises(ValueError, match="finite"):
+        PolynomialCalibration.fit(
+            [np.nan, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5]
+        )
+    with pytest.raises(ValueError, match="finite"):
+        PolynomialCalibration.fit(
+            [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5], [np.nan, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5]
+        )
+    with pytest.raises(ValueError, match="ridge"):
+        PolynomialCalibration.fit(
+            [0, 1, 2, 3, 4, 5],
+            [0, 1, 2, 3, 4, 5],
+            [0, 1, 2, 3, 4, 5],
+            [0, 1, 2, 3, 4, 5],
+            ridge=-1.0,
+        )
+
+
+def test_polynomial_calibration_rejects_underdetermined() -> None:
+    with pytest.raises(ValueError, match="at least 6 points"):
+        PolynomialCalibration.fit(
+            [0.0, 1.0, 2.0], [0.0, 1.0, 2.0], [0.0, 1.0, 2.0], [0.0, 1.0, 2.0]
+        )
+
+
+def test_calibration_edge_branches() -> None:
+    from itrace.calibration import _as_float_vector, _check_equal_lengths, interpolate_gaze_gaps
+
+    # Test 1-D vector checking
+    with pytest.raises(ValueError, match="1-D vector"):
+        _as_float_vector("bad", np.zeros((2, 2)))  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="equal-length"):
+        _check_equal_lengths(np.zeros(2), np.zeros(3))
+    gaze = GazeStream(t=np.array([0.0, 1.0]), x=np.array([0.0, 1.0]), y=np.array([0.0, 1.0]))
+    with pytest.raises(ValueError, match="non-negative"):
+        interpolate_gaze_gaps(gaze, max_gap_s=-1.0)
 
 
 def test_interpolate_gaze_gaps_fills_short_bounded_invalid_runs_only() -> None:

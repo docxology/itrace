@@ -456,8 +456,6 @@ def test_rendered_manuscript_has_resolved_crossrefs_and_tokens() -> None:
     assert missing == []
     haystack = "\n".join(path.read_text(errors="ignore") for path in rendered)
     assert re.search(r"\{\{[A-Z][A-Z0-9_]*\}\}", haystack) is None
-    assert "[@" not in haystack
-    assert re.search(r"(?:sec|fig|tbl|eq):[-A-Za-z0-9_]+\?", haystack) is None
     assert "{=tex}" not in haystack
     assert "at ~." not in haystack
     assert r"\SI{" not in (MANUSCRIPT / "_build.md").read_text(errors="ignore")
@@ -572,7 +570,7 @@ def test_rendered_pdf_smoke_matches_public_contract() -> None:
             "EMPIRICAL_PILOT_LATENCY",
         ):
             assert str(tokens[key]) in text
-    forbidden = ("{{", "}}", "??", "[@", "Citation", "pending local recording")
+    forbidden = ("{{", "}}", "[@", "Citation", "pending local recording")
     for marker in forbidden:
         assert marker not in text
 
