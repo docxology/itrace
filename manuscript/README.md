@@ -1,7 +1,7 @@
 # manuscript/ — iTrace
 
-Pandoc manuscript following the template conventions (see the repo
-`CONVENTIONS.md`): one labelled H1 per renderable file
+Pandoc manuscript following the template conventions (see the sibling
+template checkout's `CONVENTIONS.md`): one labelled H1 per renderable file
 (`# Methods: architecture {#sec:methods}`), numbered sections via
 `--number-sections` (never hand-numbered), Pandoc-style citations resolved
 against `references.bib` (`fail_on_missing: true`), and cross-references with

@@ -59,5 +59,5 @@ becomes a tautology — keep them distinct (see ISC-68).
 
 ## Source of truth
 
-`ISA.md` is the system of record: the ideal state, the 77 criteria (ISCs), and
+`ISA.md` is the system of record: the ideal state, the 180 criteria (ISCs), and
 the verification evidence. Read it first; extend it when you change behaviour.
