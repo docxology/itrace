@@ -1,0 +1,37 @@
+# iTrace — Documentation
+
+iTrace is an open-source Python toolkit for webcam eye-movement analysis — gaze
+trajectory, saccade direction & dynamics, and pupil diameter — built as a pure
+NumPy/SciPy analysis core with an optional thin webcam + MediaPipe capture shell.
+See the root `README.md` for the full overview and validation-status warnings.
+
+## Directory map
+
+| Path | Contents |
+| ---- | -------- |
+| `src/` | Analysis core and capture shell |
+| `tests/` | Test suite |
+| `scripts/` | Analysis, rendering, and manuscript pipeline scripts |
+| `manuscript/` | Manuscript markdown sources (SECTION files + config.yaml) |
+| `output/` | Run outputs and reports (local working artifacts) |
+| `docs/` | This documentation tree (research ledgers and protocols) |
+
+## How to run
+
+Commands are documented in the root `README.md` and `pyproject.toml` (uv-managed;
+`uv.lock` present). Per-paper pattern: `uv sync` then `uv run pytest tests/ -q`.
+Verify exact analysis entry points against `scripts/` and `tasks.yaml` before
+running; this index does not invent commands.
+
+## Document index (selected)
+
+- [Research brief](RESEARCH_BRIEF.md)
+- [Validation protocols](VALIDATION_PROTOCOLS.md)
+- [Manual annotation protocol](manual_annotation_protocol.md)
+- [Scholarship audit](SCHOLARSHIP_AUDIT.md) / [Traceability matrix](TRACEABILITY_MATRIX.json)
+- [Prepublication review](PREPUBLICATION_REVIEW.md)
+
+Empirical session ledgers: `empirical_sessions_manifest.json`,
+`empirical_sessions_summary.json`, `empirical_pilot_metrics.json`,
+`figure_manifest.json`, `verification_metrics.json` — machine-readable evidence
+files; see the manuscript for their interpretation.
