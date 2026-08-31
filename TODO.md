@@ -94,7 +94,10 @@ accuracy still needs reference eye-tracker or public-dataset validation.
 - [x] Refactor recording validation payload generation out of CLI into core validation module.
 - [ ] Run a public-dataset validation study on webcam gaze data such as MPIIGaze
   or GazeCapture, with subject/session splits and explicit device-validation
-  language.
+  language. Acceptance: dataset license cleared for redistribution of derived
+  metrics; subject-level split script committed under scripts/ with fixed seeds;
+  results land in a dated ledger under docs/ with device-validation claim
+  language reviewed against TRACEABILITY_MATRIX.json boundaries.
 - [x] Add reference-eye-tracker comparison protocol: synchronized capture,
   calibration, clock alignment, event matching, Bland-Altman plots, and
   preregistered acceptance thresholds.
@@ -103,37 +106,62 @@ accuracy still needs reference eye-tracker or public-dataset validation.
   millimetre claim.
 - [ ] Calibrate pupil segmentation against reference geometry or a learned model
   so live webcam pupil output can move beyond relative proxy measurements.
+  Acceptance: calibrated units defined (mm from reference geometry or
+  model-predicted diameter with stated CI); no millimetre claim ships without a
+  reference-device comparison artifact; TRACEABILITY_MATRIX.json updated.
 - [x] Add binocular modelling: per-eye gaze estimates, vergence, inter-eye
   consistency checks, and diagnostic asymmetry fields.
 - [ ] Add binocular calibration and confidence down-weighting for live capture.
+  Acceptance: per-eye affine fits with inter-eye consistency gate; down-weighting
+  rule documented with its failure mode; headless tests against synthetic
+  binocular fixtures.
 - [ ] Add lens-distortion and camera-intrinsic calibration support, including
   checkerboard calibration import and distortion-aware projection/estimation.
+  Acceptance: checkerboard import (OpenCV YAML/JSON) with round-trip test;
+  distortion-aware projection stays out of the pure core (capture-shell only);
+  import safety preserved (no top-level cv2 import).
 - [ ] Add head-pose compensation from Face Mesh geometry while keeping the
-  capture shell thin and the core testable with plain arrays.
+  capture shell thin and the core testable with plain arrays. Acceptance:
+  compensation is a pure function of plain float arrays (unit-testable headless);
+  lazy MediaPipe import only in the capture shell.
 - [ ] Add REMoDNaV-like richer event classification, including smooth pursuit,
-  PSO/glissade classes, and explicit event-merging/splitting rules.
+  PSO/glissade classes, and explicit event-merging/splitting rules. Acceptance:
+  each event class validated against synthetic ground truth with the
+  reference-impl oracle; merging/splitting rules recorded in the report config.
 - [x] Add a benchmark harness comparing iTrace event outputs against
   user-supplied truth/comparator files on shared fixtures.
 - [ ] Add first-class pymovements and REMoDNaV runner integrations with recorded
-  detector configuration files.
+  detector configuration files. Acceptance: optional extra with import-safe
+  fallback; detector configs serialized with every benchmark run.
 - [ ] Add a stable plugin/backend interface for alternative capture sources:
   browser WebRTC, recorded video files, IR cameras, and synthetic frame streams.
+  Acceptance: `CaptureBackend` protocol frozen with conformance suite coverage
+  for each shipped backend; no breaking change to existing `record` CLI.
 - [ ] Add packaging/release automation: build artifacts, wheel smoke tests,
-  optional-extra matrix, generated docs, and release notes.
+  optional-extra matrix, generated docs, and release notes. Acceptance: `uv
+  build` wheel+sdist smoke-tested in a clean venv per optional-extra
+  combination; release notes generated from CHANGELOG-style ledger.
 - [ ] Add a manuscript-quality validation supplement with all protocols,
-  datasets, statistical plans, limitations, and rendered figures.
+  datasets, statistical plans, limitations, and rendered figures. Acceptance:
+  supplement renders via scripts/render_manuscript.py with all metrics
+  token-injected from ledgers; no hand-typed statistic literals.
 - [ ] Add long-running reliability tests for live capture: memory growth, FPS
   stability, dropped-frame handling, and export integrity over extended sessions.
+  Acceptance: opt-in slow-marker suite (not default CI); memory growth bounded
+  (assert RSS delta threshold); export byte-identical across replay.
 - [ ] Promote guided empirical-session reports into a preregistered
   reference-device study with synchronized truth, consent/privacy handling, and
-  subject-level uncertainty.
+  subject-level uncertainty. Acceptance: preregistration document committed
+  before data collection; consent/privacy handling documented per IRB/ethics
+  decision (owner sign-off required); analysis plan sealed until collection ends.
 
 ## Follow-ups Discovered During Implementation
 
 - [x] Replace the live HTML quick-fit calibration button with a backend-owned
   target-session workflow that records per-target finite sample windows.
-- [ ] Add visible target presentation and click/space confirmations to the live
-  HTML calibration workflow.
+- [x] Add visible target presentation and click/space confirmations to the live
+  HTML calibration workflow (target dot accepts click or Space to advance the
+  backend-owned target-session sampling; keyboard handler ignores form fields).
 - [x] Add a validation JSON example fixture covering short-gap interpolation,
   low valid fraction warnings, and calibration availability.
 - [x] Add a richer `CaptureBackend` conformance test suite for recorded video,

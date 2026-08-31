@@ -219,6 +219,11 @@ def test_live_app_serves_index_status_and_websocket_samples(tmp_path: Path) -> N
     assert client.get("/static/app.css").status_code == 200
     assert client.get("/sw.js").status_code == 200
 
+    app_js = client.get("/static/app.js").text
+    assert 'ui.calibrationTarget.addEventListener("click"' in app_js
+    assert 'event.code !== "Space"' in app_js
+    assert 'pointerEvents = "auto"' in app_js
+
     status = client.get("/api/status")
     assert status.status_code == 200
     payload = status.json()

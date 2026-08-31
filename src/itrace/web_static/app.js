@@ -1417,6 +1417,7 @@ function showCalibrationTarget(target) {
   if (!ui.calibrationTarget) return;
   if (!target) {
     ui.calibrationTarget.style.display = "none";
+    ui.calibrationTarget.style.pointerEvents = "none";
     return;
   }
   const r = Math.max(1, state.calibrationRangeDeg || 15);
@@ -1425,6 +1426,7 @@ function showCalibrationTarget(target) {
   ui.calibrationTarget.style.left = `${left}%`;
   ui.calibrationTarget.style.top = `${top}%`;
   ui.calibrationTarget.style.display = "block";
+  ui.calibrationTarget.style.pointerEvents = "auto";
 }
 
 async function fitCalibration() {
@@ -1773,6 +1775,20 @@ ui.startExperimentTrial.addEventListener("click", startExperimentTrial);
 ui.finishExperimentTrial.addEventListener("click", finishExperimentTrial);
 ui.reportExperiment.addEventListener("click", reportExperimentSession);
 ui.exportExperiment.addEventListener("click", exportExperimentSession);
+
+ui.calibrationTarget.addEventListener("click", () => {
+  if (ui.calibrationTarget.style.display !== "none") fitCalibration();
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.code !== "Space" || event.repeat) return;
+  const tag = event.target && event.target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON") return;
+  if (ui.calibrationTarget && ui.calibrationTarget.style.display !== "none") {
+    event.preventDefault();
+    fitCalibration();
+  }
+});
 ui.resetExperiment.addEventListener("click", resetExperimentSession);
 window.setInterval(() => {
   if (state.experiment?.active && !state.experimentBusy) refreshExperimentStatus();
