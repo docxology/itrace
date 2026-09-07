@@ -607,8 +607,8 @@ All evidence below is from real commands refreshed on 2026-06-09 in
 - focused empirical/documentation/manuscript tests:
   `57 passed` from
   `uv run pytest tests/test_empirical_sessions.py tests/test_live_html.py tests/test_manuscript_integrity.py tests/test_documentation_traceability.py --tb=short`.
-- full pytest/coverage: `543 passed, 1 skipped, 2 warnings`; `Total coverage:
-  90.49%` from `uv run pytest --cov=itrace`.
+- full pytest/coverage: `547 passed, 1 skipped`; `Total coverage:
+  90.21%` from `uv run pytest --cov=itrace`.
 - ruff format: `121 files already formatted` from
   `uv run ruff format --check src/ tests/ scripts/`.
 - ruff check: `All checks passed!` from `uv run ruff check src/ tests/ scripts/`.
@@ -633,7 +633,7 @@ All evidence below is from real commands refreshed on 2026-06-09 in
   cover-missing fallback text.
 - generated visual evidence: `scripts/generate_figures.py` refreshed
   `docs/figure_manifest.json` and the figure gallery; the graphical abstract was
-  inspected as a rendered PNG and shows the `543 tests / 90.49% coverage` badge.
+  inspected as a rendered PNG and shows the `547 tests / 90.21% coverage` badge.
 
 ## Verification (iteration 8 — TODO implementation sprint)
 

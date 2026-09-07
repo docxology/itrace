@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 ROOT = Path(__file__).resolve().parent.parent
-MANUSCRIPT = ROOT / "manuscript"
+MANUSCRIPT = ROOT / "docs" / "manuscript"
 FIGURE_MANIFEST = ROOT / "docs" / "figure_manifest.json"
 
 
@@ -155,5 +155,6 @@ def test_publication_figure_manifest_covers_manuscript_figures() -> None:
         str(path.relative_to(ROOT))
         for path in (ROOT / "output" / "figures").iterdir()
         if path.suffix.lower() in {".png", ".gif", ".md", ".json"}
+        and path.name not in {"README.md", "AGENTS.md"}
     }
     assert sorted(public_artifacts - set(entries)) == []

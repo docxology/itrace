@@ -18,7 +18,7 @@ the session metrics as follows: finite-gaze fraction
 render path leaves each field explicitly unavailable rather than filling a
 guessed value.
 
-![N=1 empirical session summary generated from the derived experiment report. The cards report finite-gaze fraction, sampling rate, sampling regularity, drift, held-out target residuals, and target acquisition latency as order-of-magnitude session diagnostics when a local pilot export exists; pending fields remain visible before recording. The figure demonstrates the package workflow and current-session quality ledger, not reference-device validation.](../output/figures/empirical_pilot_summary.png){#fig:empirical-pilot width=100%}
+![N=1 empirical session summary generated from the derived experiment report. The cards report finite-gaze fraction, sampling rate, sampling regularity, drift, held-out target residuals, and target acquisition latency as order-of-magnitude session diagnostics when a local pilot export exists; pending fields remain visible before recording. The figure demonstrates the package workflow and current-session quality ledger, not reference-device validation.](../../output/figures/empirical_pilot_summary.png){#fig:empirical-pilot width=100%}
 
 For adding more data, the release path now uses
 `docs/empirical_sessions_manifest.json` as an intake ledger. Each available
@@ -50,7 +50,7 @@ within-participant/device operating-scale coverage, but device validation still
 requires reference-device, public-dataset, or manual-annotation evidence backed
 by a valid artifact.
 
-![Empirical-session intake summary generated from `docs/empirical_sessions_manifest.json`. The figure reports available sessions, distinct replicates, conditions, reference-evidence count, participant/device scope, held-out residual scale, finite-gaze fraction, total derived samples, and current diagnostic-v1 status. The five-session prompt-only ledger is sufficient for diagnostic v1 readiness while population, cross-device, and device-accuracy claims remain future reference-backed validation scope.](../output/figures/empirical_sessions_summary.png){#fig:empirical-sessions-summary width=100%}
+![Empirical-session intake summary generated from `docs/empirical_sessions_manifest.json`. The figure reports available sessions, distinct replicates, conditions, reference-evidence count, participant/device scope, held-out residual scale, finite-gaze fraction, total derived samples, and current diagnostic-v1 status. The five-session prompt-only ledger is sufficient for diagnostic v1 readiness while population, cross-device, and device-accuracy claims remain future reference-backed validation scope.](../../output/figures/empirical_sessions_summary.png){#fig:empirical-sessions-summary width=100%}
 
 The pilot adds a different kind of evidence from the synthetic results. Synthetic
 truth recovery and the 3-D closed loop test the estimator under known gaze,
@@ -82,7 +82,7 @@ share one evidence boundary:
 | Held-out target RMS | {{EMPIRICAL_PILOT_HELDOUT_RMS}} | prompted-target residual / calibration-bias scale | Contextualizes screen-prompt and calibration residual scale; it is not iid landmark noise, closed-loop residual, or gaze accuracy against a reference device. |
 | Target acquisition latency | {{EMPIRICAL_PILOT_LATENCY}} | target-schedule and UI/capture timing | Contextualizes task-response timing for the live protocol; it is not physiological saccade latency. |
 
-![Synthetic-to-empirical range bridge generated from `output/figures/synthetic_empirical_range_bridge.json`. The rows place N=1 empirical session values beside synthetic-domain summaries, idealized landmark-noise sweep values, or descriptive statistical diagnostics, and each row is labelled as observed local scale, stress-domain only, or not directly comparable. The figure uses the pilot to contextualize synthetic defaults and stress ranges; it does not validate device accuracy, device performance, or webcam generality.](../output/figures/synthetic_empirical_range_bridge.png){#fig:synthetic-empirical-range-bridge width=100%}
+![Synthetic-to-empirical range bridge generated from `output/figures/synthetic_empirical_range_bridge.json`. The rows place N=1 empirical session values beside synthetic-domain summaries, idealized landmark-noise sweep values, or descriptive statistical diagnostics, and each row is labelled as observed local scale, stress-domain only, or not directly comparable. The figure uses the pilot to contextualize synthetic defaults and stress ranges; it does not validate device accuracy, device performance, or webcam generality.](../../output/figures/synthetic_empirical_range_bridge.png){#fig:synthetic-empirical-range-bridge width=100%}
 
 This comparison is intentionally asymmetric. The synthetic closed loop reports a
 near-ideal residual because both truth and measurements are generated inside a

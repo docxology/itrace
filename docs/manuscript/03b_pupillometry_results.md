@@ -20,4 +20,4 @@ match the number of sine cycles in the trace, the coarsest sanity bound on the
 detector. Saccade direction distributions over the same synthetic sessions are
 summarised as polar histograms ([@fig:polar]).
 
-![Saccade direction distribution over the synthetic multi-saccade recording. The polar convention is printed in the figure (0° = right, +90° = up), bars encode counts over 16 angular bins, and the orange resultant vector summarises directional balance. The panel verifies the package-wide direction convention and recovered event directions on synthetic data; it does not infer natural viewing bias.](../output/figures/direction_polar.png){#fig:polar width=75%}
+![Saccade direction distribution over the synthetic multi-saccade recording. The polar convention is printed in the figure (0° = right, +90° = up), bars encode counts over 16 angular bins, and the orange resultant vector summarises directional balance. The panel verifies the package-wide direction convention and recovered event directions on synthetic data; it does not infer natural viewing bias.](../../output/figures/direction_polar.png){#fig:polar width=75%}

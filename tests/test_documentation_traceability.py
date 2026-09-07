@@ -133,7 +133,9 @@ def test_public_docs_link_to_traceability_matrix() -> None:
 def test_public_docs_distinguish_transient_eye_crop_from_persisted_exports() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     validation = (ROOT / "docs" / "VALIDATION_PROTOCOLS.md").read_text(encoding="utf-8")
-    capture_section = (ROOT / "manuscript" / "02f_capture_shell.md").read_text(encoding="utf-8")
+    capture_section = (ROOT / "docs" / "manuscript" / "02f_capture_shell.md").read_text(
+        encoding="utf-8"
+    )
     combined = re.sub(r"\s+", " ", "\n".join([readme, validation, capture_section]).lower())
     assert "transient eye-crop jpeg" in combined
     assert "persisted eye-crop images" in combined
@@ -149,7 +151,7 @@ def test_traceability_figures_are_referenced_or_documented() -> None:
             ROOT / "README.md",
             ROOT / "docs" / "VALIDATION_PROTOCOLS.md",
             ROOT / "ISA.md",
-            ROOT / "manuscript" / "_build.md",
+            ROOT / "docs" / "manuscript" / "_build.md",
         ]
     )
     for figure in payload["figures"]:

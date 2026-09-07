@@ -29,8 +29,8 @@ velocity-thresholded saccade recovery falls below F1 = 0.8 near sigma
 because its noise-sweep robustness follows from the modelling assumption
 used to inject pupil noise. iTrace also ships a typer CLI, Streamlit
 dashboard, local HTML/WebSocket orchestrator, guided derived-record
-empirical workflow, and publication-figure scripts, all under 543 tests
-at 90.49% coverage. Its contribution is not a claim that webcams are
+empirical workflow, and publication-figure scripts, all under 547 tests
+at 90.21% coverage. Its contribution is not a claim that webcams are
 validated eye trackers; it is a verification-first reference
 implementation whose evidence boundaries are visible in the code,
 figures, reports, and manuscript. iTrace is MIT-licensed and openly
@@ -51,60 +51,75 @@ restricts access; commodity cameras offer reach but force software to
 confront poorer optics, lower frame rates, browser/camera permission
 boundaries, illumination changes, and weaker calibration. A maturing
 open-source ecosystem now estimates related signals from these imperfect
-inputs: browser trackers such as WebGazer [papoutsaki2016webgazer],
-large webcam and mobile gaze datasets such as GazeCapture
-[krafka2016gazecapture] and MPIIGaze [zhang2017mpiigaze],
-appearance-based gaze estimators such as L2CS-Net [hempel2022l2cs],
-landmark-based capture stacks such as MediaPipe Iris
-[vakunov2020mediapipeiris], velocity- and dispersion-threshold event
-classifiers
-[@salvucci2000identifying; @nystrom2010adaptive; @dar2021remodnav],
-microsaccade detectors [engbert2003microsaccades], file-oriented
-processing and quality-reporting pipelines
-[@krause2023pymovements; @jakobi2024quality], and webcam or offline
-pupillometry tools
-[@shah2024eyedentify; @zandi2021pupilext; @fuhl2015else; @santini2018pure; @zhang2026pupeyes; @mittner2020pypillometry; @cai2024opendpsm].
+inputs: browser trackers such as WebGazer ([Papoutsaki et al.
+2016](#ref-papoutsaki2016webgazer)), large webcam and mobile gaze
+datasets such as GazeCapture ([Krafka et al.
+2016](#ref-krafka2016gazecapture)) and MPIIGaze ([Zhang et al.
+2017](#ref-zhang2017mpiigaze)), appearance-based gaze estimators such as
+L2CS-Net ([Abdelrahman et al. 2022](#ref-hempel2022l2cs)),
+landmark-based capture stacks such as MediaPipe Iris ([Vakunov et al.
+2020](#ref-vakunov2020mediapipeiris)), velocity- and
+dispersion-threshold event classifiers ([Salvucci and Goldberg
+2000](#ref-salvucci2000identifying); [Nyström and Holmqvist
+2010](#ref-nystrom2010adaptive); [Dar et al.
+2021](#ref-dar2021remodnav)), microsaccade detectors ([Engbert and
+Kliegl 2003](#ref-engbert2003microsaccades)), file-oriented processing
+and quality-reporting pipelines ([Krakowczyk et al.
+2023](#ref-krause2023pymovements); [Jakobi et al.
+2024](#ref-jakobi2024quality)), and webcam or offline pupillometry tools
+([Shah et al. 2025](#ref-shah2024eyedentify); [Zandi et al.
+2021](#ref-zandi2021pupilext); [Fuhl et al. 2015](#ref-fuhl2015else);
+[Santini et al. 2018](#ref-santini2018pure); [Zhang and Jonides
+2026](#ref-zhang2026pupeyes); [Mittner
+2020](#ref-mittner2020pypillometry); [Cai et al.
+2024](#ref-cai2024opendpsm)).
 
 Two problems recur across these tools. First, the *capture* layer
-(camera drivers, MediaPipe, browser WebRTC [papoutsaki2016webgazer],
-integrated open-source platforms such as Pupil [kassner2014pupil]) is
-tightly coupled to the *analysis* layer, so the scientific algorithms
-cannot be exercised or checked without hardware --- which makes
-continuous integration, regression testing, and reproducible
-benchmarking awkward. Second, "validation" is often demonstrated on
-recorded data without a ground-truth oracle, so a detector that silently
-mis-handles noise, blinks, or NaNs can pass unnoticed.
+(camera drivers, MediaPipe, browser WebRTC ([Papoutsaki et al.
+2016](#ref-papoutsaki2016webgazer)), integrated open-source platforms
+such as Pupil ([Kassner et al. 2014](#ref-kassner2014pupil))) is tightly
+coupled to the *analysis* layer, so the scientific algorithms cannot be
+exercised or checked without hardware --- which makes continuous
+integration, regression testing, and reproducible benchmarking awkward.
+Second, "validation" is often demonstrated on recorded data without a
+ground-truth oracle, so a detector that silently mis-handles noise,
+blinks, or NaNs can pass unnoticed.
 
 The existing tools each occupy a different point in this design space,
 and iTrace is positioned deliberately against them. WebGazer
-[papoutsaki2016webgazer] pioneered in-browser webcam gaze but fuses
-capture, calibration, and estimation into one runtime. GazeCapture and
-MPIIGaze provide the public-data substrate for real-frame gaze
-evaluation [@krafka2016gazecapture; @zhang2017mpiigaze], while L2CS-Net
-demonstrates how appearance models can predict pitch/yaw from
-unconstrained images [hempel2022l2cs]. pymovements
-[krause2023pymovements] offers a mature, file-oriented processing
-pipeline and now anchors explicit data-quality reporting standards
-[jakobi2024quality], but it assumes the gaze samples already exist.
-REMoDNaV [dar2021remodnav] is a strong event classifier whose
+([Papoutsaki et al. 2016](#ref-papoutsaki2016webgazer)) pioneered
+in-browser webcam gaze but fuses capture, calibration, and estimation
+into one runtime. GazeCapture and MPIIGaze provide the public-data
+substrate for real-frame gaze evaluation ([Krafka et al.
+2016](#ref-krafka2016gazecapture); [Zhang et al.
+2017](#ref-zhang2017mpiigaze)), while L2CS-Net demonstrates how
+appearance models can predict pitch/yaw from unconstrained images
+([Abdelrahman et al. 2022](#ref-hempel2022l2cs)). pymovements
+([Krakowczyk et al. 2023](#ref-krause2023pymovements)) offers a mature,
+file-oriented processing pipeline and now anchors explicit data-quality
+reporting standards ([Jakobi et al. 2024](#ref-jakobi2024quality)), but
+it assumes the gaze samples already exist. REMoDNaV ([Dar et al.
+2021](#ref-dar2021remodnav)) is a strong event classifier whose
 four-class fixation / saccade / smooth-pursuit /
 post-saccadic-oscillation output is richer than ours, but it classifies
 an input signal rather than reasoning about how that signal was
-estimated from a camera. PupilSense/EyeDentify [shah2024eyedentify]
-addresses webcam pupil diameter with learned models and a dataset;
-PupilEXT, ElSe, and PuRe represent mature pupil-detection platform and
-algorithm lines [@zandi2021pupilext; @fuhl2015else; @santini2018pure];
-PupEyes and pypillometry focus on reproducible pupil preprocessing and
-analysis after samples have been recorded
-[@zhang2026pupeyes; @mittner2020pypillometry]; Open-DPSM models
-luminance-driven pupil responses in dynamic stimuli [cai2024opendpsm].
-iTrace does not try to out-measure any of these on real eyes. It
-occupies a narrower gap: a *verification-first*, hardware-decoupled
-implementation of established gaze, saccade, microsaccade, pupil, and
-descriptive scanpath algorithms whose correctness is pinned to
-constructed ground truth and whose outputs can later be compared against
-public datasets, reference devices, or other packages when the caller
-supplies truth.
+estimated from a camera. PupilSense/EyeDentify ([Shah et al.
+2025](#ref-shah2024eyedentify)) addresses webcam pupil diameter with
+learned models and a dataset; PupilEXT, ElSe, and PuRe represent mature
+pupil-detection platform and algorithm lines ([Zandi et al.
+2021](#ref-zandi2021pupilext); [Fuhl et al. 2015](#ref-fuhl2015else);
+[Santini et al. 2018](#ref-santini2018pure)); PupEyes and pypillometry
+focus on reproducible pupil preprocessing and analysis after samples
+have been recorded ([Zhang and Jonides 2026](#ref-zhang2026pupeyes);
+[Mittner 2020](#ref-mittner2020pypillometry)); Open-DPSM models
+luminance-driven pupil responses in dynamic stimuli ([Cai et al.
+2024](#ref-cai2024opendpsm)). iTrace does not try to out-measure any of
+these on real eyes. It occupies a narrower gap: a *verification-first*,
+hardware-decoupled implementation of established gaze, saccade,
+microsaccade, pupil, and descriptive scanpath algorithms whose
+correctness is pinned to constructed ground truth and whose outputs can
+later be compared against public datasets, reference devices, or other
+packages when the caller supplies truth.
 
 iTrace makes three contributions. First, it implements established
 algorithms in a pure NumPy/SciPy core with no hardware dependency, then
@@ -204,7 +219,7 @@ added by writing a shell (sec. 8) that emits the same `GazeStream` /
 verified core never changes, every analysis in sec. 5 through sec. 12
 applies unaltered to its output, and the visualization/report layer can
 be regenerated from the same stored payloads. The full module map and
-dependency contract are in sec. 27.
+dependency contract are in sec. 29.
 
 # Methods: gaze geometry {#sec:geometry}
 
@@ -243,7 +258,8 @@ a valid centred gaze.
 
 Gaze velocity is estimated two ways, matching how data arrives. For
 uniformly sampled streams, the implementation uses a Savitzky--Golay
-local-polynomial derivative [savitzky1964smoothing] as a deterministic
+local-polynomial derivative ([Savitzky and Golay
+1964](#ref-savitzky1964smoothing)) as a deterministic
 smoothing-and-differentiation choice; the window is clamped to an odd
 length not exceeding the trace. For non-uniform timestamps a
 central-difference gradient is taken on the actual time vector.
@@ -251,25 +267,26 @@ Two-dimensional speed is the Euclidean norm of the per-axis velocities.
 
 ## Fixations and saccades (I-VT, I-DT)
 
-**I-VT** [salvucci2000identifying] labels each sample saccadic when its
-2-D speed exceeds a velocity threshold and collapses contiguous
-same-label runs into events; runs shorter than a minimum duration are
-reabsorbed into the surrounding fixation, suppressing single-sample
-velocity spikes. In noisy or intermittently tracked streams the
-configurable `merge_gap_s` parameter optionally bridges short
-subthreshold holes inside one high-velocity movement before the duration
-filter is applied; this prevents a brief landmark dropout or
-low-velocity plateau from fragmenting one saccade into several events
-while leaving the historical default at zero for exact backward
-compatibility. **I-DT** [salvucci2000identifying] greedily extends a
-window while its spatial dispersion
-$(\max x - \min x) + (\max y - \min y)$ stays below threshold, emitting
-one fixation per maximal low-dispersion window.
+**I-VT** ([Salvucci and Goldberg 2000](#ref-salvucci2000identifying))
+labels each sample saccadic when its 2-D speed exceeds a velocity
+threshold and collapses contiguous same-label runs into events; runs
+shorter than a minimum duration are reabsorbed into the surrounding
+fixation, suppressing single-sample velocity spikes. In noisy or
+intermittently tracked streams the configurable `merge_gap_s` parameter
+optionally bridges short subthreshold holes inside one high-velocity
+movement before the duration filter is applied; this prevents a brief
+landmark dropout or low-velocity plateau from fragmenting one saccade
+into several events while leaving the historical default at zero for
+exact backward compatibility. **I-DT** ([Salvucci and Goldberg
+2000](#ref-salvucci2000identifying)) greedily extends a window while its
+spatial dispersion $(\max x - \min x) + (\max y - \min y)$ stays below
+threshold, emitting one fixation per maximal low-dispersion window.
 
 ## Microsaccades (Engbert--Kliegl)
 
-Microsaccades follow @engbert2003microsaccades. Velocity uses their
-five-sample moving-average estimator, and a per-axis elliptic threshold
+Microsaccades follow Engbert and Kliegl
+([2003](#ref-engbert2003microsaccades)). Velocity uses their five-sample
+moving-average estimator, and a per-axis elliptic threshold
 
 [$$ (v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1 \qquad{(3)}$$]{#eq:ek}
 
@@ -292,11 +309,11 @@ exponential
 
 [$$ V = V_{\max}\,\big(1 - e^{-A/C}\big) \qquad{(4)}$$]{#eq:mainseq}
 
-(eq. 4; @bahill1975main) by non-linear least squares, and a power law
-$V = aA^b$ by linear regression in log-log space, reporting the
-coefficient of determination. A physiological oculomotor system gives an
-exponent $b$ of roughly 0.4--0.9; deviation is a recognised marker, so
-the fit doubles as a sanity probe.
+(eq. 4; Bahill et al. ([1975](#ref-bahill1975main))) by non-linear least
+squares, and a power law $V = aA^b$ by linear regression in log-log
+space, reporting the coefficient of determination. A physiological
+oculomotor system gives an exponent $b$ of roughly 0.4--0.9; deviation
+is a recognised marker, so the fit doubles as a sanity probe.
 
 ## Scanpath encoding
 
@@ -313,19 +330,20 @@ The pupil pipeline is a sequence of pure transforms over a
 `PupilStream`, each independently testable. It follows the conservative
 preprocessing vocabulary common to open pupil-analysis tools: blink
 handling, interpolation, baseline-correction, quality reporting, and
-transparent preprocessing records
-[@zhang2026pupeyes; @mittner2020pypillometry]. Blinks are detected as
-runs of NaN or sub-threshold samples and removed by linear interpolation
-with edge padding, so the partial-occlusion ramp on either side of a
-closure does not leak into the signal; a trace with no valid samples is
-reported as unusable rather than silently flattened to a constant.
-Outliers are flagged by the scaled median absolute deviation
+transparent preprocessing records ([Zhang and Jonides
+2026](#ref-zhang2026pupeyes); [Mittner
+2020](#ref-mittner2020pypillometry)). Blinks are detected as runs of NaN
+or sub-threshold samples and removed by linear interpolation with edge
+padding, so the partial-occlusion ramp on either side of a closure does
+not leak into the signal; a trace with no valid samples is reported as
+unusable rather than silently flattened to a constant. Outliers are
+flagged by the scaled median absolute deviation
 ($1.4826\,\mathrm{MAD}$), which is robust to the very spikes it must
 catch. The deblinked trace is low-pass filtered with a deterministic
 zero-phase Butterworth implementation choice (with a short-trace
-moving-average fallback) [butterworth1930theory] and
-baseline-corrected, subtractively or divisively, against a chosen
-pre-event time window.
+moving-average fallback) ([Butterworth
+1930](#ref-butterworth1930theory)) and baseline-corrected, subtractively
+or divisively, against a chosen pre-event time window.
 
 The runtime `PupilConfig` now controls the same decisions the standalone
 functions expose: the low-confidence pupil threshold, interpolation
@@ -338,7 +356,8 @@ a relative proxy, but the analysis path records how much of the trace
 was usable and how strongly the cleaned pupil changed over time.
 Brightness and contrast effects are not modelled away in this version;
 tools such as Open-DPSM show why dynamic visual confounds need explicit
-modelling when pupil size is interpreted cognitively [cai2024opendpsm].
+modelling when pupil size is interpreted cognitively ([Cai et al.
+2024](#ref-cai2024opendpsm)).
 
 The separate `pupilseg` module covers a narrower, testable image-space
 step for callers that already have an eye crop. It thresholds the finite
@@ -347,17 +366,19 @@ centroid/radius/area and contrast-derived confidence, and converts that
 segmentation into either a `PupilUnit.PIXELS` sample or a
 pupil/iris-relative sample when an iris-radius normalizer is supplied.
 This deliberately does less than established pupil detectors and
-platforms such as ElSe, PuRe, or PupilEXT
-[@fuhl2015else; @santini2018pure; @zandi2021pupilext]: it is a pure-core
+platforms such as ElSe, PuRe, or PupilEXT ([Fuhl et al.
+2015](#ref-fuhl2015else); [Santini et al. 2018](#ref-santini2018pure);
+[Zandi et al. 2021](#ref-zandi2021pupilext)): it is a pure-core
 fixture-verified path for pixels/relative measurements, not a millimetre
 calibration or device validation claim.
 
 For closed-loop and online use, a causal `PhaseDetector` classifies each
 streamed sample as dilation, constriction, peak, or trough using only
-the current and prior samples [kronemer2024rtpupilphase]. Causality is
-not merely asserted but verified: feeding the detector a prefix of a
-signal reproduces exactly the labels it assigns to that prefix in a full
-run, proving no future sample influences a past label (sec. 15).
+the current and prior samples ([Kronemer et al.
+2025](#ref-kronemer2024rtpupilphase)). Causality is not merely asserted
+but verified: feeding the detector a prefix of a signal reproduces
+exactly the labels it assigns to that prefix in a full run, proving no
+future sample influences a past label (sec. 15).
 
 # Methods: the capture shell {#sec:capture}
 
@@ -367,10 +388,11 @@ converts one frame of normalised MediaPipe Face Mesh landmarks ---
 supplied as a plain float array --- into a binocular gaze sample, with
 no MediaPipe import anywhere in the call. MediaPipe Iris is cited here
 as a commodity-camera landmark source, not as a guarantee of calibrated
-eye-tracker accuracy [vakunov2020mediapipeiris]. Because the function
-consumes plain floats, the entire landmark→gaze mathematics is
-unit-tested headless, and the same function is the bridge the
-forward-model loop (sec. 9) exercises.
+eye-tracker accuracy ([Vakunov et al.
+2020](#ref-vakunov2020mediapipeiris)). Because the function consumes
+plain floats, the entire landmark→gaze mathematics is unit-tested
+headless, and the same function is the bridge the forward-model loop
+(sec. 9) exercises.
 
 `WebcamSource` wraps the genuinely device-bound work: opening the camera
 with OpenCV, running MediaPipe inference per frame, and yielding
@@ -520,15 +542,16 @@ validation gap (sec. 23). Appearance-based gaze work on GazeCapture,
 MPIIGaze, and L2CS-Net makes the same practical point from the opposite
 direction: real-frame accuracy depends on dataset, camera, illumination,
 head pose, and calibration conditions, not just on the downstream event
-detector [@krafka2016gazecapture; @zhang2017mpiigaze; @hempel2022l2cs].
-Pupil-size measurement, which a real pipeline derives from a separate
-segmentation we do not implement, carries its own observation noise
-scaled with $\sigma$ as a stated modelling assumption --- so the pupil
-channel's noise behaviour is *assumed*, not emergent. The model is
-chosen to be the simplest perturbation that is falsifiable rather than
-the most realistic one: it is a lower bound on the kinds of corruption a
-real webcam imposes, and the recovery curves it produces are best read
-as best-case envelopes.
+detector ([Krafka et al. 2016](#ref-krafka2016gazecapture); [Zhang et
+al. 2017](#ref-zhang2017mpiigaze); [Abdelrahman et al.
+2022](#ref-hempel2022l2cs)). Pupil-size measurement, which a real
+pipeline derives from a separate segmentation we do not implement,
+carries its own observation noise scaled with $\sigma$ as a stated
+modelling assumption --- so the pupil channel's noise behaviour is
+*assumed*, not emergent. The model is chosen to be the simplest
+perturbation that is falsifiable rather than the most realistic one: it
+is a lower bound on the kinds of corruption a real webcam imposes, and
+the recovery curves it produces are best read as best-case envelopes.
 
 ## Statistical design
 
@@ -555,7 +578,7 @@ combined as the harmonic mean, so a detector that fragments one true
 saccade into several events or merges several into one is penalised
 rather than rewarded. Every trial seed is deterministic, so the whole
 sweep --- and therefore every figure and table number --- is
-reproducible. Full statistical detail is in sec. 26. The sweep is
+reproducible. Full statistical detail is in sec. 28. The sweep is
 falsifiable: were recovery independent of noise, gaze RMS would be flat
 across the grid.
 
@@ -581,7 +604,7 @@ eye-tracking standards work, the live HTML interface therefore reports
 sampling regularity, finite gaze fraction, pupil-valid fraction, path
 length, dispersion, and warnings, but deliberately leaves recovery F1
 undefined unless a future reference-device or public-dataset path
-supplies truth [jakobi2024quality].
+supplies truth ([Jakobi et al. 2024](#ref-jakobi2024quality)).
 
 # Methods: descriptive and distribution statistics {#sec:diststats}
 
@@ -614,14 +637,15 @@ The publication diagnostics sidecar adds a robust amplitude-shape block
 before any fitted model is interpreted. It reports the median,
 inter-quartile range, coefficient of variation, mean-minus-median gap,
 Bowley's quartile skewness, and Tukey-style 1.5 IQR outside-value counts
-[@bowley1901elements; @tukey1977exploratory]. The same block adds seeded
-percentile-bootstrap intervals for the median and IQR
-[efron1993introduction], reported as finite-sample uncertainty
-summaries rather than population confidence claims. These descriptors
-are intentionally redundant with the parametric fits below: the quartile
-summaries show the scale and asymmetry of the detected events even when
-the sample is too small, too skewed, or too structured for a fitted
-family to deserve much interpretive weight.
+([Bowley 1901](#ref-bowley1901elements); [Tukey
+1977](#ref-tukey1977exploratory)). The same block adds seeded
+percentile-bootstrap intervals for the median and IQR ([Efron and
+Tibshirani 1993](#ref-efron1993introduction)), reported as finite-sample
+uncertainty summaries rather than population confidence claims. These
+descriptors are intentionally redundant with the parametric fits below:
+the quartile summaries show the scale and asymmetry of the detected
+events even when the sample is too small, too skewed, or too structured
+for a fitted family to deserve much interpretive weight.
 
 ## Distribution fitting and model comparison
 
@@ -630,33 +654,36 @@ right-skewed, so iTrace fits three standard positive-support families by
 maximum likelihood: the **gamma** and **log-normal** distributions, and
 the **ex-Gaussian** (a Gaussian convolved with an exponential), whose
 right tail has long been used to model the shape of reaction-time and
-fixation-duration distributions [@ratcliff1979group; @luce1986response].
-For the two SciPy families the location parameter is **pinned to zero**
+fixation-duration distributions ([Ratcliff
+1979](#ref-ratcliff1979group); [Luce 1986](#ref-luce1986response)). For
+the two SciPy families the location parameter is **pinned to zero**
 (`floc=0`) so the fit respects the positive support and the scale
 parameter is not traded off against a spurious shift; the ex-Gaussian is
 fit by numerically maximising its log-likelihood over
 $(\mu, \sigma, \tau)$ from method-of-moments starting values. Models are
 ranked by the **Akaike and Bayesian information criteria**
 ($\mathrm{AIC} = 2k - 2\ln\hat{L}$,
-$\mathrm{BIC} = k\ln n - 2\ln\hat{L}$)
-[@akaike1974new; @schwarz1978estimating], which penalise the extra
-ex-Gaussian parameter against any gain in fit, and a lower-is-better
-ordering is reported alongside the raw log-likelihoods. The diagnostics
-payload also reports the small-sample correction
-$\mathrm{AICc} = \mathrm{AIC} + 2k(k+1)/(n-k-1)$ when it is defined,
-plus normalised Akaike weights $w_i \propto \exp(-\Delta_i/2)$ and
-evidence ratios within the same finite candidate set
-[burnham2002model]. These weights are relative support diagnostics for
-the compared families; they are not posterior probabilities and do not
-prove that the selected family generated the data. The same sidecar runs
-a deterministic bootstrap over detected amplitudes, refits the same
-candidate family set on each resample, and records the lowest-AIC winner
-frequencies as a stability diagnostic, not as posterior model
-probabilities [@efron1993introduction; @burnham2002model]. Absolute
-goodness of fit is summarised by a one-sample **Kolmogorov--Smirnov**
-statistic $D = \sup_x |F_n(x) - \hat{F}(x)|$ between the empirical CDF
-and each fitted CDF [massey1951kolmogorov]; we report $D$ as a
-descriptive distance and treat the companion $p$-value with caution,
+$\mathrm{BIC} = k\ln n - 2\ln\hat{L}$) ([Akaike
+1974](#ref-akaike1974new); [Schwarz 1978](#ref-schwarz1978estimating)),
+which penalise the extra ex-Gaussian parameter against any gain in fit,
+and a lower-is-better ordering is reported alongside the raw
+log-likelihoods. The diagnostics payload also reports the small-sample
+correction $\mathrm{AICc} = \mathrm{AIC} + 2k(k+1)/(n-k-1)$ when it is
+defined, plus normalised Akaike weights $w_i \propto \exp(-\Delta_i/2)$
+and evidence ratios within the same finite candidate set ([Burnham and
+Anderson 2002](#ref-burnham2002model)). These weights are relative
+support diagnostics for the compared families; they are not posterior
+probabilities and do not prove that the selected family generated the
+data. The same sidecar runs a deterministic bootstrap over detected
+amplitudes, refits the same candidate family set on each resample, and
+records the lowest-AIC winner frequencies as a stability diagnostic, not
+as posterior model probabilities ([Efron and Tibshirani
+1993](#ref-efron1993introduction); [Burnham and Anderson
+2002](#ref-burnham2002model)). Absolute goodness of fit is summarised by
+a one-sample **Kolmogorov--Smirnov** statistic
+$D = \sup_x |F_n(x) - \hat{F}(x)|$ between the empirical CDF and each
+fitted CDF ([Massey 1951](#ref-massey1951kolmogorov)); we report $D$ as
+a descriptive distance and treat the companion $p$-value with caution,
 since the parameters were estimated from the same sample (the classic
 fitted-parameter caveat). Fitting requires a minimum number of finite
 positive observations and raises a `ValueError` below it, mirroring the
@@ -665,30 +692,31 @@ guard in `mainsequence.fit`.
 For the publication diagnostics payload, the lowest-AIC family is also
 rendered as a quantile--quantile check: empirical order statistics are
 plotted against the fitted distribution's quantiles at plotting
-positions $(i - 0.5)/n$ [wilk1968probability]. The sidecar reports the
-QQ residuals, root-mean-square residual, central-80% residual, maximum
-absolute residual, fitted-line slope, intercept, and correlation. The
-same best-fit family is also checked on the CDF scale: empirical
-plotting positions are compared with fitted CDF values at the observed
+positions $(i - 0.5)/n$ ([Wilk and Gnanadesikan
+1968](#ref-wilk1968probability)). The sidecar reports the QQ residuals,
+root-mean-square residual, central-80% residual, maximum absolute
+residual, fitted-line slope, intercept, and correlation. The same
+best-fit family is also checked on the CDF scale: empirical plotting
+positions are compared with fitted CDF values at the observed
 amplitudes, producing a P-P-style residual series, residual RMSE, mean
-absolute residual, maximum residual, and the fitted KS distance
-[massey1951kolmogorov]. The same residual block reports a
+absolute residual, maximum residual, and the fitted KS distance ([Massey
+1951](#ref-massey1951kolmogorov)). The same residual block reports a
 Cramer--von-Mises-style integrated squared CDF distance and an
-Anderson--Darling-style tail-weighted distance
-[anderson1952asymptotic], plus lower- and upper-tail maximum residuals.
-These scalar distances help separate a fit that is wrong everywhere from
-one that fails mainly in the tails, but they are still descriptive
-because the family and parameters were selected from the same events.
-For scale, the payload also reports a DKW/Massart reference width
-`epsilon = sqrt(log(2 / alpha) / (2 n))` for the empirical CDF at
-$\alpha=0.05$ [massart1990tight], plus whether the maximum fitted-CDF
-residual exceeds that width. This band is displayed as a
-distribution-free visual reference for ECDF fluctuation around a fixed
-CDF; because the distribution family and its parameters were selected
-from the same sample, it is not a formal acceptance test. The quantile
-and CDF residuals are model-adequacy diagnostics for the detected
-sample; they are not a proof that the family is true or that another
-recording would share the same amplitude distribution.
+Anderson--Darling-style tail-weighted distance ([Anderson and Darling
+1952](#ref-anderson1952asymptotic)), plus lower- and upper-tail maximum
+residuals. These scalar distances help separate a fit that is wrong
+everywhere from one that fails mainly in the tails, but they are still
+descriptive because the family and parameters were selected from the
+same events. For scale, the payload also reports a DKW/Massart reference
+width `epsilon = sqrt(log(2 / alpha) / (2 n))` for the empirical CDF at
+$\alpha=0.05$ ([Massart 1990](#ref-massart1990tight)), plus whether the
+maximum fitted-CDF residual exceeds that width. This band is displayed
+as a distribution-free visual reference for ECDF fluctuation around a
+fixed CDF; because the distribution family and its parameters were
+selected from the same sample, it is not a formal acceptance test. The
+quantile and CDF residuals are model-adequacy diagnostics for the
+detected sample; they are not a proof that the family is true or that
+another recording would share the same amplitude distribution.
 
 ## Scanpath spread metrics
 
@@ -700,11 +728,12 @@ the ellipse expected to contain a stated fraction (default 68%) of
 fixations under a bivariate-normal assumption,
 `BCEA = 2 * pi * k * sigma_x * sigma_y * sqrt(1 - rho^2)` with
 $k = -\ln(1-P)$ --- is a standard, units-of-deg$^2$ measure of fixation
-stability introduced for fixational eye movements [steinman1965effect]
-and widely used as a low-vision fixation-stability index
-[castet2012quantifying]. The **convex-hull area** of the fixation
-centroids gives a distribution-free footprint of explored space via
-`scipy.spatial.ConvexHull` (returning zero for fewer than three
+stability introduced for fixational eye movements ([Steinman
+1965](#ref-steinman1965effect)) and widely used as a low-vision
+fixation-stability index ([Castet and Crossland
+2012](#ref-castet2012quantifying)). The **convex-hull area** of the
+fixation centroids gives a distribution-free footprint of explored space
+via `scipy.spatial.ConvexHull` (returning zero for fewer than three
 non-collinear points rather than raising). Both BCEA and convex-hull
 area are reported only as conditional descriptors: BCEA assumes
 approximate bivariate normality, which a structured scanpath violates,
@@ -719,10 +748,11 @@ cardinal scanpath string of sec. 6: it forms the first-order
 transition-count matrix between successive direction symbols and reports
 the entropy of the transition distribution, a compact index of how
 predictable the scan order is, in the spirit of information-theoretic
-scanpath analysis [boccignone2004gaze]. Both are normalised against the
-maximum entropy of their respective alphabets so values are comparable
-across recordings of different length, and both degenerate gracefully
-(zero entropy) when only one cell or symbol is observed.
+scanpath analysis ([Boccignone and Ferraro
+2004](#ref-boccignone2004gaze)). Both are normalised against the maximum
+entropy of their respective alphabets so values are comparable across
+recordings of different length, and both degenerate gracefully (zero
+entropy) when only one cell or symbol is observed.
 
 ## Bootstrap CI on the main-sequence exponent
 
@@ -732,16 +762,16 @@ uncertainty, `stats.scanpath_metrics.main_sequence_exponent_ci`
 resamples the matched amplitude / peak-velocity pairs with replacement
 $B$ times (default $B = 2000$, explicit seed), refits the log-log
 regression on each resample, and reports a two-sided 95% **bootstrap
-percentile** confidence interval on $b$ [efron1993introduction]. We use
-the percentile interval here for the same reason it is used in the noise
-sweep (sec. 26): it makes no symmetry assumption and stays inside the
-range supported by the data. The interval describes sampling variability
-of the exponent *across the observed saccades*; it is not a claim about
-a population of eyes the recording did not sample. Resamples that lose
-enough unique positive amplitudes to make the log-log fit
-ill-conditioned are discarded; if no valid resample survives, the
-interval collapses to the point estimate rather than producing a
-spurious narrow bound.
+percentile** confidence interval on $b$ ([Efron and Tibshirani
+1993](#ref-efron1993introduction)). We use the percentile interval here
+for the same reason it is used in the noise sweep (sec. 28): it makes no
+symmetry assumption and stays inside the range supported by the data.
+The interval describes sampling variability of the exponent *across the
+observed saccades*; it is not a claim about a population of eyes the
+recording did not sample. Resamples that lose enough unique positive
+amplitudes to make the log-log fit ill-conditioned are discarded; if no
+valid resample survives, the interval collapses to the point estimate
+rather than producing a spurious narrow bound.
 
 # Methods: advanced detection and scanpath comparison {#sec:advdetect}
 
@@ -761,14 +791,15 @@ validation gap of sec. 23.
 The fixed-threshold I-VT of sec. 5 requires the analyst to pick a
 velocity cut that suits the recording's noise floor.
 `detection.detect_ivt_adaptive` instead follows the data-driven scheme
-of Nyström & Holmqvist [nystrom2010adaptive]: it seeds a peak-velocity
-threshold, iteratively re-estimates it from the mean and standard
-deviation of the samples that fall *below* the current threshold (the
-putative fixation/noise population), and stops when the estimate
-converges. The converged value, not a hand-set constant, then classifies
-saccades, so the same call adapts to a clean high-rate trace and a noisy
-webcam one without re-tuning. The converged threshold is also surfaced
-in `SessionReport.quality` when the configurable pipeline is run with
+of Nyström & Holmqvist ([Nyström and Holmqvist
+2010](#ref-nystrom2010adaptive)): it seeds a peak-velocity threshold,
+iteratively re-estimates it from the mean and standard deviation of the
+samples that fall *below* the current threshold (the putative
+fixation/noise population), and stops when the estimate converges. The
+converged value, not a hand-set constant, then classifies saccades, so
+the same call adapts to a clean high-rate trace and a noisy webcam one
+without re-tuning. The converged threshold is also surfaced in
+`SessionReport.quality` when the configurable pipeline is run with
 `DetectionConfig(method="adaptive_ivt")`, so a downstream report can
 state which threshold actually certified the detected events.
 
@@ -788,18 +819,19 @@ either swallows into the saccade or mislabels as a tiny second saccade.
 saccade offset for a short, lower-amplitude velocity excursion in the
 settling window and tags it as a PSO rather than a movement, in the
 spirit of the glissade/PSO class that REMoDNaV adds to the
-saccade/fixation dichotomy [dar2021remodnav]. iTrace does not yet claim
-REMoDNaV's full four-class smooth-pursuit classification --- that is
-named as future work in sec. 23 --- so the PSO tag is reported as a
-labelled sub-event of the saccade it follows, not as an independent
-event class.
+saccade/fixation dichotomy ([Dar et al. 2021](#ref-dar2021remodnav)).
+iTrace does not yet claim REMoDNaV's full four-class smooth-pursuit
+classification --- that is named as future work in sec. 23 --- so the
+PSO tag is reported as a labelled sub-event of the saccade it follows,
+not as an independent event class.
 
 Two further quantities describe the *dynamics* the fixed detectors leave
 on the floor. `detection.intersaccadic_intervals` returns the gaps
 between successive saccade onsets (seconds), the inter-saccadic-interval
 distribution used throughout the eye-movement literature to characterise
-scanning tempo and fixational dwell [holmqvist2011eye]; an empty or
-single-saccade input yields an empty array rather than raising.
+scanning tempo and fixational dwell ([Holmqvist et al.
+2011](#ref-holmqvist2011eye)); an empty or single-saccade input yields
+an empty array rather than raising.
 `detection.saccade_peak_accelerations` differentiates the velocity
 signal a second time and reports the peak acceleration (deg/s²) within
 each saccade interval, the second-order companion to the peak-velocity
@@ -819,12 +851,12 @@ The **Levenshtein scanpath distance** is the minimum number of
 single-character insertions, deletions, and substitutions that turn one
 encoded direction string into another, computed by the standard
 dynamic-programming edit-distance recurrence over the two strings
-[levenshtein1966binary]; it captures how much one scan *order* must be
-rewritten to match the other and is robust to small local insertions a
-fixed alignment would punish. We report both the raw edit count and a
-length-normalised version (distance divided by the longer string's
-length) so paths of unequal length are comparable, and an
-empty-versus-empty comparison returns distance zero.
+([Levenshtein 1966](#ref-levenshtein1966binary)); it captures how much
+one scan *order* must be rewritten to match the other and is robust to
+small local insertions a fixed alignment would punish. We report both
+the raw edit count and a length-normalised version (distance divided by
+the longer string's length) so paths of unequal length are comparable,
+and an empty-versus-empty comparison returns distance zero.
 
 The **n-gram cosine similarity** lifts the comparison from order to
 habitual sub-patterns. Each scanpath is turned into a vector of n-gram
@@ -833,20 +865,20 @@ and the two vectors are compared by cosine similarity over their shared
 vocabulary, giving a value in $[0, 1]$ that is high when two recordings
 share the same characteristic short sequences regardless of where they
 occur, following the vector-space comparison logic used in information
-retrieval [salton1975vector]. Either vector being empty (a recording
-with fewer than $n$ saccades) yields a defined similarity of zero rather
-than a division by zero.
+retrieval ([Salton et al. 1975](#ref-salton1975vector)). Either vector
+being empty (a recording with fewer than $n$ saccades) yields a defined
+similarity of zero rather than a division by zero.
 
 The **transition matrix** is the raw material both similarities are
 built to summarise: the first-order count (or row-normalised
 probability) of moving from each direction symbol to each next one, the
 same construction that underlies the direction-transition entropy of
 sec. 11 and the generative, information-theoretic view of scanpaths
-[boccignone2004gaze]. Exposing the matrix directly lets an analyst
-inspect *which* transitions drive a similarity or entropy value rather
-than trusting the scalar, and the row-normalised form is guaranteed to
-be a proper stochastic matrix or an all-zero row for an unobserved
-symbol.
+([Boccignone and Ferraro 2004](#ref-boccignone2004gaze)). Exposing the
+matrix directly lets an analyst inspect *which* transitions drive a
+similarity or entropy value rather than trusting the scalar, and the
+row-normalised form is guaranteed to be a proper stochastic matrix or an
+all-zero row for an unobserved symbol.
 
 ## Windowed event-rate time series
 
@@ -859,12 +891,12 @@ events the core already detected and the blink intervals of the pupil
 channel. The result is an aligned set of arrays --- window-centre times
 and the three rate series --- suitable for plotting a session's
 evolution or for feeding the spatial-stability metrics of sec. 11 (gaze
-dispersion, BCEA, used as a low-vision fixation-stability index
-[castet2012quantifying]) a window at a time. Windows that contain no
-samples report a rate of zero rather than `nan`, and a window narrower
-than the sampling interval is rejected with an actionable error, so a
-mis-specified window size fails loudly instead of producing an empty or
-misleading series.
+dispersion, BCEA, used as a low-vision fixation-stability index ([Castet
+and Crossland 2012](#ref-castet2012quantifying))) a window at a time.
+Windows that contain no samples report a rate of zero rather than `nan`,
+and a window narrower than the sampling interval is rejected with an
+actionable error, so a mis-specified window size fails loudly instead of
+producing an empty or misleading series.
 
 # Graphical abstract {#sec:graphical-abstract}
 
@@ -890,7 +922,7 @@ release scope, and the no-reference-device-claim boundary. The footer
 states MIT License, github.com/docxology/itrace, and the Zenodo DOI
 10.5281/zenodo.20614909; the figure describes architecture and evidence
 boundaries, not webcam accuracy
-validation.](../output/figures/graphical_abstract.png){#fig:graphical-abstract
+validation.](../../output/figures/graphical_abstract.png){#fig:graphical-abstract
 width="100%"}
 
 # Results: ground-truth recovery {#sec:results}
@@ -907,29 +939,30 @@ off-by-one boundaries, and accidental smoothing choices that move event
 onsets.
 
 On a synthetic fixation→saccade→fixation trace at 250 Hz, the I-VT
-detector [salvucci2000identifying] recovers exactly one saccade
-bracketed by two fixations; the recovered amplitude matches the
-constructed 10° to within 5% and peak velocity to within 10% across the
-test grid. The min-jerk generator sweeps amplitude and direction, and
-the recovered direction tracks the constructed angle around the full
-circle (the gaze convention of 0° right, +90° up), so a sign flip or
-axis swap on either path would surface immediately. A purely-noisy
-fixation trace yields zero saccades at the default threshold --- the
-anti-criterion confirming the detector does not hallucinate events from
-noise.
+detector ([Salvucci and Goldberg 2000](#ref-salvucci2000identifying))
+recovers exactly one saccade bracketed by two fixations; the recovered
+amplitude matches the constructed 10° to within 5% and peak velocity to
+within 10% across the test grid. The min-jerk generator sweeps amplitude
+and direction, and the recovered direction tracks the constructed angle
+around the full circle (the gaze convention of 0° right, +90° up), so a
+sign flip or axis swap on either path would surface immediately. A
+purely-noisy fixation trace yields zero saccades at the default
+threshold --- the anti-criterion confirming the detector does not
+hallucinate events from noise.
 
-The Engbert--Kliegl detector [engbert2003microsaccades] recovers an
-embedded 0.5° microsaccade from fixational jitter while ignoring the
-surrounding noise; a probe confirms the threshold uses the median-based
-robust estimator (it returns a value below half the plain standard
-deviation in the presence of velocity outliers), the property checked
-directly in sec. 5. Recovered microsaccade amplitude and peak velocity
-fall on a tight, low-amplitude main-sequence cluster, distinct from the
+The Engbert--Kliegl detector ([Engbert and Kliegl
+2003](#ref-engbert2003microsaccades)) recovers an embedded 0.5°
+microsaccade from fixational jitter while ignoring the surrounding
+noise; a probe confirms the threshold uses the median-based robust
+estimator (it returns a value below half the plain standard deviation in
+the presence of velocity outliers), the property checked directly in
+sec. 5. Recovered microsaccade amplitude and peak velocity fall on a
+tight, low-amplitude main-sequence cluster, distinct from the
 large-saccade branch --- the expected separation of the two scales
 rather than a fitted claim. The main-sequence fit recovers the
-saturating $V_{\max}$ and $C$ of a synthetic relationship
-[bahill1975main] to within 10% and returns a power-law exponent inside
-the physiological 0.4--0.9 range (fig. 2).
+saturating $V_{\max}$ and $C$ of a synthetic relationship ([Bahill et
+al. 1975](#ref-bahill1975main)) to within 10% and returns a power-law
+exponent inside the physiological 0.4--0.9 range (fig. 2).
 
 ![Figure 2: Main-sequence recovery from a synthetic multi-amplitude
 recording. Panel A plots detected saccades by amplitude, peak velocity,
@@ -939,7 +972,7 @@ fitted power law, making the exponent and goodness-of-fit explicit. The
 evidence is recovery of a seeded synthetic relationship and detector
 property extraction; it is not a physiological population estimate or
 real-device
-validation.](../output/figures/main_sequence.png){#fig:mainseq
+validation.](../../output/figures/main_sequence.png){#fig:mainseq
 width="100%"}
 
 # Results: pupillometry {#sec:pupilresults}
@@ -972,7 +1005,7 @@ multi-saccade recording. The polar convention is printed in the figure
 the orange resultant vector summarises directional balance. The panel
 verifies the package-wide direction convention and recovered event
 directions on synthetic data; it does not infer natural viewing
-bias.](../output/figures/direction_polar.png){#fig:polar width="75%"}
+bias.](../../output/figures/direction_polar.png){#fig:polar width="75%"}
 
 # Results: closed-loop recovery {#sec:closedloop}
 
@@ -1007,7 +1040,7 @@ pupil dynamics after normalisation, with the blink interval shaded. The
 figure verifies consistency between an independent 3-D generator and the
 estimator; shared idealisations mean the residual is a lower bound, not
 a measured webcam
-error.](../output/figures/closed_loop_summary.png){#fig:loop
+error.](../../output/figures/closed_loop_summary.png){#fig:loop
 width="100%"}
 
 The synthetic generator supplies all three target signals jointly ---
@@ -1020,18 +1053,18 @@ state at one representative frame; the trace panels repeat the recovered
 yaw, pitch, and pupil signals with true values, saccades, and the blink
 interval visible for audit. This panel is a visual audit of the
 synthetic scene and recovery path, not evidence from a recorded
-participant.](../output/figures/eye_orbs_still.png){#fig:orbs
+participant.](../../output/figures/eye_orbs_still.png){#fig:orbs
 width="100%"}
 
 # Results: noise-sensitivity analysis {#sec:noiseresults}
 
 Sweeping the landmark-noise standard deviation $\sigma$ from 0 to 0.016
 (normalised image units), 25 seeded trials per level, gives a clear and
-differentiated degradation of the three signals (fig. 6,
-tbl. **1**). The sweep is intentionally idealised: it injects
-independent landmark noise into the same synthetic scene rather than
-replaying real MediaPipe failures, so its value is to rank algorithmic
-fragilities under controlled perturbation.
+differentiated degradation of the three signals (fig. 6, tbl. 1). The
+sweep is intentionally idealised: it injects independent landmark noise
+into the same synthetic scene rather than replaying real MediaPipe
+failures, so its value is to rank algorithmic fragilities under
+controlled perturbation.
 
 **Gaze** RMS error rises monotonically and approximately linearly with
 $\sigma$, crossing the 2° usability bound at $\sigma \approx 0.005$.
@@ -1077,11 +1110,11 @@ line style all encode the signal so the figure remains legible in
 greyscale. The figure supports an algorithmic fragility ordering under
 iid landmark perturbations; it does not measure MediaPipe, lens,
 illumination, head-pose, or calibration error on real
-frames.](../output/figures/noise_power.png){#fig:power width="100%"}
+frames.](../../output/figures/noise_power.png){#fig:power width="100%"}
 
 The same numbers, with per-cell uncertainty, are the generated
-statistics table (tbl. **1**); it and the figure are generated
-from one sweep so they never drift. (Snapshot at $n=25$; regenerate with
+statistics table (tbl. 1); it and the figure are generated from one
+sweep so they never drift. (Snapshot at $n=25$; regenerate with
 `scripts/generate_power_figure.py`.)
 
   --------------------------------------------------------------------------
@@ -1106,7 +1139,7 @@ from one sweep so they never drift. (Snapshot at $n=25$; regenerate with
                                 0.102          0.045          0.018
   --------------------------------------------------------------------------
 
-  : Recovery vs landmark noise σ (mean ± 95% half-CI, $n=25$).
+  : Table 1: Recovery vs landmark noise σ (mean ± 95% half-CI, $n=25$).
   {#tbl:noise}
 
 # Results: cross-implementation agreement and gates {#sec:reproducibility}
@@ -1120,8 +1153,8 @@ implementation. The two paths share only their input and the published
 algorithm definitions, so agreement is evidence the implementation
 matches the algorithm, not that two copies of one mistake agree.
 
-The complete toolchain is green and reproducible: 543 no-mocks tests
-pass with 90.49% statement-and-branch coverage, `ruff` and `ruff format`
+The complete toolchain is green and reproducible: 547 no-mocks tests
+pass with 90.21% statement-and-branch coverage, `ruff` and `ruff format`
 report no issues, and `mypy --strict` finds no type errors across the
 source tree. The test count, coverage, version, gate date, and render
 evidence are stored once in `docs/verification_metrics.json`; the
@@ -1135,7 +1168,7 @@ noise sweep of sec. 17 reproduces its table cells exactly. No test mocks
 a computation: detectors run on real arrays with known ground truth,
 file I/O uses real temporary files, and figures are asserted to write
 non-empty PNGs. The full module map, dependency contract, and test
-strategy are in sec. 27.
+strategy are in sec. 29.
 
 The documentation and visualization layer now follows the same evidence
 rule. `docs/TRACEABILITY_MATRIX.json` maps each public validation claim
@@ -1207,7 +1240,7 @@ acquisition latency as order-of-magnitude session diagnostics when a
 local pilot export exists; pending fields remain visible before
 recording. The figure demonstrates the package workflow and
 current-session quality ledger, not reference-device
-validation.](../output/figures/empirical_pilot_summary.png){#fig:empirical-pilot
+validation.](../../output/figures/empirical_pilot_summary.png){#fig:empirical-pilot
 width="100%"}
 
 For adding more data, the release path now uses
@@ -1251,7 +1284,7 @@ total derived samples, and current diagnostic-v1 status. The
 five-session prompt-only ledger is sufficient for diagnostic v1
 readiness while population, cross-device, and device-accuracy claims
 remain future reference-backed validation
-scope.](../output/figures/empirical_sessions_summary.png){#fig:empirical-sessions-summary
+scope.](../../output/figures/empirical_sessions_summary.png){#fig:empirical-sessions-summary
 width="100%"}
 
 The pilot adds a different kind of evidence from the synthetic results.
@@ -1330,7 +1363,7 @@ and prose share one evidence boundary:
                                                               saccade latency.
   --------------------------------------------------------------------------------
 
-  : N=1 pilot scale compared with synthetic/model variables.
+  : Table 2: N=1 pilot scale compared with synthetic/model variables.
   {#tbl:empirical-synthetic-range}
 
 ![Figure 9: Synthetic-to-empirical range bridge generated from
@@ -1341,7 +1374,7 @@ diagnostics, and each row is labelled as observed local scale,
 stress-domain only, or not directly comparable. The figure uses the
 pilot to contextualize synthetic defaults and stress ranges; it does not
 validate device accuracy, device performance, or webcam
-generality.](../output/figures/synthetic_empirical_range_bridge.png){#fig:synthetic-empirical-range-bridge
+generality.](../../output/figures/synthetic_empirical_range_bridge.png){#fig:synthetic-empirical-range-bridge
 width="100%"}
 
 This comparison is intentionally asymmetric. The synthetic closed loop
@@ -1432,7 +1465,7 @@ a BCEA-style ellipse and spatial-spread summaries; panel E renders the
 row-normalised scanpath transition matrix. The figure visualizes tested
 core descriptors and relative model diagnostics, not real-eye accuracy,
 population inference, or proof that a fitted family is
-true.](../output/figures/statistical_diagnostics.png){#fig:statistical-diagnostics
+true.](../../output/figures/statistical_diagnostics.png){#fig:statistical-diagnostics
 width="100%"}
 
 The statistical panel is intentionally information-dense, so fig. 11
@@ -1456,7 +1489,7 @@ estimands, and explicit non-claims. The figure improves statistical
 readability without adding new evidence; it states what each statistic
 does not prove, including population physiology, posterior model truth,
 real-eye accuracy, and device
-validation.](../output/figures/statistical_interpretation_ledger.png){#fig:statistical-interpretation-ledger
+validation.](../../output/figures/statistical_interpretation_ledger.png){#fig:statistical-interpretation-ledger
 width="100%"}
 
 The gallery now also includes gaze density, fixation heatmap, AOI dwell,
@@ -1492,18 +1525,20 @@ saturating.
 ## Adaptive and fixed thresholds recover the same scripted events
 
 The scripted multi-saccade sessions are built so that fixed-threshold
-I-VT [salvucci2000identifying] and a data-adaptive threshold derived
-from the velocity distribution [nystrom2010adaptive] should classify
-the same intervals. They do: on the synthetic grid both recover the same
-saccade count with onsets agreeing to within a sample, and the adaptive
+I-VT ([Salvucci and Goldberg 2000](#ref-salvucci2000identifying)) and a
+data-adaptive threshold derived from the velocity distribution ([Nyström
+and Holmqvist 2010](#ref-nystrom2010adaptive)) should classify the same
+intervals. They do: on the synthetic grid both recover the same saccade
+count with onsets agreeing to within a sample, and the adaptive
 threshold settles inside the band of fixed thresholds that bracket the
 clean velocity gap. Where the signal carries injected noise the two
 diverge first on the smallest events, the same fragility that the
 saccade-F1 collapse of sec. 17 makes quantitative. The point is a
 cross-check between two independent detector designs on a shared,
 known-truth signal --- the kind of agreement an event-classification
-reference implementation is meant to provide [dar2021remodnav] --- not
-a claim that either threshold is correct for real webcam data.
+reference implementation is meant to provide ([Dar et al.
+2021](#ref-dar2021remodnav)) --- not a claim that either threshold is
+correct for real webcam data.
 
 ## Windowed event rates expose temporal structure
 
@@ -1589,11 +1624,17 @@ not "is iTrace more accurate than WebGazer, L2CS-Net, REMoDNaV,
 pymovements, PupEyes, pypillometry, ElSe, PuRe, or PupilEXT?" but "does
 iTrace make the exact algorithmic contract clear enough that those
 systems can be benchmarked against it on shared fixtures or public
-datasets?"
-[@papoutsaki2016webgazer; @hempel2022l2cs; @dar2021remodnav; @krause2023pymovements; @zhang2026pupeyes; @mittner2020pypillometry; @fuhl2015else; @santini2018pure; @zandi2021pupilext].
-The guided empirical workflow sits in the same category: it makes a
-local session auditable by writing derived records and a summary report,
-while leaving the stronger reference-device study for future data.
+datasets?" ([Papoutsaki et al. 2016](#ref-papoutsaki2016webgazer);
+[Abdelrahman et al. 2022](#ref-hempel2022l2cs); [Dar et al.
+2021](#ref-dar2021remodnav); [Krakowczyk et al.
+2023](#ref-krause2023pymovements); [Zhang and Jonides
+2026](#ref-zhang2026pupeyes); [Mittner
+2020](#ref-mittner2020pypillometry); [Fuhl et al.
+2015](#ref-fuhl2015else); [Santini et al. 2018](#ref-santini2018pure);
+[Zandi et al. 2021](#ref-zandi2021pupilext)). The guided empirical
+workflow sits in the same category: it makes a local session auditable
+by writing derived records and a summary report, while leaving the
+stronger reference-device study for future data.
 
 The N=1 pilot in sec. 19 is useful precisely because it sits between the
 two evidence types. It does not make the real-world claims that only a
@@ -1604,17 +1645,17 @@ idealised landmark noise degrades those signals; the pilot shows what
 one ordinary live run looked like in sampling rate, sampling regularity,
 drift, prompted-target residuals, and target acquisition latency. Those
 numbers are therefore best read as context for expectations and future
-benchmarks, not as population estimates. In practical terms,
-tbl. **1** and fig. 9 separate which
-synthetic defaults are contextualized by a local demonstration from
-which remain deliberate stress ranges: clean finite capture and
-webcam-rate timing look plausible for the demonstration path, whereas
-dropout, drift, landmark-noise, and calibration-bias ranges remain
-modelling levers that must be tested against future reference data. The
-statistical ledger in fig. 11 applies the same discipline to the rest of
-the results: relative model weights, residual diagnostics, bootstrap
-intervals, spatial descriptors, and scanpath summaries are reported as
-finite-record diagnostics with explicit non-claims.
+benchmarks, not as population estimates. In practical terms, tbl. 2 and
+fig. 9 separate which synthetic defaults are contextualized by a local
+demonstration from which remain deliberate stress ranges: clean finite
+capture and webcam-rate timing look plausible for the demonstration
+path, whereas dropout, drift, landmark-noise, and calibration-bias
+ranges remain modelling levers that must be tested against future
+reference data. The statistical ledger in fig. 11 applies the same
+discipline to the rest of the results: relative model weights, residual
+diagnostics, bootstrap intervals, spatial descriptors, and scanpath
+summaries are reported as finite-record diagnostics with explicit
+non-claims.
 
 The repeated-session ledger turns that point from prose into a
 collection rule. For a first paper release, additional local replicates
@@ -1677,20 +1718,24 @@ measurement of real eyes. Everything below follows from that.
 on the dataset, camera, lighting, pose, calibration, and model class;
 large public benchmarks report errors in physical screen units or
 degrees under their own protocols rather than a universal webcam
-constant [@krafka2016gazecapture; @zhang2017mpiigaze; @hempel2022l2cs].
-iTrace's noise-sensitivity result sharpens the method-level risk:
-sec. 17 shows saccade *timing* breaks down at a landmark perturbation of
-≈0.9 px, so velocity-thresholded webcam saccade timing is theoretically
-marginal before real-world lens, illumination, head-pose, landmark-bias,
-and calibration effects are added.
+constant ([Krafka et al. 2016](#ref-krafka2016gazecapture); [Zhang et
+al. 2017](#ref-zhang2017mpiigaze); [Abdelrahman et al.
+2022](#ref-hempel2022l2cs)). iTrace's noise-sensitivity result sharpens
+the method-level risk: sec. 17 shows saccade *timing* breaks down at a
+landmark perturbation of ≈0.9 px, so velocity-thresholded webcam saccade
+timing is theoretically marginal before real-world lens, illumination,
+head-pose, landmark-bias, and calibration effects are added.
 
 **Pupil.** Webcam pupil diameter now has dedicated learned-model and
-dataset work [shah2024eyedentify], mature pupil-detection algorithms
-and platforms [@fuhl2015else; @santini2018pure; @zandi2021pupilext], and
-downstream packages for transparent preprocessing, visualization, and
-statistical modelling once pupil samples exist
-[@zhang2026pupeyes; @mittner2020pypillometry]. iTrace now includes a
-pure eye-crop segmentation helper, but it reports image pixels or
+dataset work ([Shah et al. 2025](#ref-shah2024eyedentify)), mature
+pupil-detection algorithms and platforms ([Fuhl et al.
+2015](#ref-fuhl2015else); [Santini et al. 2018](#ref-santini2018pure);
+[Zandi et al. 2021](#ref-zandi2021pupilext)), and downstream packages
+for transparent preprocessing, visualization, and statistical modelling
+once pupil samples exist ([Zhang and Jonides
+2026](#ref-zhang2026pupeyes); [Mittner
+2020](#ref-mittner2020pypillometry)). iTrace now includes a pure
+eye-crop segmentation helper, but it reports image pixels or
 pupil/iris-relative values only. It does not implement an absolute
 millimetre calibration path, and its live MediaPipe pupil channel
 remains a relative proxy. The package surfaces this rather than implying
@@ -1749,12 +1794,13 @@ pupil correlation. The guided session protocol added here should become
 a preregistered calibration and screen-target block inside that larger
 study, not a substitute for it. Beyond that, a calibrated
 absolute-diameter pupil model trained on PupilSense/EyeDentify data
-[shah2024eyedentify] or validated against PupilEXT-style measurement
-protocols [zandi2021pupilext], smooth-pursuit and
+([Shah et al. 2025](#ref-shah2024eyedentify)) or validated against
+PupilEXT-style measurement protocols ([Zandi et al.
+2021](#ref-zandi2021pupilext)), smooth-pursuit and
 post-saccadic-oscillation classification to match REMoDNaV's four-class
-output [dar2021remodnav], screen-space calibration, and binocular
-disparity each slot in behind the existing typed interfaces without
-disturbing the verified core.
+output ([Dar et al. 2021](#ref-dar2021remodnav)), screen-space
+calibration, and binocular disparity each slot in behind the existing
+typed interfaces without disturbing the verified core.
 
 # Conclusion {#sec:conclusion}
 
@@ -1783,12 +1829,12 @@ upper bound on error those would finally establish.
 
 # References {#sec:references}
 
-::: {#refs .references .csl-bib-body .hanging-indent entry-spacing="0"}
+:::::::::::::::::::::::::::::::::::::::::::: {#refs .references .csl-bib-body .hanging-indent}
 ::: {#ref-hempel2022l2cs .csl-entry}
 Abdelrahman, Ahmed A., Thorsten Hempel, Aly Khalifa, and Ayoub
 Al-Hamadi. 2022. "L2CS-Net: Fine-Grained Gaze Estimation in
-Unconstrained Environments." *arXiv Preprint arXiv:2203.03339*.
-<https://doi.org/10.48550/arXiv.2203.03339>.
+Unconstrained Environments." *arXiv Preprint arXiv:2203.03339*, ahead of
+print. <https://doi.org/10.48550/arXiv.2203.03339>.
 :::
 
 ::: {#ref-akaike1974new .csl-entry}
@@ -1819,14 +1865,14 @@ Applications* 331 (1-2): 207--18.
 :::
 
 ::: {#ref-bowley1901elements .csl-entry}
-Bowley, Arthur Lyon. 1901. *Elements of Statistics*. London: P. S. King.
+Bowley, Arthur Lyon. 1901. *Elements of Statistics*. P. S. King.
 <https://openlibrary.org/books/OL6904986M/Elements_of_statistics>.
 :::
 
 ::: {#ref-burnham2002model .csl-entry}
 Burnham, Kenneth P., and David R. Anderson. 2002. *Model Selection and
 Multimodel Inference: A Practical Information-Theoretic Approach*. 2nd
-ed. New York: Springer. <https://doi.org/10.1007/b97636>.
+ed. Springer. <https://doi.org/10.1007/b97636>.
 :::
 
 ::: {#ref-butterworth1930theory .csl-entry}
@@ -1868,7 +1914,7 @@ Orientation of Covert Attention." *Vision Research* 43 (9): 1035--45.
 ::: {#ref-fuhl2015else .csl-entry}
 Fuhl, Wolfgang, Thiago C. Santini, Thomas Kübler, and Enkelejda Kasneci.
 2015. "ElSe: Ellipse Selection for Robust Pupil Detection in Real-World
-Environments." *arXiv Preprint arXiv:1511.06575*.
+Environments." *arXiv Preprint arXiv:1511.06575*, ahead of print.
 <https://doi.org/10.48550/arXiv.1511.06575>.
 :::
 
@@ -1880,7 +1926,7 @@ Comprehensive Guide to Methods and Measures*. Oxford University Press.
 
 ::: {#ref-jakobi2024quality .csl-entry}
 Jakobi, Deborah N., Daniel G. Krakowczyk, and Lena A. Jäger. 2024.
-"Reporting Eye-Tracking Data Quality: Towards a New Standard." In
+"Reporting Eye-Tracking Data Quality: Towards a New Standard."
 *Proceedings of the 2024 Symposium on Eye Tracking Research &
 Applications*, 47:1--3. <https://doi.org/10.1145/3649902.3655658>.
 :::
@@ -1894,26 +1940,23 @@ Conference on Pervasive and Ubiquitous Computing: Adjunct Publication*,
 :::
 
 ::: {#ref-krafka2016gazecapture .csl-entry}
-Krafka, Kyle, Aditya Khosla, Petr Kellnhofer, Harini Kannan, Suchendra
-Bhandarkar, Wojciech Matusik, and Antonio Torralba. 2016. "Eye Tracking
-for Everyone." In *Proceedings of the IEEE Conference on Computer Vision
+Krafka, Kyle, Aditya Khosla, Petr Kellnhofer, et al. 2016. "Eye Tracking
+for Everyone." *Proceedings of the IEEE Conference on Computer Vision
 and Pattern Recognition*, 2176--84.
 <https://openaccess.thecvf.com/content_cvpr_2016/html/Krafka_Eye_Tracking_for_CVPR_2016_paper.html>.
 :::
 
 ::: {#ref-krause2023pymovements .csl-entry}
-Krakowczyk, Daniel G., David R. Reich, Jakob Chwastek, Deborah N.
-Jakobi, Paul Prasse, Assunta Süss, Oleksii Turuta, Paweł Kasprowski, and
-Lena A. Jäger. 2023. "Pymovements: A Python Package for Eye Movement
-Data Processing." *arXiv Preprint arXiv:2304.09859*.
+Krakowczyk, Daniel G., David R. Reich, Jakob Chwastek, et al. 2023.
+"Pymovements: A Python Package for Eye Movement Data Processing." *arXiv
+Preprint arXiv:2304.09859*, ahead of print.
 <https://doi.org/10.48550/arXiv.2304.09859>.
 :::
 
 ::: {#ref-kronemer2024rtpupilphase .csl-entry}
-Kronemer, Sharif I., Victoria E. Gobo, Catherine R. Walsh, Joshua B.
-Teves, Diana C. Burk, Somayeh Shahsavarani, Javier Gonzalez-Castillo,
-and Peter A. Bandettini. 2025. "Cross-Species Real-Time Detection of
-Trends in Pupil Size Fluctuation." *Behavior Research Methods* 57: 9.
+Kronemer, Sharif I., Victoria E. Gobo, Catherine R. Walsh, et al. 2025.
+"Cross-Species Real-Time Detection of Trends in Pupil Size Fluctuation."
+*Behavior Research Methods* 57: 9.
 <https://doi.org/10.3758/s13428-024-02545-7>.
 :::
 
@@ -1925,7 +1968,7 @@ Deletions, Insertions, and Reversals." *Soviet Physics Doklady* 10:
 
 ::: {#ref-luce1986response .csl-entry}
 Luce, R. Duncan. 1986. *Response Times: Their Role in Inferring
-Elementary Mental Organization*. New York: Oxford University Press.
+Elementary Mental Organization*. Oxford University Press.
 :::
 
 ::: {#ref-massart1990tight .csl-entry}
@@ -1956,7 +1999,7 @@ Fixation, Saccade, and Glissade Detection in Eyetracking Data."
 ::: {#ref-papoutsaki2016webgazer .csl-entry}
 Papoutsaki, Alexandra, Nediyana Daskalova, Patsorn Sangkloy, Jeff Huang,
 James Laskey, and James Hays. 2016. "WebGazer: Scalable Webcam Eye
-Tracking Using User Interactions." In *Proceedings of the Twenty-Fifth
+Tracking Using User Interactions." *Proceedings of the Twenty-Fifth
 International Joint Conference on Artificial Intelligence*, 3839--45.
 <https://www.ijcai.org/Proceedings/16/Papers/540.pdf>.
 :::
@@ -2003,7 +2046,7 @@ Annals of Statistics* 6 (2): 461--64.
 ::: {#ref-shah2024eyedentify .csl-entry}
 Shah, Vijul, Ko Watanabe, Brian B. Moser, and Andreas Dengel. 2025.
 "PupilSense: A Novel Application for Webcam-Based Pupil Diameter
-Estimation." *arXiv Preprint arXiv:2407.11204*.
+Estimation." *arXiv Preprint arXiv:2407.11204*, ahead of print.
 <https://doi.org/10.48550/arXiv.2407.11204>.
 :::
 
@@ -2014,14 +2057,13 @@ Monocular Fixation." *Journal of the Optical Society of America* 55 (9):
 :::
 
 ::: {#ref-tukey1977exploratory .csl-entry}
-Tukey, John W. 1977. *Exploratory Data Analysis*. Reading, MA:
-Addison-Wesley.
+Tukey, John W. 1977. *Exploratory Data Analysis*. Addison-Wesley.
 <https://openlibrary.org/books/OL4877620M/Exploratory_data_analysis>.
 :::
 
 ::: {#ref-vakunov2020mediapipeiris .csl-entry}
 Vakunov, Andrey, Dmitry Lagun, Chuo-Ling Chang, and Matthias Grundmann.
-2020. "MediaPipe Iris: Real-Time Iris Tracking and Depth Estimation."
+2020. *MediaPipe Iris: Real-Time Iris Tracking and Depth Estimation*.
 Google Research Blog.
 <https://research.google/blog/mediapipe-iris-real-time-iris-tracking-depth-estimation/>.
 :::
@@ -2048,10 +2090,32 @@ Library for Eye Movement Data Processing." *Behavior Research Methods*
 ::: {#ref-zhang2017mpiigaze .csl-entry}
 Zhang, Xucong, Yusuke Sugano, Mario Fritz, and Andreas Bulling. 2017.
 "MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze
-Estimation." *arXiv Preprint arXiv:1711.09017*.
+Estimation." *arXiv Preprint arXiv:1711.09017*, ahead of print.
 <https://doi.org/10.48550/arXiv.1711.09017>.
 :::
-:::
+::::::::::::::::::::::::::::::::::::::::::::
+
+# docs/manuscript/ --- Agent Notes
+
+iTrace methods-paper manuscript source: numbered section markdown
+(abstract, introduction, architecture, geometry, velocity/events,
+dynamics, pupillometry, capture shell, forward/noise models, statistics,
+detection, results, limitations...), config, references, plus LaTeX
+intermediates (`_build.*`, `_render_preamble.tex`) which are GENERATED
+--- regenerate via the render pipeline, do not edit `_build` files
+directly. Page previews land in `../output/pdf_preview/`.
+
+# Manuscript Status
+
+- **Project:** itrace
+- **Manuscript title:** iTrace: an algorithmically verified open-source
+  core for webcam gaze, saccade, and pupil analysis
+- **Location:** `docs/manuscript/` --- the sole manuscript directory in
+  this repo (migrated from the legacy repo-root `manuscript/`; no
+  `infrastructure.*` module exists here)
+- **Type:** Active publication-target manuscript (25 section files)
+- **Status file purpose:** Tracks publication-readiness of the
+  manuscript content in this directory.
 
 # Supplement S1: statistical methods {#sec:statmethods}
 
@@ -2114,8 +2178,8 @@ units uses `sigma_to_pixels(σ, image_width)` (sec. 10).
 
 ## One source of truth
 
-The figure (fig. 6) and the table (tbl. **1**) are both
-rendered from a single `NoiseSweepResult` via `power.summary_records` /
+The figure (fig. 6) and the table (tbl. 1) are both rendered from a
+single `NoiseSweepResult` via `power.summary_records` /
 `format_summary_markdown`, so prose, plot, and table cannot drift apart
 --- verified by a cell-for-cell match in the documentation audit.
 

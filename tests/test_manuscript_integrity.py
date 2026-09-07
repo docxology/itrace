@@ -12,9 +12,9 @@ import pytest
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-MANUSCRIPT = ROOT / "manuscript"
+MANUSCRIPT = ROOT / "docs" / "manuscript"
 METRICS = ROOT / "docs" / "verification_metrics.json"
-NON_RENDERED_MARKDOWN = {"README.md", "preamble.md"}
+NON_RENDERED_MARKDOWN = {"README.md", "preamble.md", "AGENTS.md", "MANUSCRIPT_STATUS.md"}
 
 
 def _source_markdown() -> list[Path]:

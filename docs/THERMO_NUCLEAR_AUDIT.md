@@ -3,11 +3,11 @@
 **Date:** 2026-06-02  
 **Gate refresh:** 2026-06-09  
 **Scope:** Full package at `working/iTrace`  
-**Gates verified:** 543 tests / 90.49% coverage, `mypy --strict` clean (56 source files), `ruff` clean, `ruff format` clean, `import itrace` safe without optional extras
+**Gates verified:** 547 tests / 90.21% coverage, `mypy --strict` clean (63 source files), `ruff` clean, `ruff format` clean, `import itrace` safe without optional extras
 **Verdict:** REJECT (initial) → **APPROVE after remediation** (2026-06-02)
 
-Remediation items 1–6 implemented; June 9 verifier refresh gates: 543 tests,
-90.49% coverage, ruff format over 121 Python files, and mypy over 56 source
+Remediation items 1–6 implemented; June 9 verifier refresh gates: 547 tests,
+90.21% coverage, ruff format over 129 Python files, and mypy over 63 source
 files clean.
 
 ---

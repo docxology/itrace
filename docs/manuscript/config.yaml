@@ -25,4 +25,4 @@ citecolor: red
 urlcolor: red
 toccolor: red
 
-figures_dir: ../output/figures
+figures_dir: ../../output/figures

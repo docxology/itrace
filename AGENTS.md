@@ -46,7 +46,7 @@ src/itrace/      pure analysis core + thin capture/dashboard shells + cli
   scene.py       animated gaze/pupil trajectory + full closed-loop validation
 tests/           no-mocks suite; tests/fixtures/reference_impl.py = oracle
 scripts/         generate_figures.py, generate_loop_animation.py → output/figures/
-manuscript/      Pandoc manuscript (template numbering/citation conventions)
+docs/manuscript/      Pandoc manuscript (template numbering/citation conventions)
 docs/            RESEARCH_BRIEF.md (the ecosystem survey behind the design)
 ISA.md           ideal-state articulation, criteria, and verification evidence
 ```

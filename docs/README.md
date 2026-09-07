@@ -12,7 +12,7 @@ See the root `README.md` for the full overview and validation-status warnings.
 | `src/` | Analysis core and capture shell |
 | `tests/` | Test suite |
 | `scripts/` | Analysis, rendering, and manuscript pipeline scripts |
-| `manuscript/` | Manuscript markdown sources (SECTION files + config.yaml) |
+| `docs/manuscript/` | Manuscript markdown sources (SECTION files + config.yaml) |
 | `output/` | Run outputs and reports (local working artifacts) |
 | `docs/` | This documentation tree (research ledgers and protocols) |
 

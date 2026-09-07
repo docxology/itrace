@@ -954,3 +954,116 @@ def load_json_object(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return payload
+
+
+DEFAULT_PILOT_REPORT = Path(
+    "output/empirical_pilot/local_pilot_001/experiment/experiment_report.json"
+)
+DEFAULT_PILOT_METRICS = Path("docs/empirical_pilot_metrics.json")
+DEFAULT_PILOT_FIGURE = Path("output/figures/empirical_pilot_summary.png")
+"""Repo-relative defaults for the empirical-pilot summarizer orchestrator."""
+
+
+def _pct(value: float | None) -> str:
+    if value is None:
+        return "unavailable"
+    return f"{100.0 * value:.1f}%"
+
+
+def _fmt(value: float | None, *, suffix: str = "", digits: int = 2) -> str:
+    if value is None:
+        return "unavailable"
+    return f"{value:.{digits}f}{suffix}"
+
+
+def pilot_tokens(payload: Mapping[str, object]) -> dict[str, str]:
+    """Build manuscript hydration tokens from an empirical-pilot metrics payload."""
+    available = bool(payload.get("available"))
+    sample_count = int(_number(payload.get("sample_count")) or 0)
+    completed = int(_number(payload.get("completed_trial_count")) or 0)
+    finite_gaze = _number(payload.get("finite_gaze_fraction"))
+    sampling_hz = _number(payload.get("sampling_rate_hz"))
+    sampling_cv = _number(payload.get("sampling_interval_cv"))
+    drift = _number(payload.get("max_drift_deg_s"))
+    heldout = payload.get("heldout_target_error", {})
+    latency = payload.get("target_acquisition_latency_s", {})
+    heldout_rms = _number(heldout.get("rms_error_deg")) if isinstance(heldout, Mapping) else None
+    median_latency = (
+        _number(latency.get("median_latency_s")) if isinstance(latency, Mapping) else None
+    )
+    return {
+        "EMPIRICAL_PILOT_STATUS": (
+            f"{completed} completed trials, {sample_count} derived samples"
+            if available
+            else "pending local recording"
+        ),
+        "EMPIRICAL_PILOT_FINITE_GAZE": _pct(finite_gaze),
+        "EMPIRICAL_PILOT_SAMPLING_HZ": _fmt(sampling_hz, suffix=" Hz", digits=1),
+        "EMPIRICAL_PILOT_SAMPLING_CV": _fmt(sampling_cv, digits=3),
+        "EMPIRICAL_PILOT_DRIFT": _fmt(drift, suffix=" deg/s", digits=3),
+        "EMPIRICAL_PILOT_HELDOUT_RMS": _fmt(heldout_rms, suffix=" deg", digits=2),
+        "EMPIRICAL_PILOT_LATENCY": _fmt(median_latency, suffix=" s median", digits=2),
+    }
+
+
+def unavailable_metrics(
+    *,
+    pilot_id: str = "local_pilot_001",
+    reason: str = "pilot report not recorded yet",
+) -> dict[str, object]:
+    """Return an explicit unavailable metrics payload."""
+    payload: dict[str, object] = {
+        "kind": "empirical_pilot_metrics",
+        "pilot_id": pilot_id,
+        "available": False,
+        "reason": reason,
+        "source_report": None,
+        "sample_count": 0,
+        "completed_trial_count": 0,
+        "finite_gaze_fraction": None,
+        "sampling_rate_hz": None,
+        "sampling_interval_cv": None,
+        "max_drift_deg_s": None,
+        "pupil_valid_fraction": None,
+        "heldout_target_error": {"available": False, "reason": reason},
+        "target_acquisition_latency_s": {"available": False, "reason": reason},
+        "truth_boundary": TRUTH_BOUNDARY,
+        "storage_boundary": STORAGE_BOUNDARY,
+    }
+    payload["manuscript_tokens"] = pilot_tokens(payload)
+    return payload
+
+
+def pilot_metrics_from_report(
+    report: Mapping[str, object],
+    *,
+    source_report: Path,
+    repo_root: Path,
+    pilot_id: str = "local_pilot_001",
+) -> dict[str, object]:
+    """Extract manuscript-ready metrics from a derived experiment report."""
+    payload = empirical_metrics_from_report(
+        report,
+        source_report=source_report,
+        repo_root=repo_root,
+        pilot_id=pilot_id,
+    )
+    payload["manuscript_tokens"] = pilot_tokens(payload)
+    return payload
+
+
+def load_or_create_metrics(
+    report_path: Path,
+    *,
+    repo_root: Path,
+    pilot_id: str = "local_pilot_001",
+) -> dict[str, object]:
+    """Load a report if present; otherwise return an unavailable payload."""
+    if not report_path.exists():
+        return unavailable_metrics(pilot_id=pilot_id)
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, Mapping):
+        return unavailable_metrics(pilot_id=pilot_id, reason="pilot report is not a JSON object")
+    return pilot_metrics_from_report(
+        payload, source_report=report_path, repo_root=repo_root, pilot_id=pilot_id
+    )

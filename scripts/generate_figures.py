@@ -21,39 +21,27 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 
-from aggregate_empirical_sessions import (
-    DEFAULT_FIGURE as DEFAULT_EMPIRICAL_SESSIONS_FIGURE,
-)
-from aggregate_empirical_sessions import (
-    DEFAULT_MANIFEST as DEFAULT_EMPIRICAL_SESSIONS_MANIFEST,
-)
-from aggregate_empirical_sessions import (
-    DEFAULT_SUMMARY as DEFAULT_EMPIRICAL_SESSIONS_SUMMARY,
-)
-from aggregate_empirical_sessions import (
-    write_empirical_session_outputs,
-)
-from generate_graphical_abstract import generate_cover_visual, generate_graphical_abstract
-from generate_loop_animation import generate_loop_gif, generate_loop_summary
-from generate_orbs_animation import generate_orbs_gif, generate_orbs_still
-from generate_power_figure import generate_power_figure, write_noise_metrics, write_summary_table
 from itrace import mainsequence, power, saccades, scene
+from itrace.empirical import (
+    DEFAULT_PILOT_FIGURE,
+    DEFAULT_PILOT_METRICS,
+    DEFAULT_PILOT_REPORT,
+)
 from itrace.synthetic import gaze_with_saccade
 from itrace.types import GazeStream
+from itrace.viz.empirical_pilot import write_empirical_pilot_outputs
+from itrace.viz.empirical_sessions import (
+    DEFAULT_SESSIONS_FIGURE,
+    DEFAULT_SESSIONS_MANIFEST,
+    DEFAULT_SESSIONS_SUMMARY,
+    write_empirical_session_outputs,
+)
 from itrace.viz.gallery import render_gallery
+from itrace.viz.graphical_abstract import generate_cover_visual, generate_graphical_abstract
+from itrace.viz.loop_animation import generate_loop_gif, generate_loop_summary
+from itrace.viz.orbs_animation import generate_orbs_gif, generate_orbs_still
 from itrace.viz.palette import WONG, apply_house_style
-from summarize_empirical_pilot import (
-    DEFAULT_FIGURE as DEFAULT_EMPIRICAL_FIGURE,
-)
-from summarize_empirical_pilot import (
-    DEFAULT_METRICS as DEFAULT_EMPIRICAL_METRICS,
-)
-from summarize_empirical_pilot import (
-    DEFAULT_REPORT as DEFAULT_EMPIRICAL_REPORT,
-)
-from summarize_empirical_pilot import (
-    write_empirical_pilot_outputs,
-)
+from itrace.viz.power_figure import generate_power_figure, write_noise_metrics, write_summary_table
 
 # Single-source palette + house style (readable font floor, white bg, clean
 # spines) shared with the CLI gallery so every manuscript figure matches.
@@ -61,6 +49,12 @@ apply_house_style()
 
 ROOT = Path(__file__).resolve().parent.parent
 FIGURE_MANIFEST = ROOT / "docs" / "figure_manifest.json"
+DEFAULT_EMPIRICAL_REPORT = ROOT / DEFAULT_PILOT_REPORT
+DEFAULT_EMPIRICAL_METRICS = ROOT / DEFAULT_PILOT_METRICS
+DEFAULT_EMPIRICAL_FIGURE = ROOT / DEFAULT_PILOT_FIGURE
+DEFAULT_EMPIRICAL_SESSIONS_MANIFEST = ROOT / DEFAULT_SESSIONS_MANIFEST
+DEFAULT_EMPIRICAL_SESSIONS_SUMMARY = ROOT / DEFAULT_SESSIONS_SUMMARY
+DEFAULT_EMPIRICAL_SESSIONS_FIGURE = ROOT / DEFAULT_SESSIONS_FIGURE
 
 SOURCE_MAP: dict[str, dict[str, object]] = {
     "cover_visual.png": {
@@ -466,11 +460,13 @@ def main() -> list[Path]:
         metrics_out=DEFAULT_EMPIRICAL_METRICS,
         figure_out=DEFAULT_EMPIRICAL_FIGURE,
         pilot_id=pilot_id,
+        repo_root=ROOT,
     )
     empirical_session_paths = write_empirical_session_outputs(
         manifest_path=DEFAULT_EMPIRICAL_SESSIONS_MANIFEST,
         summary_out=DEFAULT_EMPIRICAL_SESSIONS_SUMMARY,
         figure_out=DEFAULT_EMPIRICAL_SESSIONS_FIGURE,
+        repo_root=ROOT,
     )
     gallery_paths = render_gallery(out_dir, seed=0, animations=True)
     paths = [

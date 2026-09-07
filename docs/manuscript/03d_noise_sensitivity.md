@@ -38,7 +38,7 @@ makes it useful for bounding realistic live-demo and stress-test ranges, but it
 should not be back-solved into an iid landmark-noise $\sigma$ or treated as
 reference-device gaze accuracy.
 
-![Recovery vs idealised webcam observation noise. Each panel reports the Monte-Carlo mean and 95% bootstrap confidence band for one recovered signal, with the manuscript usability bound drawn as a horizontal line and the interpolated bound crossing annotated in both normalised σ and approximate pixels at 640 px width. Colour, marker, and line style all encode the signal so the figure remains legible in greyscale. The figure supports an algorithmic fragility ordering under iid landmark perturbations; it does not measure MediaPipe, lens, illumination, head-pose, or calibration error on real frames.](../output/figures/noise_power.png){#fig:power width=100%}
+![Recovery vs idealised webcam observation noise. Each panel reports the Monte-Carlo mean and 95% bootstrap confidence band for one recovered signal, with the manuscript usability bound drawn as a horizontal line and the interpolated bound crossing annotated in both normalised σ and approximate pixels at 640 px width. Colour, marker, and line style all encode the signal so the figure remains legible in greyscale. The figure supports an algorithmic fragility ordering under iid landmark perturbations; it does not measure MediaPipe, lens, illumination, head-pose, or calibration error on real frames.](../../output/figures/noise_power.png){#fig:power width=100%}
 
 The same numbers, with per-cell uncertainty, are the generated statistics table
 ([@tbl:noise]); it and the figure are generated from one sweep so they never

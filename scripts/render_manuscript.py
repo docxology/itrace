@@ -16,7 +16,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANUSCRIPT = ROOT / "manuscript"
+MANUSCRIPT = ROOT / "docs" / "manuscript"
 DEFAULT_METRICS = ROOT / "docs" / "verification_metrics.json"
 DEFAULT_EMPIRICAL_METRICS = ROOT / "docs" / "empirical_pilot_metrics.json"
 DEFAULT_EMPIRICAL_SESSIONS = ROOT / "docs" / "empirical_sessions_summary.json"
