@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pytest
 
+from itrace.version import VERSION_DOI
+
 pytestmark = pytest.mark.skipif(
     importlib.util.find_spec("matplotlib") is None,
     reason="matplotlib (figures extra) not installed",
@@ -67,8 +69,8 @@ def test_generate_cover_and_graphical_abstract_pngs(tmp_path) -> None:
     assert height >= 1600
     assert abs((width / height) - (16 / 9)) < 0.02
     assert (
-        generate_graphical_abstract.AVAILABILITY_FOOTER
-        == "MIT License | github.com/docxology/itrace | DOI 10.5281/zenodo.20614909"
+        f"MIT License | github.com/docxology/itrace | DOI {VERSION_DOI}"
+        == generate_graphical_abstract.AVAILABILITY_FOOTER
     )
     assert generate_graphical_abstract.NO_REFERENCE_DEVICE_BOUNDARY == "no reference-device claim"
 

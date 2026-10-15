@@ -961,6 +961,9 @@ DEFAULT_PILOT_REPORT = Path(
 )
 DEFAULT_PILOT_METRICS = Path("docs/empirical_pilot_metrics.json")
 DEFAULT_PILOT_FIGURE = Path("output/figures/empirical_pilot_summary.png")
+DEFAULT_SESSIONS_MANIFEST = Path("docs/empirical_sessions_manifest.json")
+DEFAULT_SESSIONS_SUMMARY = Path("docs/empirical_sessions_summary.json")
+DEFAULT_SESSIONS_FIGURE = Path("output/figures/empirical_sessions_summary.png")
 """Repo-relative defaults for the empirical-pilot summarizer orchestrator."""
 
 

@@ -174,6 +174,7 @@ def analyze_pupil(stream: PupilStream, config: PupilConfig | None = None) -> dic
         clean,
         cutoff_hz=cfg.smooth_cutoff_hz,
         order=cfg.smooth_order,
+        fallback_window=cfg.smooth_window,
     )
     phases = PhaseDetector().run(smoothed.size.tolist())
     baseline_window = cfg.baseline_window_s

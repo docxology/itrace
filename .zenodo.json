@@ -8,11 +8,11 @@
       "orcid": "0000-0001-6232-9096"
     }
   ],
-  "description": "iTrace is an MIT-licensed Python toolkit for webcam-derived gaze, saccade, pupil, and quality diagnostics. Version 0.4.1 is a diagnostic v1 release: the pure NumPy/SciPy core is algorithmically verified against synthetic and closed-loop oracles, the optional webcam shell exports derived records, and the empirical ledger covers a single-participant, single-device, five-session diagnostic pilot. This release does not claim reference-device accuracy, cross-device generality, population generality, or webcam-accuracy validation.",
+  "description": "iTrace 0.5.0 is an MIT-licensed Python toolkit for webcam-derived gaze, saccade, pupil, and quality diagnostics. This minor release strengthens irregular-time analysis, missing-data handling, immutable recording inputs, pupil preprocessing, configuration and report contracts, reproducible live exports, manuscript rendering, and release verification. The NumPy/SciPy core is algorithmically verified against synthetic and independently formulated closed-loop oracles. Empirical figures reuse preserved summaries from a single-participant, single-device, five-session diagnostic pilot. This release does not claim reference-device accuracy, cross-device generality, population generality, or webcam-accuracy validation.",
   "access_right": "open",
   "license": "mit",
-  "version": "0.4.1",
-  "publication_date": "2026-06-09",
+  "version": "0.5.0",
+  "publication_date": "2026-10-15",
   "language": "eng",
   "keywords": [
     "eye-tracking",

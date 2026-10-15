@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-import builtins
 import importlib
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
-import tomllib
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 import itrace
 
@@ -92,17 +95,11 @@ def test_live_module_import_does_not_load_web_or_capture_deps() -> None:
     assert result.returncode == 0
 
 
-def test_live_app_missing_web_extra_has_clear_message(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_live_app_missing_web_extra_has_clear_message() -> None:
     from itrace import live
 
-    real_import = builtins.__import__
-
-    def import_without_fastapi(name: str, *args: object, **kwargs: object) -> object:
-        if name == "fastapi" or name.startswith("fastapi."):
-            raise ModuleNotFoundError("No module named 'fastapi'", name="fastapi")
-        return real_import(name, *args, **kwargs)
-
-    monkeypatch.setattr(builtins, "__import__", import_without_fastapi)
+    if importlib.util.find_spec("fastapi") is not None:
+        pytest.skip("Real missing-extra control runs in the core-only test environment")
     with pytest.raises(RuntimeError, match="uv sync --extra web"):
         live.create_app()
 

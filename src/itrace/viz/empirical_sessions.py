@@ -21,17 +21,21 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
 from itrace.empirical import (
+    DEFAULT_SESSIONS_FIGURE as DEFAULT_SESSIONS_FIGURE,
+)
+from itrace.empirical import (
+    DEFAULT_SESSIONS_MANIFEST as DEFAULT_SESSIONS_MANIFEST,
+)
+from itrace.empirical import (
+    DEFAULT_SESSIONS_SUMMARY as DEFAULT_SESSIONS_SUMMARY,
+)
+from itrace.empirical import (
     aggregate_empirical_sessions as core_aggregate_empirical_sessions,
 )
 from itrace.empirical import (
     write_json_atomic,
 )
 from itrace.viz.palette import CARD_FACE, INK, MUTED, PANEL_FACE, WONG, apply_house_style
-
-DEFAULT_SESSIONS_MANIFEST = Path("docs/empirical_sessions_manifest.json")
-DEFAULT_SESSIONS_SUMMARY = Path("docs/empirical_sessions_summary.json")
-DEFAULT_SESSIONS_FIGURE = Path("output/figures/empirical_sessions_summary.png")
-"""Repo-relative defaults for the empirical-session orchestrator."""
 
 
 def _fmt_pct(value: object) -> str:

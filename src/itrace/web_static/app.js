@@ -507,7 +507,8 @@ function drawSpeed(data) {
     return;
   }
   clearPlot(ctx, w, h, { xLabel: "time (s)", yLabel: "deg/s" });
-  const threshold = data.method.velocity_threshold_deg_s;
+  const threshold = data.analysis?.quality?.detection_threshold_deg_s
+    ?? data.method.velocity_threshold_deg_s;
   const [x0, x1] = extent(t, [0, 1]);
   const [y0, y1] = extent([...speed, threshold], [0, 100]);
   const saccades = (data.analysis && data.analysis.saccades) || [];
@@ -1255,7 +1256,7 @@ function render(data) {
     3,
   );
   ui.detectionThreshold.textContent = fmt(
-    data.analysis.quality?.detection_threshold_deg_s || data.method.velocity_threshold_deg_s,
+    data.analysis.quality?.detection_threshold_deg_s ?? data.method.velocity_threshold_deg_s,
     1,
   );
   ui.saccadeCount.textContent = data.analysis.n_saccades || 0;
@@ -1395,7 +1396,12 @@ async function exportSession() {
     return;
   }
   try {
-    const body = await postJson("/api/export");
+    const params = new URLSearchParams({
+      method: state.latest?.method?.name ?? ui.method.value,
+      velocity_threshold: state.latest?.method?.velocity_threshold_deg_s ?? ui.threshold.value,
+      include_pso: String(state.latest?.method?.include_pso ?? ui.pso.checked),
+    });
+    const body = await postJson(`/api/export?${params.toString()}`);
     const paths = Object.keys(body.paths || {}).length;
     setOutput(paths ? `exported ${paths} files` : "exported", "ok");
   } catch (error) {

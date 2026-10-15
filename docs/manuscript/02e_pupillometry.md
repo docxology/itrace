@@ -6,18 +6,25 @@ common to open pupil-analysis tools: blink handling, interpolation,
 baseline-correction, quality reporting, and transparent preprocessing records
 [@zhang2026pupeyes; @mittner2020pypillometry]. Blinks are detected as runs of
 NaN or sub-threshold samples and removed by linear interpolation with edge
-padding, so the partial-occlusion ramp on either side of a closure does not leak
+padding, using elapsed timestamps rather than sample indices, so the
+partial-occlusion ramp on either side of a closure does not leak
 into the signal; a trace with no valid samples is reported as unusable rather
-than silently flattened to a constant. Outliers are flagged by the scaled median
+than silently flattened to a constant. The same rejection applies when padding
+removes every interpolation anchor. Outliers are flagged by the scaled median
 absolute deviation ($1.4826\,\mathrm{MAD}$), which is robust to the very spikes it
-must catch. The deblinked trace is low-pass filtered with a deterministic
+must catch; when MAD is zero, finite deviations from the median are flagged
+explicitly. The deblinked trace is low-pass filtered with a deterministic
 zero-phase Butterworth implementation choice (with a short-trace moving-average
 fallback) [@butterworth1930theory] and baseline-corrected, subtractively or
-divisively, against a chosen pre-event time window.
+divisively, against a chosen pre-event time window. The short-trace fallback uses
+edge padding and a bounded odd window so it preserves length and constant input.
+The actual second-order-section padding requirement determines whether
+Butterworth filtering is available. A cutoff at or above Nyquist also uses the
+moving-average fallback; that output is not represented as Butterworth-filtered.
 
 The runtime `PupilConfig` now controls the same decisions the standalone
 functions expose: the low-confidence pupil threshold, interpolation padding, and
-Butterworth cutoff/order. Reports include both cleaned-signal summaries
+Butterworth cutoff/order and the fallback window (`smooth_window`). Reports include both cleaned-signal summaries
 (mean/standard deviation/min/max, phase peak and trough counts) and raw-quality
 summaries (valid fraction, blink fraction/count, median sample interval, peak
 dilation velocity, and peak constriction velocity). The live webcam pupil channel
@@ -44,3 +51,7 @@ prior samples [@kronemer2024rtpupilphase]. Causality is not merely asserted but
 verified: feeding the detector a prefix of a signal reproduces exactly the labels
 it assigns to that prefix in a full run, proving no future sample influences a
 past label ([@sec:pupilresults]).
+
+This causality statement applies to `PhaseDetector` itself. Blink interpolation
+and zero-phase filtering use surrounding samples; the offline pupil pipeline and
+the rolling reanalysis displayed by the live dashboard are not causal filters.

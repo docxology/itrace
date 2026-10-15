@@ -14,7 +14,7 @@ import numpy as np
 from scipy.signal import butter, sosfiltfilt
 
 from .pupilphase import PhaseDetector
-from .types import BoolArray, FloatArray, PupilStream
+from .types import BoolArray, FloatArray, PupilStream, validate_timestamps
 
 
 def detect_blinks(
@@ -62,6 +62,7 @@ def interpolate_blinks(
     if min_valid < 0.0:
         msg = "min_valid must be non-negative"
         raise ValueError(msg)
+    validate_timestamps(stream.t)
     size = stream.size.copy()
     valid = np.isfinite(size) & (size > min_valid)
     if not np.any(valid):
@@ -73,8 +74,10 @@ def interpolate_blinks(
         hi = min(offset + pad_samples, size.size - 1)
         valid[lo : hi + 1] = False
 
-    idx = np.arange(size.size)
-    size[~valid] = np.interp(idx[~valid], idx[valid], size[valid])
+    if not np.any(valid):
+        msg = "blink padding leaves no valid samples; cannot interpolate (unusable)"
+        raise ValueError(msg)
+    size[~valid] = np.interp(stream.t[~valid], stream.t[valid], size[valid])
     return PupilStream(t=stream.t, size=size, unit=stream.unit)
 
 
@@ -84,6 +87,9 @@ def mad_reject(stream: PupilStream, n_mad: float = 5.0) -> BoolArray:
     ``True`` marks an outlier. Uses the robust scaled MAD
     (``1.4826 * MAD``) so the threshold is in approximate standard deviations.
     """
+    if not np.isfinite(n_mad) or n_mad <= 0.0:
+        msg = "n_mad must be finite and positive"
+        raise ValueError(msg)
     size = stream.size
     finite = np.isfinite(size)
     flags = np.zeros(size.size, dtype=bool)
@@ -92,34 +98,63 @@ def mad_reject(stream: PupilStream, n_mad: float = 5.0) -> BoolArray:
     med = float(np.median(size[finite]))
     mad = float(np.median(np.abs(size[finite] - med)))
     if mad <= 0:
-        flags[~finite] = True
+        flags[~finite | (size != med)] = True
         return flags
     scaled = 1.4826 * mad
     deviation = np.abs(size - med) / scaled
     return cast(BoolArray, ~finite | (deviation > n_mad))
 
 
-def smooth(stream: PupilStream, cutoff_hz: float = 4.0, order: int = 2) -> PupilStream:
+def smooth(
+    stream: PupilStream,
+    cutoff_hz: float = 4.0,
+    order: int = 2,
+    *,
+    fallback_window: int = 3,
+) -> PupilStream:
     """Zero-phase Butterworth low-pass filter (falls back to a moving average).
 
     For very short traces (where the filter padding is invalid) a centred
     moving average is used instead so the function never raises on small input.
     """
+    if not np.isfinite(cutoff_hz) or cutoff_hz <= 0.0:
+        msg = "cutoff_hz must be finite and positive"
+        raise ValueError(msg)
+    if not isinstance(order, int) or isinstance(order, bool) or order < 1:
+        msg = "order must be an integer >= 1"
+        raise ValueError(msg)
+    if (
+        not isinstance(fallback_window, int)
+        or isinstance(fallback_window, bool)
+        or fallback_window < 1
+    ):
+        msg = "fallback_window must be an integer >= 1"
+        raise ValueError(msg)
+    validate_timestamps(stream.t)
     size = stream.size.astype(np.float64)
     n = size.size
-    if n < 2:
-        return stream
     if not np.all(np.isfinite(size)):
         msg = "smooth() requires a gap-free trace; interpolate blinks first"
         raise ValueError(msg)
+    if n < 2:
+        return stream
     sr = _sampling_rate(stream.t)
     nyq = sr / 2.0
-    if n >= 3 * (order + 1) and 0 < cutoff_hz < nyq:
+    sos = None
+    padlen = n
+    if cutoff_hz < nyq:
         sos = butter(order, cutoff_hz / nyq, btype="low", output="sos")
+        padlen = 3 * (
+            2 * len(sos) + 1 - min(int((sos[:, 2] == 0).sum()), int((sos[:, 5] == 0).sum()))
+        )
+    if sos is not None and n > padlen:
         out: FloatArray = sosfiltfilt(sos, size)
-    else:  # pragma: no cover - degenerate short-trace fallback
-        kernel = np.ones(3) / 3.0
-        out = np.convolve(size, kernel, mode="same")
+    else:
+        window = min(fallback_window, n)
+        if window % 2 == 0:
+            window -= 1
+        kernel = np.ones(window) / window
+        out = np.convolve(np.pad(size, window // 2, mode="edge"), kernel, mode="valid")
     return PupilStream(t=stream.t, size=out, unit=stream.unit)
 
 

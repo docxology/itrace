@@ -353,6 +353,35 @@ clean `mypy --strict`, all evidenced by real captured command output.
 - [x] ISC-181: `itrace.validation` implements `recording_validation_payload` decoupled from CLI layer
 - [x] ISC-182: Live HTML web client renders visual pulsing calibration targets during 4-point calibration sequences
 
+### Development correctness and reproducibility refresh (2026-10-15)
+
+- [x] ISC-183: Streams own read-only snapshots; later caller mutation cannot change analysis inputs, and pupil CSV units are checked on every row.
+- [x] ISC-184: Irregular gaze differentiation uses actual timestamps; invalid analysis clocks fail, and missing samples never become fixations or merged saccades.
+- [x] ISC-185: Pupil interpolation uses elapsed time, rejects absent anchors after padding, and short-trace smoothing preserves length and constant signals across SOS padding boundaries; zero-MAD spikes remain detectable.
+- [x] ISC-186: Configuration rejects nonfinite/wrong-type values and malformed windows; report builders enforce count, duration, and event-total contracts.
+- [x] ISC-187: Live display and exports retain detector settings, including partial/error reports; the browser plots the effective adaptive threshold, including zero.
+- [x] ISC-188: Manuscript audit and rendering share source discovery; missing empirical evidence never produces guessed measurements, and failed rendering preserves prior reader outputs and attempted intermediates.
+- [x] ISC-189: A fail-fast verification command records real statuses, logs, runtime prefixes, source digest, JUnit, and coverage without overwriting earlier evidence; CI separates core-only and development checks and tests the installed wheel.
+- [x] ISC-190: Dated release evidence is preserved separately from current development metrics; regenerated manuscript methods explicitly distinguish causal phase classification from noncausal preprocessing.
+
+### Minor-release integrity (v0.5.0)
+
+- [x] ISC-191: Package, lockfile, live API, citation, release notes, manuscript date, verification ledger, figure manifest, and current traceability metadata use the same version and reserved version DOI; the existing Zenodo concept DOI is preserved.
+- [x] ISC-192: Real metadata/artifact corruption fails the release gate, including mismatched versions/dates/DOIs, changed bytes, duplicate or escaping paths, empty inventories, and invalid PDF headers.
+- [x] ISC-193: Asset inventories bind full Git SHAs and payload SHA-256 values, reject ambiguous/nonregular/empty payloads, and refuse to overwrite existing inventories.
+- [x] ISC-194: CI declares core-only Python 3.10-3.13 wheel checks, development gates, and sdist installation/import checks for figures, web, dashboard, capture, and all extras. Hosted execution is separate evidence and must pass on the release commit before publication.
+
+Verification evidence for this refresh is recorded in `docs/DEVELOPMENT.md`,
+`docs/verification_metrics.json`, and the retained run at
+`${GITVAULT_ROOT}/Local/evidence/itrace-comprehensive-20261015/`.
+The final stable source gate (`gates-final2/summary.json`) passed with 674 tests,
+90.95% total coverage, clean lint/format, and strict mypy over 64 source files.
+The core-only Python 3.12 run passed with optional dependencies actually absent.
+Real Pandoc/XeLaTeX controls verify both resolved numbering and failed-render
+preservation. Browser QA uses explicitly synthetic frames; it is not hardware or
+reference-device evidence. Python 3.10 on this macOS host remains blocked by the
+locked SciPy native import failure, retained in `core310-tests.log`.
+
 ## Test Strategy
 
 | isc | type | check | threshold | tool |

@@ -14,7 +14,7 @@ from typing import cast
 import numpy as np
 from scipy.signal import savgol_filter
 
-from .types import FloatArray
+from .types import FloatArray, validate_timestamps
 
 
 def _odd_window(window: int, n: int) -> int:
@@ -40,8 +40,14 @@ def pos2vel_savgol(
     if pos.ndim != 1:
         msg = "position must be 1-D"
         raise ValueError(msg)
-    if sampling_rate_hz <= 0:
+    if not np.isfinite(sampling_rate_hz) or sampling_rate_hz <= 0:
         msg = "sampling_rate_hz must be positive"
+        raise ValueError(msg)
+    if not isinstance(window, int) or isinstance(window, bool) or window < 3:
+        msg = "window must be an integer >= 3"
+        raise ValueError(msg)
+    if not isinstance(polyorder, int) or isinstance(polyorder, bool) or polyorder < 1:
+        msg = "polyorder must be an integer >= 1"
         raise ValueError(msg)
     n = pos.shape[0]
     if n < 3:
@@ -60,6 +66,7 @@ def pos2vel_gradient(position: FloatArray, t: FloatArray) -> FloatArray:
     if pos.shape != ts.shape:
         msg = "position and t must have the same shape"
         raise ValueError(msg)
+    validate_timestamps(ts)
     if pos.shape[0] < 2:
         return np.zeros_like(pos)
     return cast(FloatArray, np.gradient(pos, ts))

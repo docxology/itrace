@@ -50,7 +50,19 @@ def method_name(method: str) -> DetectionMethodName:
     return "ivt"
 
 
-def _empty_analysis_payload() -> dict[str, object]:
+def make_analysis_config(
+    method: str, velocity_threshold_deg_s: float, include_pso: bool
+) -> AnalysisConfig:
+    return AnalysisConfig(
+        detection=DetectionConfig(
+            method=method_name(method),
+            velocity_threshold_deg_s=velocity_threshold_deg_s,
+            include_pso=include_pso,
+        )
+    )
+
+
+def _empty_analysis_payload(config: AnalysisConfig) -> dict[str, object]:
     empty_gaze = GazeStream(
         t=np.zeros(0, dtype=np.float64),
         x=np.zeros(0, dtype=np.float64),
@@ -61,7 +73,7 @@ def _empty_analysis_payload() -> dict[str, object]:
         size=np.zeros(0, dtype=np.float64),
         unit=PupilUnit.RELATIVE,
     )
-    report_dict = empty_session_report_dict()
+    report_dict = empty_session_report_dict(config=config.to_dict())
     return {
         "report": report_dict,
         "series": {"t": [], "x": [], "y": [], "pupil": [], "speed": []},
@@ -83,8 +95,9 @@ def analysis_payload(
     calibration: AffineCalibration | None = None,
 ) -> dict[str, object]:
     """Build rolling analysis payload for live HTML panels."""
+    cfg = make_analysis_config(method, velocity_threshold_deg_s, include_pso)
     if not samples:
-        return _empty_analysis_payload()
+        return _empty_analysis_payload(cfg)
 
     gaze, pupil = samples_to_streams(samples)
     speed: list[float | None]
@@ -97,13 +110,6 @@ def analysis_payload(
     quality = {"finite_sample_fraction": _finite_gaze_fraction(gaze)}
     duration = float(gaze.t[-1] - gaze.t[0]) if len(gaze) >= 2 else 0.0
     if len(samples) >= 3:
-        cfg = AnalysisConfig(
-            detection=DetectionConfig(
-                method=method,
-                velocity_threshold_deg_s=velocity_threshold_deg_s,
-                include_pso=include_pso,
-            )
-        )
         try:
             report = pipeline.analyze_session(gaze, pupil, config=cfg)
             report_dict = session_report_dict(report)
@@ -114,6 +120,7 @@ def analysis_payload(
                 duration_s=duration,
                 quality=quality,
                 error=str(exc),
+                config=cfg.to_dict(),
             )
             statistics_payload = session_statistics(gaze, pupil)
     else:
@@ -121,6 +128,7 @@ def analysis_payload(
             n_samples=len(samples),
             duration_s=duration,
             quality=quality,
+            config=cfg.to_dict(),
         )
         statistics_payload = session_statistics(gaze, pupil)
 

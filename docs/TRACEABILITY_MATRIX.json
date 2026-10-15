@@ -1,6 +1,6 @@
 {
   "kind": "itrace_documentation_visualization_analysis_traceability",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "updated": "2026-06-07",
   "truth_boundary": "Algorithmic verification uses synthetic truth, independent reference implementations, and the 3-D closed loop. Guided webcam sessions are session diagnostics. Device-level accuracy requires public-dataset or reference-device evidence that is not bundled here.",
   "claims": [

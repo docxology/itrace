@@ -3,22 +3,23 @@
   "version": 1,
   "truth_boundary": "N=1 derived-session diagnostics contextualize one local operating scale; synthetic truth and reference-oracle tests remain the correctness evidence; this is not reference-device validation.",
   "storage_boundary": "Derived gaze/pupil/capture records and summary reports only; no raw eye video or persisted eye-crop images are required or persisted by this bridge.",
-  "empirical_available": false,
+  "empirical_available": true,
   "source_report_available": false,
   "sources": {
     "empirical_metrics": "docs/empirical_pilot_metrics.json",
     "synthetic_validation": "output/synthetic_validation.json",
     "noise_metrics": "output/figures/noise_metrics.json",
-    "statistical_diagnostics": "output/figures/statistical_diagnostics.json"
+    "statistical_diagnostics": "output/figures/statistical_diagnostics.json",
+    "source_report": "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
   },
   "metrics": [
     {
       "id": "finite_gaze_fraction",
       "label": "finite gaze fraction",
       "empirical": {
-        "available": false,
-        "value": null,
-        "display": "unavailable"
+        "available": true,
+        "value": 1.0,
+        "display": "100.0%"
       },
       "comparability": "same_unit_contextual",
       "status": "observed local scale",
@@ -34,9 +35,9 @@
       "id": "pupil_valid_fraction",
       "label": "valid pupil fraction",
       "empirical": {
-        "available": false,
-        "value": null,
-        "display": "unavailable"
+        "available": true,
+        "value": 1.0,
+        "display": "100.0%"
       },
       "comparability": "same_unit_contextual",
       "status": "observed local scale",
@@ -52,9 +53,9 @@
       "id": "sampling_rate_hz",
       "label": "sampling rate",
       "empirical": {
-        "available": false,
-        "value": null,
-        "display": "unavailable"
+        "available": true,
+        "value": 29.72241167021321,
+        "display": "29.7 Hz"
       },
       "comparability": "configuration_contextual",
       "status": "observed local scale",
@@ -70,9 +71,9 @@
       "id": "sampling_interval_cv",
       "label": "sampling interval CV",
       "empirical": {
-        "available": false,
-        "value": null,
-        "display": "unavailable"
+        "available": true,
+        "value": 0.1610601945103741,
+        "display": "0.161"
       },
       "comparability": "configuration_contextual",
       "status": "observed local scale",
@@ -88,9 +89,9 @@
       "id": "max_drift_deg_s",
       "label": "maximum drift slope",
       "empirical": {
-        "available": false,
-        "value": null,
-        "display": "unavailable"
+        "available": true,
+        "value": 0.05430030501053513,
+        "display": "0.054 deg/s"
       },
       "comparability": "stress_domain_only",
       "status": "stress-domain only",
@@ -106,9 +107,9 @@
       "id": "heldout_target_rms_deg",
       "label": "held-out target RMS",
       "empirical": {
-        "available": false,
-        "value": null,
-        "display": "unavailable"
+        "available": true,
+        "value": 6.79100922447353,
+        "display": "6.79 deg"
       },
       "comparability": "not_directly_comparable",
       "status": "not directly comparable",
@@ -125,9 +126,9 @@
       "id": "target_acquisition_latency_s",
       "label": "target acquisition latency",
       "empirical": {
-        "available": false,
-        "value": null,
-        "display": "unavailable"
+        "available": true,
+        "value": 0.7209225420141365,
+        "display": "0.72 s"
       },
       "comparability": "not_directly_comparable",
       "status": "not directly comparable",
@@ -176,8 +177,8 @@
       "interpretation": "Amplitude MAE is defined only where synthetic truth labels exist; the pilot supplies operating-scale context, not truth labels.",
       "synthetic": {
         "available": true,
-        "value": 0.9376945163169363,
-        "display": "clean 0.06 deg; stress max 0.94 deg",
+        "value": 1.2018426131438198,
+        "display": "clean 0.06 deg; stress max 1.20 deg",
         "source": "synthetic truth domains"
       }
     },

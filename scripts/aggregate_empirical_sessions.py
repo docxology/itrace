@@ -23,16 +23,21 @@ import sys
 from collections.abc import Mapping
 from pathlib import Path
 
-from itrace.empirical import MANIFEST_KIND, write_json_atomic
+from itrace.empirical import (
+    DEFAULT_SESSIONS_FIGURE,
+    DEFAULT_SESSIONS_MANIFEST,
+    DEFAULT_SESSIONS_SUMMARY,
+    MANIFEST_KIND,
+    write_json_atomic,
+)
 from itrace.empirical import (
     aggregate_empirical_sessions as core_aggregate_empirical_sessions,
 )
-from itrace.viz import empirical_sessions as _sessions
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MANIFEST = ROOT / _sessions.DEFAULT_SESSIONS_MANIFEST
-DEFAULT_SUMMARY = ROOT / _sessions.DEFAULT_SESSIONS_SUMMARY
-DEFAULT_FIGURE = ROOT / _sessions.DEFAULT_SESSIONS_FIGURE
+DEFAULT_MANIFEST = ROOT / DEFAULT_SESSIONS_MANIFEST
+DEFAULT_SUMMARY = ROOT / DEFAULT_SESSIONS_SUMMARY
+DEFAULT_FIGURE = ROOT / DEFAULT_SESSIONS_FIGURE
 
 
 def aggregate_empirical_sessions(
@@ -53,6 +58,8 @@ def generate_empirical_sessions_figure(
     summary: Mapping[str, object], out: Path = DEFAULT_FIGURE
 ) -> Path:
     """Render a compact v1-readiness figure for empirical-session intake."""
+    from itrace.viz import empirical_sessions as _sessions
+
     return _sessions.generate_empirical_sessions_figure(summary, out)
 
 
@@ -63,6 +70,8 @@ def write_empirical_session_outputs(
     figure_out: Path = DEFAULT_FIGURE,
 ) -> dict[str, Path]:
     """Write aggregate empirical-session JSON and figure outputs."""
+    from itrace.viz import empirical_sessions as _sessions
+
     return _sessions.write_empirical_session_outputs(
         manifest_path=manifest_path,
         summary_out=summary_out,

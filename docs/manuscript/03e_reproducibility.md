@@ -14,7 +14,16 @@ pass with {{COVERAGE_PCT}} statement-and-branch coverage, `ruff` and
 the source tree. The test count, coverage, version, gate date, and render
 evidence are stored once in `docs/verification_metrics.json`; the manuscript
 renderer hydrates these tokens from that JSON so stale literal metrics are caught
-by tests rather than silently carried into public artifacts. Every synthetic
+by tests rather than silently carried into public artifacts.
+The historical release ledger is preserved separately at
+`docs/releases/v0.4.1-verification.json`; dated audit evidence is not rewritten
+to impersonate a new execution. `scripts/verify.py` records individual exit
+codes, combined logs, runtime prefixes, a source digest, JUnit results, and
+machine-readable coverage in a new evidence directory, stopping at the first
+failed gate. CI exercises the development gates and a separate core-only test
+matrix, and checks an installed wheel outside the source import path.
+
+Every synthetic
 generator and every Monte-Carlo trial is explicitly seeded with
 `numpy.random.default_rng`, so each figure and table number is reproducible
 byte-for-byte from a clean checkout — re-running the figure pipeline twice

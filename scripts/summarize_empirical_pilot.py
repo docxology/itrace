@@ -19,18 +19,11 @@ import argparse
 from collections.abc import Mapping
 from pathlib import Path
 
-import matplotlib
-
-matplotlib.use("Agg")
-
 from itrace.empirical import (
     DEFAULT_PILOT_FIGURE,
     DEFAULT_PILOT_METRICS,
     DEFAULT_PILOT_REPORT,
     pilot_metrics_from_report,
-)
-from itrace.viz.empirical_pilot import (
-    write_empirical_pilot_outputs as _write_empirical_pilot_outputs,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,6 +52,10 @@ def write_empirical_pilot_outputs(
     pilot_id: str = "local_pilot_001",
 ) -> dict[str, Path]:
     """Write metrics JSON and summary figure for the empirical pilot."""
+    from itrace.viz.empirical_pilot import (
+        write_empirical_pilot_outputs as _write_empirical_pilot_outputs,
+    )
+
     return _write_empirical_pilot_outputs(
         report_path=report_path,
         metrics_out=metrics_out,

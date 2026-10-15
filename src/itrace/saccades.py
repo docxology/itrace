@@ -38,7 +38,9 @@ def velocities(
     polyorder: int = 2,
 ) -> tuple[FloatArray, FloatArray, FloatArray]:
     """Return per-axis velocity and 2-D speed (deg/s) for a gaze stream."""
-    if uniform and len(stream) >= 3:
+    dt = np.diff(stream.t)
+    regular = dt.size > 0 and np.allclose(dt, np.median(dt), rtol=1e-3, atol=1e-9)
+    if uniform and regular and len(stream) >= 3:
         sr = stream.sampling_rate_hz
         vx = pos2vel_savgol(stream.x, sr, window=window, polyorder=polyorder)
         vy = pos2vel_savgol(stream.y, sr, window=window, polyorder=polyorder)
@@ -114,7 +116,8 @@ def detect_ivt(
         msg = "max_saccade_duration_s must be positive when provided"
         raise ValueError(msg)
     _vx, _vy, speed = velocities(stream, uniform=uniform)
-    sacc_mask = speed > velocity_threshold_deg_s
+    valid = np.isfinite(stream.x) & np.isfinite(stream.y) & np.isfinite(speed)
+    sacc_mask = valid & (speed > velocity_threshold_deg_s)
 
     gap_bridge_s = max(merge_gap_s, min_inter_event_gap_s)
     if gap_bridge_s > 0.0:
@@ -122,7 +125,7 @@ def detect_ivt(
             if onset == 0 or offset == len(stream) - 1:
                 continue
             gap_duration = float(stream.t[offset] - stream.t[onset])
-            if gap_duration <= gap_bridge_s:
+            if gap_duration <= gap_bridge_s and np.all(valid[onset : offset + 1]):
                 sacc_mask[onset : offset + 1] = True
 
     # Drop too-short saccade runs.
@@ -142,7 +145,7 @@ def detect_ivt(
             sacc_mask[onset : offset + 1] = False
 
     saccades = [_build_saccade(stream, o, e, speed) for o, e in _runs(sacc_mask)]
-    fixations = [_build_fixation(stream, o, e) for o, e in _runs(~sacc_mask)]
+    fixations = [_build_fixation(stream, o, e) for o, e in _runs(valid & ~sacc_mask)]
     return fixations, saccades
 
 
@@ -165,8 +168,13 @@ def detect_idt(
     fixations: list[Fixation] = []
     start = 0
     while start < n:
+        if not np.isfinite(x[start]) or not np.isfinite(y[start]):
+            start += 1
+            continue
         end = start
         while end + 1 < n:
+            if not np.isfinite(x[end + 1]) or not np.isfinite(y[end + 1]):
+                break
             sl = slice(start, end + 2)
             disp = (float(np.ptp(x[sl]))) + (float(np.ptp(y[sl])))
             if disp > dispersion_threshold_deg:

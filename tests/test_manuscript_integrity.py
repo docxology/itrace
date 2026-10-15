@@ -6,10 +6,18 @@ import json
 import re
 import shutil
 import subprocess
+import sys
+from datetime import date
 from pathlib import Path
 
 import pytest
-import tomllib
+
+from itrace.version import RELEASE_DATE, VERSION_DOI, __version__
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 MANUSCRIPT = ROOT / "docs" / "manuscript"
@@ -33,13 +41,8 @@ def _public_doc_haystack() -> str:
     return "\n".join(
         [
             (ROOT / "README.md").read_text(),
-            (ROOT / "ISA.md").read_text(),
-            *(
-                path.read_text()
-                for path in sorted((ROOT / "docs").glob("*.md"))
-                if path.name != "SCHOLARSHIP_AUDIT.md"
-            ),
             (MANUSCRIPT / "README.md").read_text(),
+            (MANUSCRIPT / "_build.md").read_text(),
             *(path.read_text() for path in _source_markdown()),
         ]
     )
@@ -129,7 +132,7 @@ def test_abstract_is_citation_free_and_declares_availability() -> None:
     for required in (
         "MIT-licensed and openly released",
         "https://github.com/docxology/itrace",
-        "10.5281/zenodo.20614909",
+        VERSION_DOI,
     ):
         assert required in normalized_abstract
 
@@ -144,14 +147,16 @@ def test_abstract_is_citation_free_and_declares_availability() -> None:
     assert "Kronemer et al." not in rendered_abstract
     assert "MIT-licensed and openly released" in normalized_rendered_abstract
     assert "https://github.com/docxology/itrace" in normalized_rendered_abstract
-    assert "10.5281/zenodo.20614909" in normalized_rendered_abstract
+    assert VERSION_DOI in normalized_rendered_abstract
 
 
 def test_manuscript_cover_uses_release_date() -> None:
     config = (MANUSCRIPT / "config.yaml").read_text(encoding="utf-8")
     tex = (MANUSCRIPT / "_build.tex").read_text(encoding="utf-8")
-    assert 'date: "June 9, 2026"' in config
-    assert r"\date{June 9, 2026}" in tex
+    released = date.fromisoformat(RELEASE_DATE)
+    cover_date = f"{released:%B} {released.day}, {released.year}"
+    assert f'date: "{cover_date}"' in config
+    assert f"\\date{{{cover_date}}}" in tex
     if not shutil.which("pdftotext"):
         pytest.skip("pdftotext is required for rendered cover-date verification")
     pdf_text = subprocess.run(
@@ -160,7 +165,7 @@ def test_manuscript_cover_uses_release_date() -> None:
         capture_output=True,
         text=True,
     ).stdout
-    assert "June 9, 2026" in pdf_text
+    assert cover_date in pdf_text
 
 
 def test_bibliography_metadata_is_publication_ready() -> None:
@@ -219,7 +224,7 @@ def test_manuscript_cover_author_and_layout_contract() -> None:
 def test_rendered_latex_uses_red_hyperlink_contract() -> None:
     config = (MANUSCRIPT / "config.yaml").read_text()
     rendered_tex = (MANUSCRIPT / "_build.tex").read_text(errors="ignore")
-    renderer = (ROOT / "scripts" / "render_manuscript.py").read_text()
+    renderer = (ROOT / "src" / "itrace" / "manuscript.py").read_text()
     for required in (
         "colorlinks: true",
         "linkcolor: red",
@@ -299,24 +304,25 @@ def test_public_claim_surfaces_reject_stale_or_overclaim_phrases() -> None:
         *(path for path in _source_markdown()),
     ]
     haystack = "\n".join(path.read_text(errors="ignore") for path in claim_paths)
+    current_haystack = _public_doc_haystack()
     stale_test_claims = sorted(
         {
             int(match)
-            for match in re.findall(r"\b(\d{2,4})\s+tests\b", haystack)
+            for match in re.findall(r"\b(\d{2,4})\s+tests\b", current_haystack)
             if int(match) != current_test_count
         }
     )
     stale_pytest_claims = sorted(
         {
             int(match)
-            for match in re.findall(r"\b(\d{2,4})\s+passed\b", haystack)
+            for match in re.findall(r"\b(\d{2,4})\s+passed\b", current_haystack)
             if int(match) >= 500 and int(match) != current_test_count
         }
     )
     stale_coverage_claims = sorted(
         {
             match
-            for match in re.findall(r"(?<!\d)(?:8\d|9\d|100)\.\d{2}%", haystack)
+            for match in re.findall(r"(?<!\d)(?:8\d|9\d|100)\.\d{2}%", current_haystack)
             if match != current_coverage
         }
     )
@@ -339,10 +345,10 @@ def test_public_claim_surfaces_reject_stale_or_overclaim_phrases() -> None:
     assert failures == {}
     assert f"{current_test_count} tests" in haystack
     assert current_coverage in haystack
-    assert "v0.4.1" in haystack
+    assert f"v{__version__}" in haystack
     assert "v0.4.0" not in haystack
     assert "MIT-licensed and openly released" in haystack
-    assert "10.5281/zenodo.20614909" in haystack
+    assert VERSION_DOI in haystack
     assert "ready for diagnostic v1" in haystack
     assert "0 reference-backed rows" in haystack
 
@@ -359,9 +365,9 @@ def test_verification_metric_summaries_match_current_file_surface() -> None:
     assert metrics["ruff_format_summary"] == f"{ruff_files} files already formatted"
     assert metrics["mypy_summary"] == f"Success: no issues found in {mypy_files} source files"
 
-    thermo = (ROOT / "docs" / "THERMO_NUCLEAR_AUDIT.md").read_text(encoding="utf-8")
-    assert f"{mypy_files} source files" in thermo
-    assert "53 source files" not in thermo
+    archived = json.loads((ROOT / "docs" / "releases" / "v0.4.1-verification.json").read_text())
+    assert archived["gate_date"] == "2026-06-09"
+    assert archived["test_count"] == 547
 
 
 def test_pyproject_urls_point_to_itrace_repo() -> None:
@@ -384,7 +390,7 @@ def test_release_license_and_citation_metadata_are_consistent() -> None:
     license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
     citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
     zenodo = json.loads((ROOT / ".zenodo.json").read_text(encoding="utf-8"))
-    release_notes = (ROOT / "docs" / "releases" / "v0.4.1.md").read_text(encoding="utf-8")
+    release_notes = (ROOT / "docs" / "releases" / f"v{__version__}.md").read_text(encoding="utf-8")
     abstract = (MANUSCRIPT / "00_abstract.md").read_text(encoding="utf-8")
 
     assert license_name == "MIT"
@@ -395,10 +401,10 @@ def test_release_license_and_citation_metadata_are_consistent() -> None:
     assert "license: MIT" in citation
     assert f'repository-code: "{repository}"' in citation
     assert f'url: "{repository}"' in citation
-    assert 'date-released: "2026-06-09"' in citation
+    assert f'date-released: "{RELEASE_DATE}"' in citation
     assert zenodo["version"] == pyproject["project"]["version"]
     assert zenodo["license"] == "mit"
-    assert zenodo["publication_date"] == "2026-06-09"
+    assert zenodo["publication_date"] == RELEASE_DATE
     assert zenodo["access_right"] == "open"
     assert zenodo["upload_type"] == "software"
     assert any(
@@ -411,9 +417,9 @@ def test_release_license_and_citation_metadata_are_consistent() -> None:
     assert "MIT License" in license_text
     assert "Permission is hereby granted" in license_text
     assert "Copyright (c) 2026 Daniel Ari Friedman" in license_text
-    assert "iTrace v0.4.1" in release_notes
+    assert f"iTrace v{__version__}" in release_notes
     assert repository in release_notes
-    assert "10.5281/zenodo.20614909" in release_notes
+    assert VERSION_DOI in release_notes
     assert "10.5281/zenodo.20614908" in release_notes
 
     for text in (readme, citation, abstract, release_notes):
@@ -422,8 +428,8 @@ def test_release_license_and_citation_metadata_are_consistent() -> None:
         assert "MIT" in normalized_text
 
 
-def test_prepublication_review_matches_current_ledgers() -> None:
-    metrics = _verification_metrics()
+def test_prepublication_review_matches_its_archived_ledger() -> None:
+    metrics = json.loads((ROOT / "docs" / "releases" / "v0.4.1-verification.json").read_text())
     sessions = json.loads((ROOT / "docs" / "empirical_sessions_summary.json").read_text())
     review = (ROOT / "docs" / "PREPUBLICATION_REVIEW.md").read_text(encoding="utf-8")
     normalized = re.sub(r"\s+", " ", review)

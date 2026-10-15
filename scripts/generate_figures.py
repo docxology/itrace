@@ -10,6 +10,7 @@ runs the pipeline, and renders 300-dpi colour-blind-safe PNGs into
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -26,14 +27,21 @@ from itrace.empirical import (
     DEFAULT_PILOT_FIGURE,
     DEFAULT_PILOT_METRICS,
     DEFAULT_PILOT_REPORT,
+    load_json_object,
+    validate_empirical_manifest,
 )
 from itrace.synthetic import gaze_with_saccade
 from itrace.types import GazeStream
-from itrace.viz.empirical_pilot import write_empirical_pilot_outputs
+from itrace.version import __version__
+from itrace.viz.empirical_pilot import (
+    generate_empirical_pilot_figure,
+    write_empirical_pilot_outputs,
+)
 from itrace.viz.empirical_sessions import (
     DEFAULT_SESSIONS_FIGURE,
     DEFAULT_SESSIONS_MANIFEST,
     DEFAULT_SESSIONS_SUMMARY,
+    generate_empirical_sessions_figure,
     write_empirical_session_outputs,
 )
 from itrace.viz.gallery import render_gallery
@@ -424,15 +432,21 @@ def _figure_metadata(path: Path) -> dict[str, object]:
     return entry
 
 
-def write_figure_manifest(paths: list[Path], out: Path = FIGURE_MANIFEST) -> Path:
+def write_figure_manifest(
+    paths: list[Path],
+    out: Path = FIGURE_MANIFEST,
+    *,
+    empirical_source: str = "derived_session_reports",
+) -> Path:
     """Write a provenance manifest for generated publication figure artifacts."""
     metrics_path = ROOT / "docs" / "verification_metrics.json"
     metrics = json.loads(metrics_path.read_text(encoding="utf-8")) if metrics_path.exists() else {}
     unique_paths = sorted({path.resolve() for path in paths if path.exists()})
     payload = {
         "kind": "itrace_publication_figure_manifest",
-        "version": metrics.get("version", "0.4.1"),
+        "version": metrics.get("version", __version__),
         "updated": metrics.get("gate_date", "2026-06-05"),
+        "empirical_source": empirical_source,
         "truth_boundary": (
             "Figures visualize Python-computed outputs and generated evidence; "
             "browser/canvas rendering is display-only and does not create validation evidence."
@@ -444,7 +458,25 @@ def write_figure_manifest(paths: list[Path], out: Path = FIGURE_MANIFEST) -> Pat
     return out
 
 
-def main() -> list[Path]:
+def main(*, reuse_empirical_summaries: bool = False) -> list[Path]:
+    empirical_report, pilot_id = _current_empirical_report()
+    if reuse_empirical_summaries:
+        pilot_summary = load_json_object(DEFAULT_EMPIRICAL_METRICS)
+        sessions_summary = load_json_object(DEFAULT_EMPIRICAL_SESSIONS_SUMMARY)
+    else:
+        if not empirical_report.is_file():
+            msg = (
+                "Empirical source report is missing; no figures or ledgers were changed. "
+                "Use --reuse-empirical-summaries to render the recorded summary ledgers."
+            )
+            raise FileNotFoundError(msg)
+        manifest = load_json_object(DEFAULT_EMPIRICAL_SESSIONS_MANIFEST)
+        validity = validate_empirical_manifest(
+            manifest, repo_root=ROOT, require_existing_reports=True
+        )
+        if not validity["valid"]:
+            msg = f"Empirical manifest preflight failed: {validity['errors']}"
+            raise ValueError(msg)
     out_dir = ROOT / "output" / "figures"
     out_dir.mkdir(parents=True, exist_ok=True)
     power_res = power.run_noise_sweep(n_trials=25)
@@ -454,20 +486,27 @@ def main() -> list[Path]:
         write_summary_table(out_dir, power_res),
         write_noise_metrics(out_dir, power_res),
     ]
-    empirical_report, pilot_id = _current_empirical_report()
-    empirical_paths = write_empirical_pilot_outputs(
-        report_path=empirical_report,
-        metrics_out=DEFAULT_EMPIRICAL_METRICS,
-        figure_out=DEFAULT_EMPIRICAL_FIGURE,
-        pilot_id=pilot_id,
-        repo_root=ROOT,
-    )
-    empirical_session_paths = write_empirical_session_outputs(
-        manifest_path=DEFAULT_EMPIRICAL_SESSIONS_MANIFEST,
-        summary_out=DEFAULT_EMPIRICAL_SESSIONS_SUMMARY,
-        figure_out=DEFAULT_EMPIRICAL_SESSIONS_FIGURE,
-        repo_root=ROOT,
-    )
+    if reuse_empirical_summaries:
+        pilot_figure = generate_empirical_pilot_figure(pilot_summary, DEFAULT_EMPIRICAL_FIGURE)
+        session_figure = generate_empirical_sessions_figure(
+            sessions_summary, DEFAULT_EMPIRICAL_SESSIONS_FIGURE
+        )
+    else:
+        empirical_paths = write_empirical_pilot_outputs(
+            report_path=empirical_report,
+            metrics_out=DEFAULT_EMPIRICAL_METRICS,
+            figure_out=DEFAULT_EMPIRICAL_FIGURE,
+            pilot_id=pilot_id,
+            repo_root=ROOT,
+        )
+        empirical_session_paths = write_empirical_session_outputs(
+            manifest_path=DEFAULT_EMPIRICAL_SESSIONS_MANIFEST,
+            summary_out=DEFAULT_EMPIRICAL_SESSIONS_SUMMARY,
+            figure_out=DEFAULT_EMPIRICAL_SESSIONS_FIGURE,
+            repo_root=ROOT,
+        )
+        pilot_figure = empirical_paths["figure"]
+        session_figure = empirical_session_paths["figure"]
     gallery_paths = render_gallery(out_dir, seed=0, animations=True)
     paths = [
         *power_paths,
@@ -475,19 +514,35 @@ def main() -> list[Path]:
         generate_loop_gif(out_dir, res=loop_res),
         generate_orbs_still(out_dir, loop_res),
         generate_orbs_gif(out_dir, res=loop_res),
-        empirical_paths["figure"],
-        empirical_session_paths["figure"],
+        pilot_figure,
+        session_figure,
         *gallery_paths,
         generate_cover_visual(out_dir),
-        generate_graphical_abstract(out_dir),
+        generate_graphical_abstract(out_dir, ROOT),
         generate_main_sequence(out_dir),
         generate_direction_polar(out_dir),
     ]
-    paths.append(write_figure_manifest(paths))
+    paths.append(
+        write_figure_manifest(
+            paths,
+            empirical_source="retained_summary_ledgers"
+            if reuse_empirical_summaries
+            else "derived_session_reports",
+        )
+    )
     for p in paths:
         print(f"wrote {p}")
     return paths
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Regenerate the complete iTrace publication gallery."
+    )
+    parser.add_argument(
+        "--reuse-empirical-summaries",
+        action="store_true",
+        help="Render retained empirical summaries without reanalysing records.",
+    )
+    args = parser.parse_args()
+    main(reuse_empirical_summaries=args.reuse_empirical_summaries)

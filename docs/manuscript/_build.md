@@ -29,13 +29,13 @@ velocity-thresholded saccade recovery falls below F1 = 0.8 near sigma
 because its noise-sweep robustness follows from the modelling assumption
 used to inject pupil noise. iTrace also ships a typer CLI, Streamlit
 dashboard, local HTML/WebSocket orchestrator, guided derived-record
-empirical workflow, and publication-figure scripts, all under 547 tests
-at 90.21% coverage. Its contribution is not a claim that webcams are
+empirical workflow, and publication-figure scripts, all under 692 tests
+at 91.07% coverage. Its contribution is not a claim that webcams are
 validated eye trackers; it is a verification-first reference
 implementation whose evidence boundaries are visible in the code,
 figures, reports, and manuscript. iTrace is MIT-licensed and openly
 released at https://github.com/docxology/itrace, with this version
-archived at DOI 10.5281/zenodo.20614909 (concept DOI
+archived at DOI 10.5281/zenodo.23403300 (concept DOI
 10.5281/zenodo.20614908 resolves to the latest version).
 
 # Introduction {#sec:introduction}
@@ -219,7 +219,7 @@ added by writing a shell (sec. 8) that emits the same `GazeStream` /
 verified core never changes, every analysis in sec. 5 through sec. 12
 applies unaltered to its output, and the visualization/report layer can
 be regenerated from the same stored payloads. The full module map and
-dependency contract are in sec. 29.
+dependency contract are in sec. 27.
 
 # Methods: gaze geometry {#sec:geometry}
 
@@ -227,7 +227,7 @@ The geometry layer turns raw image measurements into calibrated
 quantities in degrees of visual angle (dva). Pixel offsets from screen
 centre are converted by the exact relation
 
-[$$ \theta = \arctan(s_\text{cm} / d_\text{cm}) \qquad{(1)}$$]{#eq:pix2deg}
+[$$\theta = \arctan(s_\text{cm} / d_\text{cm})\qquad{(1)}$$]{#eq:pix2deg}
 
 where $s_{\mathrm{cm}}$ is the offset in centimetres (pixels times the
 screen's cm-per-pixel) and $d_{\mathrm{cm}}$ the viewing distance. The
@@ -237,7 +237,7 @@ round-trips to floating-point tolerance.
 For appearance-based capture, normalised iris displacement within the
 eye aperture is mapped to eyeball rotation through a sphere model,
 
-[$$ \theta_{\mathrm{gaze}} = \arcsin\!\big(o \cdot \sin\theta_{\max}\big) \qquad{(2)}$$]{#eq:iris}
+[$$\theta_{\mathrm{gaze}} = \arcsin\!\big(o \cdot \sin\theta_{\max}\big)\qquad{(2)}$$]{#eq:iris}
 
 with $o \in [-1, 1]$ the normalised iris offset and $\theta_{\max}$ the
 angle at full deflection; the map (eq. 2) is monotone and odd.
@@ -265,6 +265,14 @@ length not exceeding the trace. For non-uniform timestamps a
 central-difference gradient is taken on the actual time vector.
 Two-dimensional speed is the Euclidean norm of the per-axis velocities.
 
+The default velocity dispatcher checks timestamp spacing before
+selecting its estimator: intervals constant within a relative tolerance
+of 0.001 use the uniform path; irregular intervals use the actual time
+vector. Differentiation rejects nonfinite, duplicate, and decreasing
+timestamps. Stream containers retain such clocks for quality
+diagnostics, but they cannot be treated as valid timing for event
+dynamics.
+
 ## Fixations and saccades (I-VT, I-DT)
 
 **I-VT** ([Salvucci and Goldberg 2000](#ref-salvucci2000identifying))
@@ -274,13 +282,14 @@ shorter than a minimum duration are reabsorbed into the surrounding
 fixation, suppressing single-sample velocity spikes. In noisy or
 intermittently tracked streams the configurable `merge_gap_s` parameter
 optionally bridges short subthreshold holes inside one high-velocity
-movement before the duration filter is applied; this prevents a brief
-landmark dropout or low-velocity plateau from fragmenting one saccade
-into several events while leaving the historical default at zero for
-exact backward compatibility. **I-DT** ([Salvucci and Goldberg
+movement before the duration filter is applied. Only finite, analysable
+samples can be bridged; missing gaze and nonfinite velocity split the
+candidate intervals and are never labelled as fixations. The historical
+merge default remains zero. **I-DT** ([Salvucci and Goldberg
 2000](#ref-salvucci2000identifying)) greedily extends a window while its
 spatial dispersion $(\max x - \min x) + (\max y - \min y)$ stays below
-threshold, emitting one fixation per maximal low-dispersion window.
+threshold, emitting one fixation per maximal low-dispersion window. It
+likewise splits windows at nonfinite gaze samples.
 
 ## Microsaccades (Engbert--Kliegl)
 
@@ -288,7 +297,7 @@ Microsaccades follow Engbert and Kliegl
 ([2003](#ref-engbert2003microsaccades)). Velocity uses their five-sample
 moving-average estimator, and a per-axis elliptic threshold
 
-[$$ (v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1 \qquad{(3)}$$]{#eq:ek}
+[$$(v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1\qquad{(3)}$$]{#eq:ek}
 
 (eq. 3) flags an event when held for at least a minimum number of
 samples. The threshold $\eta = \lambda\sigma$ uses the **median-based**
@@ -307,7 +316,7 @@ velocity. The amplitude--peak-velocity relationship --- the *main
 sequence* --- is fit to two standard parameterisations: a saturating
 exponential
 
-[$$ V = V_{\max}\,\big(1 - e^{-A/C}\big) \qquad{(4)}$$]{#eq:mainseq}
+[$$V = V_{\max}\,\big(1 - e^{-A/C}\big)\qquad{(4)}$$]{#eq:mainseq}
 
 (eq. 4; Bahill et al. ([1975](#ref-bahill1975main))) by non-linear least
 squares, and a power law $V = aA^b$ by linear regression in log-log
@@ -334,29 +343,37 @@ transparent preprocessing records ([Zhang and Jonides
 2026](#ref-zhang2026pupeyes); [Mittner
 2020](#ref-mittner2020pypillometry)). Blinks are detected as runs of NaN
 or sub-threshold samples and removed by linear interpolation with edge
-padding, so the partial-occlusion ramp on either side of a closure does
-not leak into the signal; a trace with no valid samples is reported as
-unusable rather than silently flattened to a constant. Outliers are
-flagged by the scaled median absolute deviation
-($1.4826\,\mathrm{MAD}$), which is robust to the very spikes it must
-catch. The deblinked trace is low-pass filtered with a deterministic
-zero-phase Butterworth implementation choice (with a short-trace
-moving-average fallback) ([Butterworth
-1930](#ref-butterworth1930theory)) and baseline-corrected, subtractively
-or divisively, against a chosen pre-event time window.
+padding, using elapsed timestamps rather than sample indices, so the
+partial-occlusion ramp on either side of a closure does not leak into
+the signal; a trace with no valid samples is reported as unusable rather
+than silently flattened to a constant. The same rejection applies when
+padding removes every interpolation anchor. Outliers are flagged by the
+scaled median absolute deviation ($1.4826\,\mathrm{MAD}$), which is
+robust to the very spikes it must catch; when MAD is zero, finite
+deviations from the median are flagged explicitly. The deblinked trace
+is low-pass filtered with a deterministic zero-phase Butterworth
+implementation choice (with a short-trace moving-average fallback)
+([Butterworth 1930](#ref-butterworth1930theory)) and baseline-corrected,
+subtractively or divisively, against a chosen pre-event time window. The
+short-trace fallback uses edge padding and a bounded odd window so it
+preserves length and constant input. The actual second-order-section
+padding requirement determines whether Butterworth filtering is
+available. A cutoff at or above Nyquist also uses the moving-average
+fallback; that output is not represented as Butterworth-filtered.
 
 The runtime `PupilConfig` now controls the same decisions the standalone
 functions expose: the low-confidence pupil threshold, interpolation
-padding, and Butterworth cutoff/order. Reports include both
-cleaned-signal summaries (mean/standard deviation/min/max, phase peak
-and trough counts) and raw-quality summaries (valid fraction, blink
-fraction/count, median sample interval, peak dilation velocity, and peak
-constriction velocity). The live webcam pupil channel therefore remains
-a relative proxy, but the analysis path records how much of the trace
-was usable and how strongly the cleaned pupil changed over time.
-Brightness and contrast effects are not modelled away in this version;
-tools such as Open-DPSM show why dynamic visual confounds need explicit
-modelling when pupil size is interpreted cognitively ([Cai et al.
+padding, and Butterworth cutoff/order and the fallback window
+(`smooth_window`). Reports include both cleaned-signal summaries
+(mean/standard deviation/min/max, phase peak and trough counts) and
+raw-quality summaries (valid fraction, blink fraction/count, median
+sample interval, peak dilation velocity, and peak constriction
+velocity). The live webcam pupil channel therefore remains a relative
+proxy, but the analysis path records how much of the trace was usable
+and how strongly the cleaned pupil changed over time. Brightness and
+contrast effects are not modelled away in this version; tools such as
+Open-DPSM show why dynamic visual confounds need explicit modelling when
+pupil size is interpreted cognitively ([Cai et al.
 2024](#ref-cai2024opendpsm)).
 
 The separate `pupilseg` module covers a narrower, testable image-space
@@ -379,6 +396,11 @@ the current and prior samples ([Kronemer et al.
 but verified: feeding the detector a prefix of a signal reproduces
 exactly the labels it assigns to that prefix in a full run, proving no
 future sample influences a past label (sec. 15).
+
+This causality statement applies to `PhaseDetector` itself. Blink
+interpolation and zero-phase filtering use surrounding samples; the
+offline pupil pipeline and the rolling reanalysis displayed by the live
+dashboard are not causal filters.
 
 # Methods: the capture shell {#sec:capture}
 
@@ -578,7 +600,7 @@ combined as the harmonic mean, so a detector that fragments one true
 saccade into several events or merges several into one is penalised
 rather than rewarded. Every trial seed is deterministic, so the whole
 sweep --- and therefore every figure and table number --- is
-reproducible. Full statistical detail is in sec. 28. The sweep is
+reproducible. Full statistical detail is in sec. 26. The sweep is
 falsifiable: were recovery independent of noise, gaze RMS would be flat
 across the grid.
 
@@ -764,7 +786,7 @@ $B$ times (default $B = 2000$, explicit seed), refits the log-log
 regression on each resample, and reports a two-sided 95% **bootstrap
 percentile** confidence interval on $b$ ([Efron and Tibshirani
 1993](#ref-efron1993introduction)). We use the percentile interval here
-for the same reason it is used in the noise sweep (sec. 28): it makes no
+for the same reason it is used in the noise sweep (sec. 26): it makes no
 symmetry assumption and stays inside the range supported by the data.
 The interval describes sampling variability of the exponent *across the
 observed saccades*; it is not a claim about a population of eyes the
@@ -920,7 +942,7 @@ figures, and live displays from Python-computed payloads. Three badges
 summarise the current verification gate, the five-session diagnostic v1
 release scope, and the no-reference-device-claim boundary. The footer
 states MIT License, github.com/docxology/itrace, and the Zenodo DOI
-10.5281/zenodo.20614909; the figure describes architecture and evidence
+10.5281/zenodo.23403300; the figure describes architecture and evidence
 boundaries, not webcam accuracy
 validation.](../../output/figures/graphical_abstract.png){#fig:graphical-abstract
 width="100%"}
@@ -1153,22 +1175,30 @@ implementation. The two paths share only their input and the published
 algorithm definitions, so agreement is evidence the implementation
 matches the algorithm, not that two copies of one mistake agree.
 
-The complete toolchain is green and reproducible: 547 no-mocks tests
-pass with 90.21% statement-and-branch coverage, `ruff` and `ruff format`
+The complete toolchain is green and reproducible: 692 no-mocks tests
+pass with 91.07% statement-and-branch coverage, `ruff` and `ruff format`
 report no issues, and `mypy --strict` finds no type errors across the
 source tree. The test count, coverage, version, gate date, and render
 evidence are stored once in `docs/verification_metrics.json`; the
 manuscript renderer hydrates these tokens from that JSON so stale
 literal metrics are caught by tests rather than silently carried into
-public artifacts. Every synthetic generator and every Monte-Carlo trial
-is explicitly seeded with `numpy.random.default_rng`, so each figure and
-table number is reproducible byte-for-byte from a clean checkout ---
-re-running the figure pipeline twice produces identical PNGs, and the
-noise sweep of sec. 17 reproduces its table cells exactly. No test mocks
-a computation: detectors run on real arrays with known ground truth,
-file I/O uses real temporary files, and figures are asserted to write
-non-empty PNGs. The full module map, dependency contract, and test
-strategy are in sec. 29.
+public artifacts. The historical release ledger is preserved separately
+at `docs/releases/v0.4.1-verification.json`; dated audit evidence is not
+rewritten to impersonate a new execution. `scripts/verify.py` records
+individual exit codes, combined logs, runtime prefixes, a source digest,
+JUnit results, and machine-readable coverage in a new evidence
+directory, stopping at the first failed gate. CI exercises the
+development gates and a separate core-only test matrix, and checks an
+installed wheel outside the source import path.
+
+Every synthetic generator and every Monte-Carlo trial is explicitly
+seeded with `numpy.random.default_rng`, so each figure and table number
+is reproducible byte-for-byte from a clean checkout --- re-running the
+figure pipeline twice produces identical PNGs, and the noise sweep of
+sec. 17 reproduces its table cells exactly. No test mocks a computation:
+detectors run on real arrays with known ground truth, file I/O uses real
+temporary files, and figures are asserted to write non-empty PNGs. The
+full module map, dependency contract, and test strategy are in sec. 27.
 
 The documentation and visualization layer now follows the same evidence
 rule. `docs/TRACEABILITY_MATRIX.json` maps each public validation claim
@@ -1232,6 +1262,12 @@ variation **0.161**, maximum drift **0.054 deg/s**, held-out target RMS
 values are stored in `docs/empirical_pilot_metrics.json`; when the pilot
 export is absent, the same render path leaves each field explicitly
 unavailable rather than filling a guessed value.
+
+The development refresh retains the recorded empirical summary ledgers.
+The local derived session exports are not bundled in this checkout, so
+regenerating figures from those ledgers reproduces the recorded summary
+rather than a new empirical acquisition or reanalysis of the original
+records.
 
 ![Figure 7: N=1 empirical session summary generated from the derived
 experiment report. The cards report finite-gaze fraction, sampling rate,
@@ -2094,28 +2130,6 @@ Estimation." *arXiv Preprint arXiv:1711.09017*, ahead of print.
 <https://doi.org/10.48550/arXiv.1711.09017>.
 :::
 ::::::::::::::::::::::::::::::::::::::::::::
-
-# docs/manuscript/ --- Agent Notes
-
-iTrace methods-paper manuscript source: numbered section markdown
-(abstract, introduction, architecture, geometry, velocity/events,
-dynamics, pupillometry, capture shell, forward/noise models, statistics,
-detection, results, limitations...), config, references, plus LaTeX
-intermediates (`_build.*`, `_render_preamble.tex`) which are GENERATED
---- regenerate via the render pipeline, do not edit `_build` files
-directly. Page previews land in `../output/pdf_preview/`.
-
-# Manuscript Status
-
-- **Project:** itrace
-- **Manuscript title:** iTrace: an algorithmically verified open-source
-  core for webcam gaze, saccade, and pupil analysis
-- **Location:** `docs/manuscript/` --- the sole manuscript directory in
-  this repo (migrated from the legacy repo-root `manuscript/`; no
-  `infrastructure.*` module exists here)
-- **Type:** Active publication-target manuscript (25 section files)
-- **Status file purpose:** Tracks publication-readiness of the
-  manuscript content in this directory.
 
 # Supplement S1: statistical methods {#sec:statmethods}
 

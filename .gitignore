@@ -16,6 +16,7 @@ coverage.xml
 .benchmarks/
 manuscript/_build.aux
 manuscript/_build.log
+.itrace-render-*/
 
 # Local-only capture artifacts: single-participant derived pilot records and
 # live-smoke run outputs stay local. Public evidence is the aggregated, derived

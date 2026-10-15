@@ -135,6 +135,29 @@ def test_live_message_serializes_capture_frame_and_analysis() -> None:
     assert len(message["series"]["speed"]) == 4
 
 
+def test_export_preserves_requested_analysis_settings(tmp_path: Path) -> None:
+    app = create_app(output_dir=tmp_path, frame_source_factory=_frame_source)
+    state = app.state.live_state
+    for index in range(60):
+        state.append(_capture_sample(index, x=0.0 if index < 30 else 8.0))
+    query = "method=adaptive_ivt&velocity_threshold=99&include_pso=true"
+    with TestClient(app) as client:
+        displayed = client.get(f"/api/statistics/live?{query}").json()["analysis"]
+        response = client.post(f"/api/export?{query}")
+    assert response.status_code == 200
+    report = json.loads(Path(response.json()["paths"]["report_json"]).read_text())
+    assert report["config"] == displayed["config"]
+    assert report["saccades"] == displayed["saccades"]
+    assert report["config"]["detection"]["method"] == "adaptive_ivt"
+
+
+@pytest.mark.parametrize("query", ["method=unknown", "velocity_threshold=nan", "window_s=inf"])
+def test_live_statistics_rejects_invalid_analysis_parameters(query: str) -> None:
+    with TestClient(create_app(frame_source_factory=_frame_source)) as client:
+        response = client.get(f"/api/statistics/live?{query}")
+    assert response.status_code == 400
+
+
 def test_live_message_serializes_no_face_frames_without_analysis_crash() -> None:
     state = LiveState()
     for index in range(4):

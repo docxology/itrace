@@ -30,6 +30,14 @@ running; this index does not invent commands.
 - [Manual annotation protocol](manual_annotation_protocol.md)
 - [Scholarship audit](SCHOLARSHIP_AUDIT.md) / [Traceability matrix](TRACEABILITY_MATRIX.json)
 - [Prepublication review](PREPUBLICATION_REVIEW.md)
+- [Development, verification, numerical contracts, and manuscript rendering](DEVELOPMENT.md)
+- [Comprehensive development review and remaining limits](COMPREHENSIVE_REVIEW.md)
+- [Release procedure and artifact verification](RELEASING.md)
+- [v0.5.0 release notes](releases/v0.5.0.md)
+
+`verification_metrics.json` records current development checks. The previous
+release ledger is retained in `releases/v0.4.1-verification.json`; dated audit
+reports retain their original evidence rather than claiming a later gate run.
 
 Empirical session ledgers: `empirical_sessions_manifest.json`,
 `empirical_sessions_summary.json`, `empirical_pilot_metrics.json`,

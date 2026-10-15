@@ -16,7 +16,7 @@ with an optional, thin webcam + MediaPipe capture shell.
 
 iTrace is MIT-licensed and openly released at
 https://github.com/docxology/itrace, with this version archived on Zenodo at
-DOI [10.5281/zenodo.20614909](https://doi.org/10.5281/zenodo.20614909) (concept
+DOI [10.5281/zenodo.23403300](https://doi.org/10.5281/zenodo.23403300) (concept
 DOI [10.5281/zenodo.20614908](https://doi.org/10.5281/zenodo.20614908) always
 resolves to the latest version). The repository URL is fixed here, in
 `pyproject.toml`, in `docs/verification_metrics.json`, and in `CITATION.cff` so
@@ -68,6 +68,18 @@ uv sync --extra all            # capture + dashboard + figures + web
 
 ## CLI
 
+For a complete development check with retained logs, runtime identity, coverage,
+and JUnit results, see [Development and verification](docs/DEVELOPMENT.md):
+
+```bash
+uv sync --locked --extra dev
+uv run --frozen --no-sync python scripts/verify.py --out-dir output/verification/new-run
+```
+
+Each verification run requires a new output directory. The CI workflow also
+checks a core-only environment and an installed wheel. Numerical stream, unit,
+missing-data, and filtering contracts are documented in the development guide.
+
 ```bash
 itrace demo                            # end-to-end synthetic demo
 itrace analyze gaze.csv --out report.json --pupil-csv pupil.csv
@@ -86,10 +98,18 @@ itrace live-html --camera 0 --output-dir output/live-html  # local HTML app (web
 itrace dashboard                              # needs the dashboard extra
 ```
 
-For the publication/manuscript figure set, run the script-level refresh path:
+For the publication/manuscript figure set, run the script-level refresh path
+when the empirical source exports required by the manifest are available:
 
 ```bash
 uv run python scripts/generate_figures.py
+```
+
+For a checkout without the local session exports, preserve the recorded
+empirical summaries explicitly:
+
+```bash
+uv run python scripts/generate_figures.py --reuse-empirical-summaries
 ```
 
 ## Live HTML orchestrator
@@ -515,7 +535,7 @@ pixel-variance checks for generated figure artifacts.
 
 ## Status
 
-`working/` project (standalone, self-contained), v0.4.1. Current gate metrics
+`working/` project (standalone, self-contained), v0.5.0. Current gate metrics
 live in [`docs/verification_metrics.json`](docs/verification_metrics.json):
 tests, coverage, `ruff`, `ruff format`, `mypy --strict`, lockfile, and render
 evidence are kept in that ledger. License and citation metadata are recorded in

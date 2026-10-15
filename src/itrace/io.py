@@ -49,7 +49,13 @@ def read_pupil_csv(path: str | Path) -> PupilStream:
     if missing:
         msg = f"pupil CSV missing columns: {sorted(missing)}"
         raise ValueError(msg)
-    unit = PupilUnit(df["unit"].iloc[0]) if "unit" in df.columns and len(df) else PupilUnit.RELATIVE
+    unit = PupilUnit.RELATIVE
+    if "unit" in df.columns and len(df):
+        units = df["unit"]
+        if units.isna().any() or units.nunique() != 1:
+            msg = "pupil CSV unit column must contain one consistent, non-missing unit"
+            raise ValueError(msg)
+        unit = PupilUnit(units.iloc[0])
     return PupilStream(
         t=df["t"].to_numpy(dtype=np.float64),
         size=df["size"].to_numpy(dtype=np.float64),

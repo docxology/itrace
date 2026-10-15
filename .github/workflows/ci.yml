@@ -1,0 +1,91 @@
+name: Verify iTrace
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync --locked
+      - run: uv run --locked --with pytest --with pytest-timeout --with tomli pytest tests/ -q
+      - run: uv build --wheel --out-dir dist
+      - run: |
+          uv venv wheel-env
+          uv pip install --python wheel-env/bin/python dist/*.whl
+          wheel-env/bin/python -I -c "import importlib.util, itrace; from pathlib import Path; assert 'site-packages' in itrace.__file__; assert (Path(itrace.__file__).parent / 'py.typed').is_file(); assert (Path(itrace.__file__).parent / 'web_static' / 'app.js').is_file(); assert all(importlib.util.find_spec(m) is None for m in ('cv2','mediapipe','streamlit','matplotlib','fastapi')); from itrace.synthetic import gaze_with_saccade; from itrace.pipeline import analyze_gaze; assert len(analyze_gaze(gaze_with_saccade()[0]).saccades) == 1"
+          wheel-env/bin/itrace demo
+  development:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --extra dev
+      - run: uv run --locked python scripts/verify.py --out-dir output/verification/ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-receipts
+          path: output/verification/ci
+  optional-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        extra: ["figures", "web", "dashboard", "capture", "all"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv build --out-dir dist
+      - name: Install source distribution with advertised extra
+        env:
+          EXTRA: ${{ matrix.extra }}
+        run: |
+          uv venv package-env
+          for artifact in dist/*.tar.gz; do
+            uv pip install --python package-env/bin/python "${artifact}[${EXTRA}]"
+          done
+      - name: Exercise installed package and optional imports
+        env:
+          EXTRA: ${{ matrix.extra }}
+        run: |
+          package-env/bin/python -I - <<'PY'
+          import importlib
+          import os
+          from pathlib import Path
+          import itrace
+          modules = {
+              "figures": ("matplotlib",),
+              "web": ("fastapi", "uvicorn"),
+              "dashboard": ("streamlit", "plotly"),
+              "capture": ("cv2", "mediapipe"),
+          }
+          selected = modules.values() if os.environ["EXTRA"] == "all" else [modules[os.environ["EXTRA"]]]
+          assert "site-packages" in itrace.__file__
+          for group in selected:
+              for name in group:
+                  importlib.import_module(name)
+          if os.environ["EXTRA"] in ("web", "all"):
+              from itrace.live.server import create_app
+              assert create_app().version == itrace.__version__
+          if os.environ["EXTRA"] in ("figures", "all"):
+              from itrace.viz.graphical_abstract import generate_graphical_abstract
+              assert generate_graphical_abstract(Path("package-figures"), repo_root=Path.cwd()).is_file()
+          PY
+          package-env/bin/itrace demo

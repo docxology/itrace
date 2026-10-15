@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "itrace"
-version = "0.4.1"
+version = "0.5.0"
 description = "Open-source webcam eye-movement analysis: gaze geometry, saccade/fixation/microsaccade detection, main-sequence dynamics, and pupillometry — a pure, algorithmically verified NumPy/SciPy core with an optional thin webcam/MediaPipe capture shell."
 readme = "README.md"
 requires-python = ">=3.10"

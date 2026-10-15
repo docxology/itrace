@@ -59,6 +59,7 @@ def test_stats_command_skips_fit_with_few_saccades(tmp_path) -> None:
 
 
 def test_figures_command_writes_dashboard_png(tmp_path) -> None:
+    pytest.importorskip("matplotlib")
     cli.figures(out_dir=tmp_path, seed=1)
     png = tmp_path / "session_dashboard.png"
     assert png.exists()
@@ -128,6 +129,7 @@ def test_figures_command_writes_dashboard_png(tmp_path) -> None:
 
 
 def test_figures_command_writes_animation_when_requested(tmp_path) -> None:
+    pytest.importorskip("matplotlib")
     cli.figures(out_dir=tmp_path, seed=1, animations=True)
     gif = tmp_path / "synthetic_replay.gif"
     assert gif.exists()

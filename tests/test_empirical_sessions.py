@@ -433,6 +433,7 @@ def test_generic_reference_artifact_schema_counts_for_public_dataset(
 
 
 def test_empirical_sessions_summary_figure_renders(tmp_path: Path) -> None:
+    pytest.importorskip("matplotlib")
     aggregator = _aggregator_module()
     summary = empirical.build_empirical_sessions_summary(
         manifest={"v1_readiness_criteria": {"requires_reference_evidence": True}},

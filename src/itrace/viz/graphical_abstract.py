@@ -16,9 +16,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Ellipse, FancyArrowPatch, FancyBboxPatch, Polygon, Rectangle
 
+from itrace.version import VERSION_DOI
 from itrace.viz.palette import CARD_FACE, FONT_FLOOR, INK, MUTED, WONG, apply_house_style
 
-AVAILABILITY_FOOTER = "MIT License | github.com/docxology/itrace | DOI 10.5281/zenodo.20614909"
+AVAILABILITY_FOOTER = f"MIT License | github.com/docxology/itrace | DOI {VERSION_DOI}"
 NO_REFERENCE_DEVICE_BOUNDARY = "no reference-device claim"
 
 

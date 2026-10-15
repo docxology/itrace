@@ -13,6 +13,7 @@ import numpy as np
 from .. import empirical, experiments, io, pipeline
 from ..calibration import AffineCalibration
 from ..capture import CaptureSample, samples_to_streams, write_capture_records_csv
+from ..config import AnalysisConfig
 from ..reporting import error_session_report_dict, partial_session_report_dict, session_report_dict
 
 SESSION_PREFIX = "local_pilot"
@@ -139,7 +140,7 @@ class LiveState:
             self.experiment_replicate_id = None
             self.experiment_output_dir = None
 
-    def export(self) -> dict[str, str]:
+    def export(self, *, config: AnalysisConfig | None = None) -> dict[str, str]:
         """Write CSV/JSON artifacts for the current session."""
         if self.output_dir is None:
             msg = "No output directory configured for this live session"
@@ -155,25 +156,30 @@ class LiveState:
         pupil_path = self.output_dir / "live_pupil.csv"
         records_path = self.output_dir / "live_capture_records.csv"
         report_path = self.output_dir / "live_report.json"
+        resolved = config or AnalysisConfig()
 
         io.write_gaze_csv(gaze, gaze_path)
         io.write_pupil_csv(pupil, pupil_path)
         write_capture_records_csv(samples, records_path)
         if len(samples) >= 3:
             try:
-                report_payload = session_report_dict(pipeline.analyze_session(gaze, pupil))
+                report_payload = session_report_dict(
+                    pipeline.analyze_session(gaze, pupil, config=resolved)
+                )
             except ValueError as exc:
                 report_payload = error_session_report_dict(
                     n_samples=len(samples),
                     duration_s=float(gaze.t[-1] - gaze.t[0]) if len(gaze) >= 2 else 0.0,
                     quality={},
                     error=str(exc),
+                    config=resolved.to_dict(),
                 )
         else:
             report_payload = partial_session_report_dict(
                 n_samples=len(samples),
                 duration_s=float(gaze.t[-1] - gaze.t[0]) if len(gaze) >= 2 else 0.0,
                 quality={},
+                config=resolved.to_dict(),
             )
         report_path.write_text(json.dumps(report_payload, indent=2), encoding="utf-8")
         paths = {

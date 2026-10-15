@@ -33,6 +33,19 @@ NumericReportDict: TypeAlias = dict[str, float]
 ReportPayload: TypeAlias = dict[str, object]
 
 
+def validate_timestamps(t: FloatArray) -> None:
+    """Require a finite, one-dimensional, strictly increasing analysis clock."""
+    if t.ndim != 1 or not np.all(np.isfinite(t)) or np.any(np.diff(t) <= 0.0):
+        msg = "timestamps must be finite, 1-D, and strictly increasing"
+        raise ValueError(msg)
+
+
+def _snapshot(values: FloatArray) -> FloatArray:
+    result = np.array(values, dtype=np.float64, copy=True)
+    result.flags.writeable = False
+    return result
+
+
 class EventType(str, Enum):
     """Oculomotor event categories (REMoDNaV-compatible)."""
 
@@ -216,9 +229,9 @@ class GazeStream:
     y: FloatArray
 
     def __post_init__(self) -> None:
-        t = np.asarray(self.t, dtype=np.float64)
-        x = np.asarray(self.x, dtype=np.float64)
-        y = np.asarray(self.y, dtype=np.float64)
+        t = _snapshot(self.t)
+        x = _snapshot(self.x)
+        y = _snapshot(self.y)
         if not (t.shape == x.shape == y.shape):
             msg = (
                 f"GazeStream requires equal-length t/x/y; got t={t.shape}, x={x.shape}, y={y.shape}"
@@ -238,6 +251,7 @@ class GazeStream:
     @property
     def sampling_rate_hz(self) -> float:
         """Median sampling rate inferred from timestamps."""
+        validate_timestamps(self.t)
         if len(self) < 2:
             msg = "Need >=2 samples to infer sampling rate"
             raise ValueError(msg)
@@ -257,13 +271,16 @@ class PupilStream:
     unit: PupilUnit = PupilUnit.RELATIVE
 
     def __post_init__(self) -> None:
-        t = np.asarray(self.t, dtype=np.float64)
-        size = np.asarray(self.size, dtype=np.float64)
+        t = _snapshot(self.t)
+        size = _snapshot(self.size)
         if t.shape != size.shape:
             msg = f"PupilStream requires equal-length t/size; got {t.shape} vs {size.shape}"
             raise ValueError(msg)
         if t.ndim != 1:
             msg = f"PupilStream arrays must be 1-D; got ndim={t.ndim}"
+            raise ValueError(msg)
+        if not isinstance(self.unit, PupilUnit):
+            msg = "PupilStream unit must be a PupilUnit"
             raise ValueError(msg)
         object.__setattr__(self, "t", t)
         object.__setattr__(self, "size", size)

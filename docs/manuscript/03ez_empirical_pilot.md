@@ -18,6 +18,11 @@ the session metrics as follows: finite-gaze fraction
 render path leaves each field explicitly unavailable rather than filling a
 guessed value.
 
+The development refresh retains the recorded empirical summary ledgers. The
+local derived session exports are not bundled in this checkout, so regenerating
+figures from those ledgers reproduces the recorded summary rather than a new
+empirical acquisition or reanalysis of the original records.
+
 ![N=1 empirical session summary generated from the derived experiment report. The cards report finite-gaze fraction, sampling rate, sampling regularity, drift, held-out target residuals, and target acquisition latency as order-of-magnitude session diagnostics when a local pilot export exists; pending fields remain visible before recording. The figure demonstrates the package workflow and current-session quality ledger, not reference-device validation.](../../output/figures/empirical_pilot_summary.png){#fig:empirical-pilot width=100%}
 
 For adding more data, the release path now uses

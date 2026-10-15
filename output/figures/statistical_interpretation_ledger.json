@@ -8,7 +8,7 @@
     "noise_metrics": "output/figures/noise_metrics.json",
     "empirical_metrics": "docs/empirical_pilot_metrics.json"
   },
-  "empirical_available": false,
+  "empirical_available": true,
   "rows": [
     {
       "id": "robust_amplitude_shape",

@@ -48,9 +48,6 @@
 \makeatletter
 \patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
 \makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
 \newsavebox\pandoc@box
@@ -178,7 +175,7 @@
 gaze, saccade, and pupil analysis}
 \author{Daniel Ari Friedman (Active Inference Institute; ORCID:
 0000-0001-6232-9096)}
-\date{June 9, 2026}
+\date{October 15, 2026}
 
 \begin{document}
 \maketitle
@@ -215,13 +212,13 @@ velocity-thresholded saccade recovery falls below F1 = 0.8 near sigma
 because its noise-sweep robustness follows from the modelling assumption
 used to inject pupil noise. iTrace also ships a typer CLI, Streamlit
 dashboard, local HTML/WebSocket orchestrator, guided derived-record
-empirical workflow, and publication-figure scripts, all under 547 tests
-at 90.21\% coverage. Its contribution is not a claim that webcams are
+empirical workflow, and publication-figure scripts, all under 692 tests
+at 91.07\% coverage. Its contribution is not a claim that webcams are
 validated eye trackers; it is a verification-first reference
 implementation whose evidence boundaries are visible in the code,
 figures, reports, and manuscript. iTrace is MIT-licensed and openly
 released at https://github.com/docxology/itrace, with this version
-archived at DOI 10.5281/zenodo.20614909 (concept DOI
+archived at DOI 10.5281/zenodo.23403300 (concept DOI
 10.5281/zenodo.20614908 resolves to the latest version).
 
 \section{Introduction}\label{sec:introduction}
@@ -433,7 +430,7 @@ The geometry layer turns raw image measurements into calibrated
 quantities in degrees of visual angle (dva). Pixel offsets from screen
 centre are converted by the exact relation
 
-\begin{equation}\protect\phantomsection\label{eq:pix2deg}{ \theta = \arctan(s_\text{cm} / d_\text{cm}) }\end{equation}
+\begin{equation}\protect\phantomsection\label{eq:pix2deg}{\theta = \arctan(s_\text{cm} / d_\text{cm})}\end{equation}
 
 where \(s_{\mathrm{cm}}\) is the offset in centimetres (pixels times the
 screen's cm-per-pixel) and \(d_{\mathrm{cm}}\) the viewing distance. The
@@ -444,7 +441,7 @@ tolerance.
 For appearance-based capture, normalised iris displacement within the
 eye aperture is mapped to eyeball rotation through a sphere model,
 
-\begin{equation}\protect\phantomsection\label{eq:iris}{ \theta_{\mathrm{gaze}} = \arcsin\!\big(o \cdot \sin\theta_{\max}\big) }\end{equation}
+\begin{equation}\protect\phantomsection\label{eq:iris}{\theta_{\mathrm{gaze}} = \arcsin\!\big(o \cdot \sin\theta_{\max}\big)}\end{equation}
 
 with \(o \in [-1, 1]\) the normalised iris offset and \(\theta_{\max}\)
 the angle at full deflection; the map (eq.~\ref{eq:iris}) is monotone
@@ -473,6 +470,14 @@ timestamps a central-difference gradient is taken on the actual time
 vector. Two-dimensional speed is the Euclidean norm of the per-axis
 velocities.
 
+The default velocity dispatcher checks timestamp spacing before
+selecting its estimator: intervals constant within a relative tolerance
+of 0.001 use the uniform path; irregular intervals use the actual time
+vector. Differentiation rejects nonfinite, duplicate, and decreasing
+timestamps. Stream containers retain such clocks for quality
+diagnostics, but they cannot be treated as valid timing for event
+dynamics.
+
 \subsection{Fixations and saccades (I-VT,
 I-DT)}\label{fixations-and-saccades-i-vt-i-dt}
 
@@ -483,14 +488,15 @@ runs shorter than a minimum duration are reabsorbed into the surrounding
 fixation, suppressing single-sample velocity spikes. In noisy or
 intermittently tracked streams the configurable \texttt{merge\_gap\_s}
 parameter optionally bridges short subthreshold holes inside one
-high-velocity movement before the duration filter is applied; this
-prevents a brief landmark dropout or low-velocity plateau from
-fragmenting one saccade into several events while leaving the historical
-default at zero for exact backward compatibility. \textbf{I-DT}
+high-velocity movement before the duration filter is applied. Only
+finite, analysable samples can be bridged; missing gaze and nonfinite
+velocity split the candidate intervals and are never labelled as
+fixations. The historical merge default remains zero. \textbf{I-DT}
 (\citeproc{ref-salvucci2000identifying}{Salvucci and Goldberg 2000})
 greedily extends a window while its spatial dispersion
 \((\max x - \min x) + (\max y - \min y)\) stays below threshold,
-emitting one fixation per maximal low-dispersion window.
+emitting one fixation per maximal low-dispersion window. It likewise
+splits windows at nonfinite gaze samples.
 
 \subsection{Microsaccades
 (Engbert--Kliegl)}\label{microsaccades-engbertkliegl}
@@ -499,7 +505,7 @@ Microsaccades follow Engbert and Kliegl
 (\citeproc{ref-engbert2003microsaccades}{2003}). Velocity uses their
 five-sample moving-average estimator, and a per-axis elliptic threshold
 
-\begin{equation}\protect\phantomsection\label{eq:ek}{ (v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1 }\end{equation}
+\begin{equation}\protect\phantomsection\label{eq:ek}{(v_x / \eta_x)^2 + (v_y / \eta_y)^2 > 1}\end{equation}
 
 (eq.~\ref{eq:ek}) flags an event when held for at least a minimum number
 of samples. The threshold \(\eta = \lambda\sigma\) uses the
@@ -519,7 +525,7 @@ velocity. The amplitude--peak-velocity relationship --- the \emph{main
 sequence} --- is fit to two standard parameterisations: a saturating
 exponential
 
-\begin{equation}\protect\phantomsection\label{eq:mainseq}{ V = V_{\max}\,\big(1 - e^{-A/C}\big) }\end{equation}
+\begin{equation}\protect\phantomsection\label{eq:mainseq}{V = V_{\max}\,\big(1 - e^{-A/C}\big)}\end{equation}
 
 (eq.~\ref{eq:mainseq}; Bahill et al.
 (\citeproc{ref-bahill1975main}{1975})) by non-linear least squares, and
@@ -548,30 +554,39 @@ reporting, and transparent preprocessing records
 (\citeproc{ref-zhang2026pupeyes}{Zhang and Jonides 2026};
 \citeproc{ref-mittner2020pypillometry}{Mittner 2020}). Blinks are
 detected as runs of NaN or sub-threshold samples and removed by linear
-interpolation with edge padding, so the partial-occlusion ramp on either
-side of a closure does not leak into the signal; a trace with no valid
-samples is reported as unusable rather than silently flattened to a
-constant. Outliers are flagged by the scaled median absolute deviation
+interpolation with edge padding, using elapsed timestamps rather than
+sample indices, so the partial-occlusion ramp on either side of a
+closure does not leak into the signal; a trace with no valid samples is
+reported as unusable rather than silently flattened to a constant. The
+same rejection applies when padding removes every interpolation anchor.
+Outliers are flagged by the scaled median absolute deviation
 (\(1.4826\,\mathrm{MAD}\)), which is robust to the very spikes it must
-catch. The deblinked trace is low-pass filtered with a deterministic
-zero-phase Butterworth implementation choice (with a short-trace
-moving-average fallback)
+catch; when MAD is zero, finite deviations from the median are flagged
+explicitly. The deblinked trace is low-pass filtered with a
+deterministic zero-phase Butterworth implementation choice (with a
+short-trace moving-average fallback)
 (\citeproc{ref-butterworth1930theory}{Butterworth 1930}) and
 baseline-corrected, subtractively or divisively, against a chosen
-pre-event time window.
+pre-event time window. The short-trace fallback uses edge padding and a
+bounded odd window so it preserves length and constant input. The actual
+second-order-section padding requirement determines whether Butterworth
+filtering is available. A cutoff at or above Nyquist also uses the
+moving-average fallback; that output is not represented as
+Butterworth-filtered.
 
 The runtime \texttt{PupilConfig} now controls the same decisions the
 standalone functions expose: the low-confidence pupil threshold,
-interpolation padding, and Butterworth cutoff/order. Reports include
-both cleaned-signal summaries (mean/standard deviation/min/max, phase
-peak and trough counts) and raw-quality summaries (valid fraction, blink
-fraction/count, median sample interval, peak dilation velocity, and peak
-constriction velocity). The live webcam pupil channel therefore remains
-a relative proxy, but the analysis path records how much of the trace
-was usable and how strongly the cleaned pupil changed over time.
-Brightness and contrast effects are not modelled away in this version;
-tools such as Open-DPSM show why dynamic visual confounds need explicit
-modelling when pupil size is interpreted cognitively
+interpolation padding, and Butterworth cutoff/order and the fallback
+window (\texttt{smooth\_window}). Reports include both cleaned-signal
+summaries (mean/standard deviation/min/max, phase peak and trough
+counts) and raw-quality summaries (valid fraction, blink fraction/count,
+median sample interval, peak dilation velocity, and peak constriction
+velocity). The live webcam pupil channel therefore remains a relative
+proxy, but the analysis path records how much of the trace was usable
+and how strongly the cleaned pupil changed over time. Brightness and
+contrast effects are not modelled away in this version; tools such as
+Open-DPSM show why dynamic visual confounds need explicit modelling when
+pupil size is interpreted cognitively
 (\citeproc{ref-cai2024opendpsm}{Cai et al. 2024}).
 
 The separate \texttt{pupilseg} module covers a narrower, testable
@@ -596,6 +611,11 @@ Causality is not merely asserted but verified: feeding the detector a
 prefix of a signal reproduces exactly the labels it assigns to that
 prefix in a full run, proving no future sample influences a past label
 (sec.~\ref{sec:pupilresults}).
+
+This causality statement applies to \texttt{PhaseDetector} itself. Blink
+interpolation and zero-phase filtering use surrounding samples; the
+offline pupil pipeline and the rolling reanalysis displayed by the live
+dashboard are not causal filters.
 
 \section{Methods: the capture shell}\label{sec:capture}
 
@@ -1165,7 +1185,17 @@ evidence boundaries; it is not a validation figure for webcam accuracy.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Graphical abstract of the iTrace eye-to-code evidence pipeline. A stylized observed eye feeds typed gaze, saccade, pupil, and quality records into the pure Python core, which then produces reports, figures, and live displays from Python-computed payloads. Three badges summarise the current verification gate, the five-session diagnostic v1 release scope, and the no-reference-device-claim boundary. The footer states MIT License, github.com/docxology/itrace, and the Zenodo DOI 10.5281/zenodo.20614909; the figure describes architecture and evidence boundaries, not webcam accuracy validation.}]{../../output/figures/graphical_abstract.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Graphical
+abstract of the iTrace eye-to-code evidence pipeline. A stylized
+observed eye feeds typed gaze, saccade, pupil, and quality records into
+the pure Python core, which then produces reports, figures, and live
+displays from Python-computed payloads. Three badges summarise the
+current verification gate, the five-session diagnostic v1 release scope,
+and the no-reference-device-claim boundary. The footer states MIT
+License, github.com/docxology/itrace, and the Zenodo DOI
+10.5281/zenodo.23403300; the figure describes architecture and evidence
+boundaries, not webcam accuracy
+validation.}]{../../output/figures/graphical_abstract.png}
 \caption{Graphical abstract of the iTrace eye-to-code evidence pipeline.
 A stylized observed eye feeds typed gaze, saccade, pupil, and quality
 records into the pure Python core, which then produces reports, figures,
@@ -1173,7 +1203,7 @@ and live displays from Python-computed payloads. Three badges summarise
 the current verification gate, the five-session diagnostic v1 release
 scope, and the no-reference-device-claim boundary. The footer states MIT
 License, github.com/docxology/itrace, and the Zenodo DOI
-10.5281/zenodo.20614909; the figure describes architecture and evidence
+10.5281/zenodo.23403300; the figure describes architecture and evidence
 boundaries, not webcam accuracy
 validation.}\label{fig:graphical-abstract}
 \end{figure}
@@ -1220,7 +1250,15 @@ physiological 0.4--0.9 range (fig.~\ref{fig:mainseq}).
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Main-sequence recovery from a synthetic multi-amplitude recording. Panel A plots detected saccades by amplitude, peak velocity, and direction, with the fitted saturating curve and recovered parameters. Panel B repeats the same detections on log-log axes with the fitted power law, making the exponent and goodness-of-fit explicit. The evidence is recovery of a seeded synthetic relationship and detector property extraction; it is not a physiological population estimate or real-device validation.}]{../../output/figures/main_sequence.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Main-sequence
+recovery from a synthetic multi-amplitude recording. Panel A plots
+detected saccades by amplitude, peak velocity, and direction, with the
+fitted saturating curve and recovered parameters. Panel B repeats the
+same detections on log-log axes with the fitted power law, making the
+exponent and goodness-of-fit explicit. The evidence is recovery of a
+seeded synthetic relationship and detector property extraction; it is
+not a physiological population estimate or real-device
+validation.}]{../../output/figures/main_sequence.png}
 \caption{Main-sequence recovery from a synthetic multi-amplitude
 recording. Panel A plots detected saccades by amplitude, peak velocity,
 and direction, with the fitted saturating curve and recovered
@@ -1257,7 +1295,14 @@ sessions are summarised as polar histograms (fig.~\ref{fig:polar}).
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\linewidth,height=\textheight,keepaspectratio,alt={Saccade direction distribution over the synthetic multi-saccade recording. The polar convention is printed in the figure (0° = right, +90° = up), bars encode counts over 16 angular bins, and the orange resultant vector summarises directional balance. The panel verifies the package-wide direction convention and recovered event directions on synthetic data; it does not infer natural viewing bias.}]{../../output/figures/direction_polar.png}
+\includegraphics[width=0.75\linewidth,height=\textheight,keepaspectratio,alt={Saccade
+direction distribution over the synthetic multi-saccade recording. The
+polar convention is printed in the figure (0° = right, +90° = up), bars
+encode counts over 16 angular bins, and the orange resultant vector
+summarises directional balance. The panel verifies the package-wide
+direction convention and recovered event directions on synthetic data;
+it does not infer natural viewing
+bias.}]{../../output/figures/direction_polar.png}
 \caption{Saccade direction distribution over the synthetic multi-saccade
 recording. The polar convention is printed in the figure (0° = right,
 +90° = up), bars encode counts over 16 angular bins, and the orange
@@ -1296,7 +1341,15 @@ system.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Closed-loop recovery on the default synthetic scene. Panel A shows the projected binocular landmark geometry and the two iris-centre paths. Panel B overlays true and recovered yaw/pitch, with scripted and detected saccade intervals shaded. Panel C overlays true and recovered pupil dynamics after normalisation, with the blink interval shaded. The figure verifies consistency between an independent 3-D generator and the estimator; shared idealisations mean the residual is a lower bound, not a measured webcam error.}]{../../output/figures/closed_loop_summary.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Closed-loop
+recovery on the default synthetic scene. Panel A shows the projected
+binocular landmark geometry and the two iris-centre paths. Panel B
+overlays true and recovered yaw/pitch, with scripted and detected
+saccade intervals shaded. Panel C overlays true and recovered pupil
+dynamics after normalisation, with the blink interval shaded. The figure
+verifies consistency between an independent 3-D generator and the
+estimator; shared idealisations mean the residual is a lower bound, not
+a measured webcam error.}]{../../output/figures/closed_loop_summary.png}
 \caption{Closed-loop recovery on the default synthetic scene. Panel A
 shows the projected binocular landmark geometry and the two iris-centre
 paths. Panel B overlays true and recovered yaw/pitch, with scripted and
@@ -1313,7 +1366,14 @@ floating 3-D eyeball orbs (fig.~\ref{fig:orbs}).
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Synthetic truth and recovered signals rendered together. The 3-D panel shows the true eyeball orientation, gaze rays, iris, and pupil state at one representative frame; the trace panels repeat the recovered yaw, pitch, and pupil signals with true values, saccades, and the blink interval visible for audit. This panel is a visual audit of the synthetic scene and recovery path, not evidence from a recorded participant.}]{../../output/figures/eye_orbs_still.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Synthetic
+truth and recovered signals rendered together. The 3-D panel shows the
+true eyeball orientation, gaze rays, iris, and pupil state at one
+representative frame; the trace panels repeat the recovered yaw, pitch,
+and pupil signals with true values, saccades, and the blink interval
+visible for audit. This panel is a visual audit of the synthetic scene
+and recovery path, not evidence from a recorded
+participant.}]{../../output/figures/eye_orbs_still.png}
 \caption{Synthetic truth and recovered signals rendered together. The
 3-D panel shows the true eyeball orientation, gaze rays, iris, and pupil
 state at one representative frame; the trace panels repeat the recovered
@@ -1328,7 +1388,7 @@ participant.}\label{fig:orbs}
 Sweeping the landmark-noise standard deviation \(\sigma\) from 0 to
 0.016 (normalised image units), 25 seeded trials per level, gives a
 clear and differentiated degradation of the three signals
-(fig.~\ref{fig:power}, tbl.~1). The sweep is intentionally
+(fig.~\ref{fig:power}, tbl.~\ref{tbl:noise}). The sweep is intentionally
 idealised: it injects independent landmark noise into the same synthetic
 scene rather than replaying real MediaPipe failures, so its value is to
 rank algorithmic fragilities under controlled perturbation.
@@ -1371,7 +1431,17 @@ reference-device gaze accuracy.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Recovery vs idealised webcam observation noise. Each panel reports the Monte-Carlo mean and 95\% bootstrap confidence band for one recovered signal, with the manuscript usability bound drawn as a horizontal line and the interpolated bound crossing annotated in both normalised σ and approximate pixels at 640 px width. Colour, marker, and line style all encode the signal so the figure remains legible in greyscale. The figure supports an algorithmic fragility ordering under iid landmark perturbations; it does not measure MediaPipe, lens, illumination, head-pose, or calibration error on real frames.}]{../../output/figures/noise_power.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Recovery
+vs idealised webcam observation noise. Each panel reports the
+Monte-Carlo mean and 95\% bootstrap confidence band for one recovered
+signal, with the manuscript usability bound drawn as a horizontal line
+and the interpolated bound crossing annotated in both normalised σ and
+approximate pixels at 640 px width. Colour, marker, and line style all
+encode the signal so the figure remains legible in greyscale. The figure
+supports an algorithmic fragility ordering under iid landmark
+perturbations; it does not measure MediaPipe, lens, illumination,
+head-pose, or calibration error on real
+frames.}]{../../output/figures/noise_power.png}
 \caption{Recovery vs idealised webcam observation noise. Each panel
 reports the Monte-Carlo mean and 95\% bootstrap confidence band for one
 recovered signal, with the manuscript usability bound drawn as a
@@ -1385,7 +1455,7 @@ frames.}\label{fig:power}
 \end{figure}
 
 The same numbers, with per-cell uncertainty, are the generated
-statistics table (tbl.~1); it and the figure are generated
+statistics table (tbl.~\ref{tbl:noise}); it and the figure are generated
 from one sweep so they never drift. (Snapshot at \(n=25\); regenerate
 with \texttt{scripts/generate\_power\_figure.py}.)
 
@@ -1448,23 +1518,32 @@ and the published algorithm definitions, so agreement is evidence the
 implementation matches the algorithm, not that two copies of one mistake
 agree.
 
-The complete toolchain is green and reproducible: 547 no-mocks tests
-pass with 90.21\% statement-and-branch coverage, \texttt{ruff} and
+The complete toolchain is green and reproducible: 692 no-mocks tests
+pass with 91.07\% statement-and-branch coverage, \texttt{ruff} and
 \texttt{ruff\ format} report no issues, and \texttt{mypy\ -\/-strict}
 finds no type errors across the source tree. The test count, coverage,
 version, gate date, and render evidence are stored once in
 \texttt{docs/verification\_metrics.json}; the manuscript renderer
 hydrates these tokens from that JSON so stale literal metrics are caught
-by tests rather than silently carried into public artifacts. Every
-synthetic generator and every Monte-Carlo trial is explicitly seeded
-with \texttt{numpy.random.default\_rng}, so each figure and table number
-is reproducible byte-for-byte from a clean checkout --- re-running the
-figure pipeline twice produces identical PNGs, and the noise sweep of
-sec.~\ref{sec:noiseresults} reproduces its table cells exactly. No test
-mocks a computation: detectors run on real arrays with known ground
-truth, file I/O uses real temporary files, and figures are asserted to
-write non-empty PNGs. The full module map, dependency contract, and test
-strategy are in sec.~\ref{sec:software}.
+by tests rather than silently carried into public artifacts. The
+historical release ledger is preserved separately at
+\texttt{docs/releases/v0.4.1-verification.json}; dated audit evidence is
+not rewritten to impersonate a new execution. \texttt{scripts/verify.py}
+records individual exit codes, combined logs, runtime prefixes, a source
+digest, JUnit results, and machine-readable coverage in a new evidence
+directory, stopping at the first failed gate. CI exercises the
+development gates and a separate core-only test matrix, and checks an
+installed wheel outside the source import path.
+
+Every synthetic generator and every Monte-Carlo trial is explicitly
+seeded with \texttt{numpy.random.default\_rng}, so each figure and table
+number is reproducible byte-for-byte from a clean checkout ---
+re-running the figure pipeline twice produces identical PNGs, and the
+noise sweep of sec.~\ref{sec:noiseresults} reproduces its table cells
+exactly. No test mocks a computation: detectors run on real arrays with
+known ground truth, file I/O uses real temporary files, and figures are
+asserted to write non-empty PNGs. The full module map, dependency
+contract, and test strategy are in sec.~\ref{sec:software}.
 
 The documentation and visualization layer now follows the same evidence
 rule. \texttt{docs/TRACEABILITY\_MATRIX.json} maps each public
@@ -1532,9 +1611,23 @@ latency \textbf{0.72 s median}. The values are stored in
 absent, the same render path leaves each field explicitly unavailable
 rather than filling a guessed value.
 
+The development refresh retains the recorded empirical summary ledgers.
+The local derived session exports are not bundled in this checkout, so
+regenerating figures from those ledgers reproduces the recorded summary
+rather than a new empirical acquisition or reanalysis of the original
+records.
+
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={N=1 empirical session summary generated from the derived experiment report. The cards report finite-gaze fraction, sampling rate, sampling regularity, drift, held-out target residuals, and target acquisition latency as order-of-magnitude session diagnostics when a local pilot export exists; pending fields remain visible before recording. The figure demonstrates the package workflow and current-session quality ledger, not reference-device validation.}]{../../output/figures/empirical_pilot_summary.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={N=1
+empirical session summary generated from the derived experiment report.
+The cards report finite-gaze fraction, sampling rate, sampling
+regularity, drift, held-out target residuals, and target acquisition
+latency as order-of-magnitude session diagnostics when a local pilot
+export exists; pending fields remain visible before recording. The
+figure demonstrates the package workflow and current-session quality
+ledger, not reference-device
+validation.}]{../../output/figures/empirical_pilot_summary.png}
 \caption{N=1 empirical session summary generated from the derived
 experiment report. The cards report finite-gaze fraction, sampling rate,
 sampling regularity, drift, held-out target residuals, and target
@@ -1581,7 +1674,15 @@ by a valid artifact.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Empirical-session intake summary generated from docs/empirical\_sessions\_manifest.json. The figure reports available sessions, distinct replicates, conditions, reference-evidence count, participant/device scope, held-out residual scale, finite-gaze fraction, total derived samples, and current diagnostic-v1 status. The five-session prompt-only ledger is sufficient for diagnostic v1 readiness while population, cross-device, and device-accuracy claims remain future reference-backed validation scope.}]{../../output/figures/empirical_sessions_summary.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Empirical-session
+intake summary generated from docs/empirical\_sessions\_manifest.json.
+The figure reports available sessions, distinct replicates, conditions,
+reference-evidence count, participant/device scope, held-out residual
+scale, finite-gaze fraction, total derived samples, and current
+diagnostic-v1 status. The five-session prompt-only ledger is sufficient
+for diagnostic v1 readiness while population, cross-device, and
+device-accuracy claims remain future reference-backed validation
+scope.}]{../../output/figures/empirical_sessions_summary.png}
 \caption{Empirical-session intake summary generated from
 \protect\texttt{docs/empirical\_sessions\_manifest.json}. The figure
 reports available sessions, distinct replicates, conditions,
@@ -1673,7 +1774,16 @@ protocol; it is not physiological saccade latency. \\
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Synthetic-to-empirical range bridge generated from output/figures/synthetic\_empirical\_range\_bridge.json. The rows place N=1 empirical session values beside synthetic-domain summaries, idealized landmark-noise sweep values, or descriptive statistical diagnostics, and each row is labelled as observed local scale, stress-domain only, or not directly comparable. The figure uses the pilot to contextualize synthetic defaults and stress ranges; it does not validate device accuracy, device performance, or webcam generality.}]{../../output/figures/synthetic_empirical_range_bridge.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Synthetic-to-empirical
+range bridge generated from
+output/figures/synthetic\_empirical\_range\_bridge.json. The rows place
+N=1 empirical session values beside synthetic-domain summaries,
+idealized landmark-noise sweep values, or descriptive statistical
+diagnostics, and each row is labelled as observed local scale,
+stress-domain only, or not directly comparable. The figure uses the
+pilot to contextualize synthetic defaults and stress ranges; it does not
+validate device accuracy, device performance, or webcam
+generality.}]{../../output/figures/synthetic_empirical_range_bridge.png}
 \caption{Synthetic-to-empirical range bridge generated from
 \protect\texttt{output/figures/synthetic\_empirical\_range\_bridge.json}.
 The rows place N=1 empirical session values beside synthetic-domain
@@ -1765,7 +1875,23 @@ untracked matplotlib-only calculation.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Statistical diagnostics over a deterministic synthetic session. Panel A ranks amplitude-distribution families by delta AIC while carrying Akaike weights, AICc, BIC, Kolmogorov-Smirnov descriptors, bootstrap lowest-AIC winner stability, robust median/IQR shape summaries with seeded bootstrap intervals, Bowley quartile skewness, and IQR outside-value counts; panel B plots empirical amplitude quantiles against fitted quantiles for the lowest-AIC family, reports QQ residual scale, and adds a P-P/CDF residual inset with integrated and Anderson-Darling-style tail-weighted CDF distances plus a DKW/Massart reference band; panel C shows the seeded bootstrap interval for the main-sequence exponent; panel D overlays fixation centroids with a BCEA-style ellipse and spatial-spread summaries; panel E renders the row-normalised scanpath transition matrix. The figure visualizes tested core descriptors and relative model diagnostics, not real-eye accuracy, population inference, or proof that a fitted family is true.}]{../../output/figures/statistical_diagnostics.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Statistical
+diagnostics over a deterministic synthetic session. Panel A ranks
+amplitude-distribution families by delta AIC while carrying Akaike
+weights, AICc, BIC, Kolmogorov-Smirnov descriptors, bootstrap lowest-AIC
+winner stability, robust median/IQR shape summaries with seeded
+bootstrap intervals, Bowley quartile skewness, and IQR outside-value
+counts; panel B plots empirical amplitude quantiles against fitted
+quantiles for the lowest-AIC family, reports QQ residual scale, and adds
+a P-P/CDF residual inset with integrated and Anderson-Darling-style
+tail-weighted CDF distances plus a DKW/Massart reference band; panel C
+shows the seeded bootstrap interval for the main-sequence exponent;
+panel D overlays fixation centroids with a BCEA-style ellipse and
+spatial-spread summaries; panel E renders the row-normalised scanpath
+transition matrix. The figure visualizes tested core descriptors and
+relative model diagnostics, not real-eye accuracy, population inference,
+or proof that a fitted family is
+true.}]{../../output/figures/statistical_diagnostics.png}
 \caption{Statistical diagnostics over a deterministic synthetic session.
 Panel A ranks amplitude-distribution families by delta AIC while
 carrying Akaike weights, AICc, BIC, Kolmogorov-Smirnov descriptors,
@@ -1798,7 +1924,18 @@ rather than device validation.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Statistical interpretation ledger generated from output/figures/statistical\_interpretation\_ledger.json. The rows map robust shape summaries, relative distribution comparison, CDF residual checks, bootstrap main-sequence uncertainty, spatial descriptors, scanpath transitions, idealized noise sensitivity, and the synthetic-to-empirical range bridge to their source artifacts, estimands, and explicit non-claims. The figure improves statistical readability without adding new evidence; it states what each statistic does not prove, including population physiology, posterior model truth, real-eye accuracy, and device validation.}]{../../output/figures/statistical_interpretation_ledger.png}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Statistical
+interpretation ledger generated from
+output/figures/statistical\_interpretation\_ledger.json. The rows map
+robust shape summaries, relative distribution comparison, CDF residual
+checks, bootstrap main-sequence uncertainty, spatial descriptors,
+scanpath transitions, idealized noise sensitivity, and the
+synthetic-to-empirical range bridge to their source artifacts,
+estimands, and explicit non-claims. The figure improves statistical
+readability without adding new evidence; it states what each statistic
+does not prove, including population physiology, posterior model truth,
+real-eye accuracy, and device
+validation.}]{../../output/figures/statistical_interpretation_ledger.png}
 \caption{Statistical interpretation ledger generated from
 \protect\texttt{output/figures/statistical\_interpretation\_ledger.json}.
 The rows map robust shape summaries, relative distribution comparison,
@@ -1977,7 +2114,7 @@ pilot shows what one ordinary live run looked like in sampling rate,
 sampling regularity, drift, prompted-target residuals, and target
 acquisition latency. Those numbers are therefore best read as context
 for expectations and future benchmarks, not as population estimates. In
-practical terms, tbl.~2 and
+practical terms, tbl.~\ref{tbl:empirical-synthetic-range} and
 fig.~\ref{fig:synthetic-empirical-range-bridge} separate which synthetic
 defaults are contextualized by a local demonstration from which remain
 deliberate stress ranges: clean finite capture and webcam-rate timing
@@ -2402,38 +2539,6 @@ Estimation.''} \emph{arXiv Preprint arXiv:1711.09017}, ahead of print.
 
 \end{CSLReferences}
 
-\section{docs/manuscript/ --- Agent
-Notes}\label{docsmanuscript-agent-notes}
-
-iTrace methods-paper manuscript source: numbered section markdown
-(abstract, introduction, architecture, geometry, velocity/events,
-dynamics, pupillometry, capture shell, forward/noise models, statistics,
-detection, results, limitations\ldots), config, references, plus LaTeX
-intermediates (\texttt{\_build.*}, \texttt{\_render\_preamble.tex})
-which are GENERATED --- regenerate via the render pipeline, do not edit
-\texttt{\_build} files directly. Page previews land in
-\texttt{../output/pdf\_preview/}.
-
-\section{Manuscript Status}\label{manuscript-status}
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Project:} itrace
-\item
-  \textbf{Manuscript title:} iTrace: an algorithmically verified
-  open-source core for webcam gaze, saccade, and pupil analysis
-\item
-  \textbf{Location:} \texttt{docs/manuscript/} --- the sole manuscript
-  directory in this repo (migrated from the legacy repo-root
-  \texttt{manuscript/}; no \texttt{infrastructure.*} module exists here)
-\item
-  \textbf{Type:} Active publication-target manuscript (25 section files)
-\item
-  \textbf{Status file purpose:} Tracks publication-readiness of the
-  manuscript content in this directory.
-\end{itemize}
-
 \section{Supplement S1: statistical methods}\label{sec:statmethods}
 
 This supplement gives the full statistical detail behind
@@ -2499,7 +2604,7 @@ physical units uses \texttt{sigma\_to\_pixels(σ,\ image\_width)}
 
 \subsection{One source of truth}\label{one-source-of-truth}
 
-The figure (fig.~\ref{fig:power}) and the table (tbl.~1)
+The figure (fig.~\ref{fig:power}) and the table (tbl.~\ref{tbl:noise})
 are both rendered from a single \texttt{NoiseSweepResult} via
 \texttt{power.summary\_records} / \texttt{format\_summary\_markdown}, so
 prose, plot, and table cannot drift apart --- verified by a

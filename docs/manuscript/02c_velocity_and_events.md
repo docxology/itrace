@@ -10,6 +10,13 @@ exceeding the trace. For non-uniform timestamps a
 central-difference gradient is taken on the actual time vector. Two-dimensional
 speed is the Euclidean norm of the per-axis velocities.
 
+The default velocity dispatcher checks timestamp spacing before selecting its
+estimator: intervals constant within a relative tolerance of 0.001 use the
+uniform path; irregular intervals use the actual time vector. Differentiation
+rejects nonfinite, duplicate, and decreasing timestamps. Stream containers retain
+such clocks for quality diagnostics, but they cannot be treated as valid timing
+for event dynamics.
+
 ## Fixations and saccades (I-VT, I-DT)
 
 **I-VT** [@salvucci2000identifying] labels each sample saccadic when its 2-D
@@ -18,12 +25,13 @@ events; runs shorter than a minimum duration are reabsorbed into the surrounding
 fixation, suppressing single-sample velocity spikes. In noisy or intermittently
 tracked streams the configurable `merge_gap_s` parameter optionally bridges short
 subthreshold holes inside one high-velocity movement before the duration filter
-is applied; this prevents a brief landmark dropout or low-velocity plateau from
-fragmenting one saccade into several events while leaving the historical default
-at zero for exact backward compatibility. **I-DT**
+is applied. Only finite, analysable samples can be bridged; missing gaze and
+nonfinite velocity split the candidate intervals and are never labelled as
+fixations. The historical merge default remains zero. **I-DT**
 [@salvucci2000identifying] greedily extends a window while its spatial dispersion
 $(\max x - \min x) + (\max y - \min y)$ stays below threshold, emitting one
 fixation per maximal low-dispersion window.
+It likewise splits windows at nonfinite gaze samples.
 
 ## Microsaccades (Engbert–Kliegl)
 

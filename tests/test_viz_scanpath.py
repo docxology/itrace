@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+
+pytest.importorskip("matplotlib")
+
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 

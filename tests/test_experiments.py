@@ -221,6 +221,7 @@ def test_capture_records_roundtrip_and_cli_experiment_report(tmp_path: Path) -> 
 def test_empirical_pilot_summarizer_reads_derived_export_without_video(
     tmp_path: Path,
 ) -> None:
+    pytest.importorskip("matplotlib")
     protocol = experiments.default_eye_video_protocol(trial_duration_s=10.0, target_range_deg=10.0)
     samples, recorded = _samples_for_protocol(protocol)
     bundle = tmp_path / "bundle"
@@ -253,6 +254,7 @@ def test_empirical_pilot_summarizer_reads_derived_export_without_video(
 
 
 def test_empirical_pilot_summarizer_marks_missing_report_unavailable(tmp_path: Path) -> None:
+    pytest.importorskip("matplotlib")
     summarizer = _summarizer_module()
 
     outputs = summarizer.write_empirical_pilot_outputs(

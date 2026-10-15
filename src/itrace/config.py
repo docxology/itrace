@@ -8,11 +8,35 @@ features kept behind their extras.
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal, cast, get_type_hints
 
 DetectionMethod = Literal["ivt", "adaptive_ivt"]
+
+
+def _validate_scalar_fields(
+    config: DetectionConfig | PupilConfig | CaptureConfig | CalibrationConfig | FigureConfig,
+) -> None:
+    for name, annotation in get_type_hints(type(config)).items():
+        value = getattr(config, name)
+        if annotation is bool and not isinstance(value, bool):
+            msg = f"{name} must be a boolean"
+            raise ValueError(msg)
+        if annotation is int and (not isinstance(value, int) or isinstance(value, bool)):
+            msg = f"{name} must be an integer"
+            raise ValueError(msg)
+        if annotation is float or annotation == float | None:
+            if annotation == float | None and value is None:
+                continue
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, int | float)
+                or not math.isfinite(value)
+            ):
+                msg = f"{name} must be a finite number"
+                raise ValueError(msg)
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +62,7 @@ class DetectionConfig:
     pso_peak_fraction: float = 0.2
 
     def __post_init__(self) -> None:
+        _validate_scalar_fields(self)
         if self.method not in {"ivt", "adaptive_ivt"}:
             msg = f"method must be 'ivt' or 'adaptive_ivt'; got {self.method!r}"
             raise ValueError(msg)
@@ -93,6 +118,7 @@ class PupilConfig:
     response_window_s: tuple[float, float] | None = None
 
     def __post_init__(self) -> None:
+        _validate_scalar_fields(self)
         if self.smooth_window < 1:
             msg = "smooth_window must be >= 1"
             raise ValueError(msg)
@@ -112,9 +138,23 @@ class PupilConfig:
             ("baseline_window_s", self.baseline_window_s),
             ("response_window_s", self.response_window_s),
         ):
-            if window is not None and window[1] <= window[0]:
-                msg = f"{name} end must exceed start"
-                raise ValueError(msg)
+            if window is not None:
+                if (
+                    not isinstance(window, tuple | list)
+                    or len(window) != 2
+                    or any(
+                        isinstance(v, bool)
+                        or not isinstance(v, int | float)
+                        or not math.isfinite(v)
+                        for v in window
+                    )
+                ):
+                    msg = f"{name} must contain two finite numbers"
+                    raise ValueError(msg)
+                if window[1] <= window[0]:
+                    msg = f"{name} end must exceed start"
+                    raise ValueError(msg)
+                object.__setattr__(self, name, tuple(window))
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,6 +167,7 @@ class CaptureConfig:
     write_pupil: bool = False
 
     def __post_init__(self) -> None:
+        _validate_scalar_fields(self)
         if self.camera_index < 0:
             msg = "camera_index must be non-negative"
             raise ValueError(msg)
@@ -217,6 +258,7 @@ class CalibrationConfig:
     target_range_deg: float = 15.0
 
     def __post_init__(self) -> None:
+        _validate_scalar_fields(self)
         if self.method not in {"affine", "polynomial"}:
             msg = f"method must be 'affine' or 'polynomial'; got {self.method!r}"
             raise ValueError(msg)
@@ -241,6 +283,7 @@ class FigureConfig:
     animations: bool = False
 
     def __post_init__(self) -> None:
+        _validate_scalar_fields(self)
         if self.dpi < 72:
             msg = "dpi must be >= 72"
             raise ValueError(msg)

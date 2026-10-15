@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import ast
 import importlib
 import json
 import re
 from pathlib import Path
 from typing import Any
+
+from itrace.version import __version__
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "docs" / "TRACEABILITY_MATRIX.json"
@@ -32,6 +35,13 @@ def _path_exists(reference: str) -> bool:
 
 
 def _resolve_symbol(symbol: str) -> object:
+    if symbol.startswith("itrace.viz.") and importlib.util.find_spec("matplotlib") is None:
+        module, name = symbol.rsplit(".", 1)
+        path = ROOT / "src" / Path(*module.split(".")).with_suffix(".py")
+        tree = ast.parse(path.read_text())
+        return next(
+            node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == name
+        )
     parts = symbol.split(".")
     for idx in range(len(parts), 0, -1):
         candidate_module = ".".join(parts[:idx])
@@ -50,7 +60,7 @@ def _resolve_symbol(symbol: str) -> object:
 def test_traceability_matrix_schema_and_boundaries() -> None:
     payload = _load_matrix()
     assert payload["kind"] == "itrace_documentation_visualization_analysis_traceability"
-    assert payload["version"] == "0.4.1"
+    assert payload["version"] == __version__
     assert "Device-level accuracy requires" in payload["truth_boundary"]
 
     claim_ids: set[str] = set()

@@ -4,12 +4,14 @@ import asyncio
 import webbrowser
 from collections.abc import Callable, Iterable
 from importlib.util import find_spec
+from math import isfinite
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .. import validation
 from ..capture import LiveFrameSample, WebcamSource, native_stderr
-from .analysis import analysis_payload, live_message_from_frame, method_name
+from ..version import __version__
+from .analysis import analysis_payload, live_message_from_frame, make_analysis_config, method_name
 from .state import LiveState
 
 if TYPE_CHECKING:
@@ -63,7 +65,7 @@ def create_app(
         else None,
         calibration_target_range_deg=calibration_target_deg,
     )
-    app = FastAPI(title="iTrace Live HTML", version="0.4.1")
+    app = FastAPI(title="iTrace Live HTML", version=__version__)
     app.state.live_state = state
     app.mount("/static", StaticFiles(directory=assets_dir), name="static")
 
@@ -129,27 +131,38 @@ def create_app(
         include_pso: bool = False,
         window_s: float = 10.0,
     ) -> dict[str, object]:
-        if window_s <= 0.0:
+        if not isfinite(window_s) or window_s <= 0.0:
             raise HTTPException(status_code=400, detail="window_s must be positive")
-        analysis = analysis_payload(
-            state.recent(window_s),
-            method=method_name(method),
-            velocity_threshold_deg_s=velocity_threshold,
-            include_pso=include_pso,
-            calibration=state.calibration,
-        )
+        samples = state.recent(window_s)
+        try:
+            analysis = analysis_payload(
+                samples,
+                method=method_name(method),
+                velocity_threshold_deg_s=velocity_threshold,
+                include_pso=include_pso,
+                calibration=state.calibration,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         return {
             "ok": True,
-            "sample_count": len(state.recent(window_s)),
+            "sample_count": len(samples),
             "analysis": analysis["report"],
             "statistics": analysis["statistics"],
             "diagnostics": analysis["diagnostics"],
         }
 
     @app.post("/api/export")
-    def export() -> dict[str, object]:
+    def export(
+        method: str = "ivt",
+        velocity_threshold: float = 30.0,
+        include_pso: bool = False,
+    ) -> dict[str, object]:
         try:
-            paths = state.export()
+            config = make_analysis_config(method, velocity_threshold, include_pso)
+            paths = state.export(config=config)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         except RuntimeError as exc:
             status_code = 400 if state.output_dir is None else 409
             raise HTTPException(status_code=status_code, detail=str(exc)) from exc

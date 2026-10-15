@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from itertools import pairwise
 
+import pytest
+
+pytest.importorskip("matplotlib")
+
 import matplotlib.image as mpimg
 
 from itrace.stats.evidence import load_statistical_interpretation_ledger

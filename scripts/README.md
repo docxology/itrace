@@ -16,6 +16,11 @@ the provenance manifest `docs/figure_manifest.json`.
 uv run python scripts/generate_figures.py
 ```
 
+The default path preflights the empirical source exports before writing outputs.
+If those local files are absent, use `--reuse-empirical-summaries` to render
+empirical figures from retained summary JSON without changing the ledgers. The
+figure manifest records which empirical source mode was used.
+
 Delegates to:
 
 - `src/itrace/viz/power_figure.py` — 3-panel noise-sensitivity figure, statistics table, sidecar metrics
@@ -118,8 +123,10 @@ Pandoc (pandoc-crossref before citeproc) in `docs/manuscript/`.
 uv run python scripts/render_manuscript.py --metrics-json docs/verification_metrics.json
 ```
 
-Module logic: in-script token loading + Pandoc invocation (the canonical
-template pipeline takes over after promotion to `active/`).
+Module logic: `src/itrace/manuscript.py` owns source discovery, token loading,
+the source audit, staged Pandoc rendering, and output validation. The script
+only parses paths and explicit token overrides. See
+[`docs/DEVELOPMENT.md`](../docs/DEVELOPMENT.md) for the evidence contract.
 
 Outputs: `docs/manuscript/_build.{md,tex,pdf,txt}`.
 
@@ -134,3 +141,29 @@ uv run python scripts/audit_crossrefs.py
 ```
 
 Module logic: `src/itrace/manuscript.py`.
+
+### `verify.py`
+
+Run lock validation, lint, format, strict typing, manuscript and release audits, and
+coverage-enabled tests into a new evidence directory:
+
+```bash
+uv run --frozen --no-sync python scripts/verify.py --out-dir output/verification/new-run
+```
+
+Delegates to `itrace.verification`. The directory must not already exist; logs
+and the failure status are preserved and execution stops at the first failed
+gate. `summary.json` binds the commands to runtime paths and a source digest.
+
+### `audit_release.py`
+
+Check current versions, dates, DOI metadata, manuscript availability, release
+notes, and every figure's byte count and SHA-256. Delegates to `itrace.release`.
+Malformed or missing inputs and contract violations exit nonzero.
+
+```bash
+uv run --frozen python scripts/audit_release.py
+```
+
+See [the release procedure](../docs/RELEASING.md) for distribution smoke checks,
+commit-bound asset inventories, GitHub publication, and versioned Zenodo archival.
