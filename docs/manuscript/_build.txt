@@ -29,7 +29,7 @@ velocity-thresholded saccade recovery falls below F1 = 0.8 near sigma
 because its noise-sweep robustness follows from the modelling assumption
 used to inject pupil noise. iTrace also ships a typer CLI, Streamlit
 dashboard, local HTML/WebSocket orchestrator, guided derived-record
-empirical workflow, and publication-figure scripts, all under 692 tests
+empirical workflow, and publication-figure scripts, all under 693 tests
 at 91.07% coverage. Its contribution is not a claim that webcams are
 validated eye trackers; it is a verification-first reference
 implementation whose evidence boundaries are visible in the code,
@@ -1112,7 +1112,7 @@ The two paths share only their input and the published algorithm
 definitions, so agreement is evidence the implementation matches the
 algorithm, not that two copies of one mistake agree.
 
-The complete toolchain is green and reproducible: 692 no-mocks tests
+The complete toolchain is green and reproducible: 693 no-mocks tests
 pass with 91.07% statement-and-branch coverage, ruff and ruff format
 report no issues, and mypy --strict finds no type errors across the
 source tree. The test count, coverage, version, gate date, and render

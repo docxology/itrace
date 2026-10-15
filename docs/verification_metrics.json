@@ -1,8 +1,8 @@
 {
   "version": "0.5.0",
   "gate_date": "2026-10-15",
-  "test_count": 692,
-  "collected_test_count": 694,
+  "test_count": 693,
+  "collected_test_count": 695,
   "skipped_test_count": 2,
   "coverage_pct": "91.07%",
   "demo_amplitude": "10",
@@ -10,7 +10,7 @@
   "license": "MIT",
   "doi_version": "10.5281/zenodo.23403300",
   "doi_concept": "10.5281/zenodo.20614908",
-  "pytest_summary": "692 passed, 2 skipped in 111.49s",
+  "pytest_summary": "693 passed, 2 skipped; duration is recorded in the source-bound final gate receipt",
   "coverage_summary": "Required test coverage of 90.0% reached. Total coverage: 91.07%",
   "ruff_format_summary": "138 files already formatted",
   "ruff_check_summary": "All checks passed!",
@@ -20,8 +20,8 @@
   "scope": "v0.5.0 release verification; publication status is recorded separately from local checks",
   "test_count_definition": "passed tests; collected and skipped counts are recorded separately",
   "base_git_head": "88e9a08a9ea47ac3cd261382601f4878482140e9",
-  "source_sha256": "cdbc7e3f14adfe32c24f3805c77c35d631d18d8737be642554a0481987dd5437",
+  "source_sha256": "058a8547c01f319e93e97ee10b15afd5cf5f9300aa57b941e68bc5e8c92c1565",
   "coverage_definition": "combined statement-and-branch coverage",
-  "core_only_summary": "570 passed, 67 skipped on Python 3.12.13 with no optional dependencies",
+  "core_only_summary": "571 passed, 67 skipped on Python 3.12.13 with no optional dependencies",
   "python310_status": "blocked on this macOS host: locked scipy 1.15.3 native import fails before iTrace loads; Linux CI lane configured"
 }

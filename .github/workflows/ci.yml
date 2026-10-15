@@ -86,6 +86,8 @@ jobs:
               assert create_app().version == itrace.__version__
           if os.environ["EXTRA"] in ("figures", "all"):
               from itrace.viz.graphical_abstract import generate_graphical_abstract
-              assert generate_graphical_abstract(Path("package-figures"), repo_root=Path.cwd()).is_file()
+              output = Path("package-figures")
+              output.mkdir()
+              assert generate_graphical_abstract(output, repo_root=Path.cwd()).is_file()
           PY
           package-env/bin/itrace demo
