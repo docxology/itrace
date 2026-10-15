@@ -21,6 +21,8 @@ def test_synthetic_domain_validation_is_deterministic_and_truth_bounded() -> Non
     assert first["n_truth_saccades"] == 7
     assert first["saccade_recovery"]["f1"] > 0.5
     assert first["pupil"]["truth_event_count"] == 3.0
+    assert first["gaze"]["short_gap_interpolation_used"] == 0.0
+    assert first["gaze"]["invalid_sample_drop_used"] == 0.0
 
 
 def test_within_and_cross_domain_validation_summaries() -> None:
@@ -69,7 +71,8 @@ def test_default_dropout_domain_validation_uses_safe_gap_interpolation() -> None
 
     assert result["domain"] == "low_light_dropout"
     assert result["summary"]["saccade_f1"]["n"] == 5.0
-    assert any(
+    assert all(run["gaze"]["finite_sample_fraction"] < 1.0 for run in result["runs"])
+    assert all(
         run["gaze"]["short_gap_interpolation_used"] == 1.0
         or run["gaze"]["invalid_sample_drop_used"] == 1.0
         for run in result["runs"]

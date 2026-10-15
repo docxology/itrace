@@ -839,31 +839,31 @@
           "label": "Low-light dropout",
           "seed": 0,
           "n_truth_saccades": 7,
-          "n_detected_saccades": 14,
+          "n_detected_saccades": 18,
           "n_matched_saccades": 7,
           "saccade_recovery": {
             "true_positive": 7.0,
-            "false_positive": 7.0,
+            "false_positive": 11.0,
             "false_negative": 0.0,
-            "precision": 0.5,
+            "precision": 0.3888888888888889,
             "recall": 1.0,
-            "f1": 0.6666666666666666
+            "f1": 0.56
           },
           "gaze": {
             "finite_sample_fraction": 0.9645714285714285,
             "sampling_rate_hz": 249.99999999999977,
-            "detection_threshold_deg_s": 16.821038145266176,
+            "detection_threshold_deg_s": 17.579399780850242,
             "dropout_fraction": 0.035428571428571476,
             "large_gap_count": 0.0,
-            "short_gap_interpolation_used": 0.0,
+            "short_gap_interpolation_used": 1.0,
             "invalid_sample_drop_used": 0.0
           },
           "saccade_error": {
-            "amplitude_mae_deg": 3.1219502881135903,
-            "amplitude_bias_deg": -2.7546894915153937,
-            "direction_mae_deg": 1.0891534301517984,
-            "peak_velocity_rmse_deg_s": 87.9257522685484,
-            "duration_mae_s": 0.010857142857142867
+            "amplitude_mae_deg": 0.3321909640140235,
+            "amplitude_bias_deg": 0.3002108460867879,
+            "direction_mae_deg": 0.41641172702153995,
+            "peak_velocity_rmse_deg_s": 69.96550741554576,
+            "duration_mae_s": 0.009142857142857088
           },
           "pupil": {
             "truth_event_count": 3.0,
@@ -881,31 +881,31 @@
           "label": "Low-light dropout",
           "seed": 1,
           "n_truth_saccades": 7,
-          "n_detected_saccades": 11,
-          "n_matched_saccades": 5,
+          "n_detected_saccades": 16,
+          "n_matched_saccades": 7,
           "saccade_recovery": {
-            "true_positive": 5.0,
-            "false_positive": 6.0,
-            "false_negative": 2.0,
-            "precision": 0.45454545454545453,
-            "recall": 0.7142857142857143,
-            "f1": 0.5555555555555556
+            "true_positive": 7.0,
+            "false_positive": 9.0,
+            "false_negative": 0.0,
+            "precision": 0.4375,
+            "recall": 1.0,
+            "f1": 0.6086956521739131
           },
           "gaze": {
             "finite_sample_fraction": 0.9605714285714285,
             "sampling_rate_hz": 249.99999999999977,
-            "detection_threshold_deg_s": 18.011475504408445,
+            "detection_threshold_deg_s": 17.955425235558238,
             "dropout_fraction": 0.03942857142857148,
             "large_gap_count": 0.0,
-            "short_gap_interpolation_used": 0.0,
+            "short_gap_interpolation_used": 1.0,
             "invalid_sample_drop_used": 0.0
           },
           "saccade_error": {
-            "amplitude_mae_deg": 0.5112678377522529,
-            "amplitude_bias_deg": 0.06661815415454608,
-            "direction_mae_deg": 0.2352142885499518,
-            "peak_velocity_rmse_deg_s": 63.75409519696552,
-            "duration_mae_s": 0.008799999999999919
+            "amplitude_mae_deg": 0.2243146375220337,
+            "amplitude_bias_deg": 0.21892138624144547,
+            "direction_mae_deg": 0.3343209688066346,
+            "peak_velocity_rmse_deg_s": 61.19372083160855,
+            "duration_mae_s": 0.00799999999999988
           },
           "pupil": {
             "truth_event_count": 3.0,
@@ -965,31 +965,31 @@
           "label": "Low-light dropout",
           "seed": 3,
           "n_truth_saccades": 7,
-          "n_detected_saccades": 9,
+          "n_detected_saccades": 14,
           "n_matched_saccades": 7,
           "saccade_recovery": {
             "true_positive": 7.0,
-            "false_positive": 2.0,
+            "false_positive": 7.0,
             "false_negative": 0.0,
-            "precision": 0.7777777777777778,
+            "precision": 0.5,
             "recall": 1.0,
-            "f1": 0.8750000000000001
+            "f1": 0.6666666666666666
           },
           "gaze": {
             "finite_sample_fraction": 0.9474285714285714,
             "sampling_rate_hz": 249.99999999999977,
-            "detection_threshold_deg_s": 17.6058234018817,
+            "detection_threshold_deg_s": 18.39822983596099,
             "dropout_fraction": 0.0525714285714286,
             "large_gap_count": 0.0,
-            "short_gap_interpolation_used": 0.0,
+            "short_gap_interpolation_used": 1.0,
             "invalid_sample_drop_used": 0.0
           },
           "saccade_error": {
-            "amplitude_mae_deg": 0.47111336120474867,
-            "amplitude_bias_deg": -0.46601892201507084,
-            "direction_mae_deg": 0.4855244521404529,
+            "amplitude_mae_deg": 0.22150530345440306,
+            "amplitude_bias_deg": 0.12902248488147286,
+            "direction_mae_deg": 0.7753693843906474,
             "peak_velocity_rmse_deg_s": 55.63355824094869,
-            "duration_mae_s": 0.005714285714285394
+            "duration_mae_s": 0.006857142857142768
           },
           "pupil": {
             "truth_event_count": 3.0,
@@ -1048,45 +1048,45 @@
       "summary": {
         "saccade_f1": {
           "n": 5.0,
-          "mean": 0.6481111111111112,
-          "std": 0.12029059464685439,
-          "ci_low": 0.562888888888889,
-          "ci_high": 0.7694444444444445
+          "mean": 0.5957391304347827,
+          "std": 0.03976697509666258,
+          "ci_low": 0.5646666666666668,
+          "ci_high": 0.6337391304347826
         },
         "saccade_precision": {
           "n": 5.0,
-          "mean": 0.5065953654188948,
-          "std": 0.14081211698214713,
-          "ci_low": 0.41117052881758764,
-          "ci_high": 0.6490196078431372
+          "mean": 0.4254084967320261,
+          "std": 0.041385053712272184,
+          "ci_low": 0.39346405228758174,
+          "ci_high": 0.4652777777777778
         },
         "saccade_recall": {
           "n": 5.0,
-          "mean": 0.9428571428571428,
-          "std": 0.11428571428571428,
-          "ci_low": 0.8285714285714286,
+          "mean": 1.0,
+          "std": 0.0,
+          "ci_low": 1.0,
           "ci_high": 1.0
         },
         "amplitude_mae_deg": {
           "n": 5.0,
-          "mean": 0.9376945163169363,
-          "std": 1.097793840418003,
-          "ci_low": 0.3093863958872428,
-          "ci_high": 2.0546152406228084
+          "mean": 0.27243039990091017,
+          "std": 0.07853188672324357,
+          "ci_low": 0.2087384862833963,
+          "ci_high": 0.3450285084826941
         },
         "direction_mae_deg": {
           "n": 5.0,
-          "mean": 0.5061595602465508,
-          "std": 0.3030236906323269,
-          "ci_low": 0.30260943313730065,
-          "ci_high": 0.8130012604396548
+          "mean": 0.44940154212187455,
+          "std": 0.1669416224426483,
+          "ci_low": 0.3423360385045864,
+          "ci_high": 0.6153681698000233
         },
         "peak_velocity_rmse_deg_s": {
           "n": 5.0,
-          "mean": 68.99013223460393,
-          "std": 13.251757389710239,
-          "ci_low": 57.522783901345875,
-          "ci_high": 80.457480567862
+          "mean": 64.886008390932,
+          "std": 9.691107310690885,
+          "ci_low": 57.01070902827447,
+          "ci_high": 73.9243540628732
         },
         "pupil_valid_fraction": {
           "n": 5.0,
@@ -1106,10 +1106,10 @@
     }
   ],
   "cross_domain": {
-    "macro_saccade_f1": 0.7696997705447363,
-    "min_saccade_f1": 0.6287998591797219,
+    "macro_saccade_f1": 0.7566067753756541,
+    "min_saccade_f1": 0.5957391304347827,
     "max_saccade_f1": 0.9846153846153847,
-    "stability_gap_f1": 0.35581552543566275,
-    "worst_domain": "head_drift"
+    "stability_gap_f1": 0.388876254180602,
+    "worst_domain": "low_light_dropout"
   }
 }

@@ -1535,15 +1535,22 @@ directory, stopping at the first failed gate. CI exercises the
 development gates and a separate core-only test matrix, and checks an
 installed wheel outside the source import path.
 
-Every synthetic generator and every Monte-Carlo trial is explicitly
-seeded with \texttt{numpy.random.default\_rng}, so each figure and table
-number is reproducible byte-for-byte from a clean checkout ---
-re-running the figure pipeline twice produces identical PNGs, and the
-noise sweep of sec.~\ref{sec:noiseresults} reproduces its table cells
-exactly. No test mocks a computation: detectors run on real arrays with
-known ground truth, file I/O uses real temporary files, and figures are
-asserted to write non-empty PNGs. The full module map, dependency
-contract, and test strategy are in sec.~\ref{sec:software}.
+Synthetic-domain validation selects gaze preprocessing from finite-input
+masks before analysis. It fills bounded gaps of at most 0.08 s, reports
+actual sample interpolation and removal, and rejects longer bounded
+gaps. This benchmark policy is explicit and does not depend on whether a
+particular numerical-library version raises during analysis; the
+raw-recording pipeline retains missing data.
+
+Every synthetic generator and Monte-Carlo trial is explicitly seeded
+with \texttt{numpy.random.default\_rng}. Within the recorded runtime and
+locked dependencies, figures and table numbers can be reproduced from a
+clean checkout; re-running the figure pipeline twice produces identical
+PNGs, and the noise sweep of sec.~\ref{sec:noiseresults} reproduces its
+table cells exactly. No test mocks a computation: detectors run on real
+arrays with known ground truth, file I/O uses real temporary files, and
+figures are asserted to write non-empty PNGs. The full module map,
+dependency contract, and test strategy are in sec.~\ref{sec:software}.
 
 The documentation and visualization layer now follows the same evidence
 rule. \texttt{docs/TRACEABILITY\_MATRIX.json} maps each public

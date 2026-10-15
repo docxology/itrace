@@ -20,7 +20,7 @@
   "scope": "v0.5.0 release verification; publication status is recorded separately from local checks",
   "test_count_definition": "passed tests; collected and skipped counts are recorded separately",
   "base_git_head": "88e9a08a9ea47ac3cd261382601f4878482140e9",
-  "source_sha256": "058a8547c01f319e93e97ee10b15afd5cf5f9300aa57b941e68bc5e8c92c1565",
+  "source_sha256": "442b04a9b883802746fc57782cf4f42411b2d3b7de4ff901678f20b564c4787a",
   "coverage_definition": "combined statement-and-branch coverage",
   "core_only_summary": "571 passed, 67 skipped on Python 3.12.13 with no optional dependencies",
   "python310_status": "blocked on this macOS host: locked scipy 1.15.3 native import fails before iTrace loads; Linux CI lane configured"

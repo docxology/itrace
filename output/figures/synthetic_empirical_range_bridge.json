@@ -153,8 +153,8 @@
       "interpretation": "Synthetic truth and oracle comparisons, not the N=1 pilot, test event-detector correctness under known labels.",
       "synthetic": {
         "available": true,
-        "value": 0.6287998591797219,
-        "display": "clean F1 81.7%; stress min 62.9%",
+        "value": 0.5957391304347827,
+        "display": "clean F1 81.7%; stress min 59.6%",
         "source": "synthetic truth domains"
       },
       "noise_model": {

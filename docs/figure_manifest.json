@@ -495,7 +495,7 @@
         "output/empirical_pilot/local_pilot_005/experiment/experiment_report.json"
       ],
       "bytes": 7878,
-      "sha256": "2b532dc23a8bd59c34163c1a8585524e422f16209047342e4e2703252d0b3a2a",
+      "sha256": "1edb7dcb4ee0a771f7167ab986aedfe40f45e43e21c2effe5d849c0729ba43d2",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -507,11 +507,11 @@
       "source_data": [
         "output/figures/synthetic_empirical_range_bridge.json"
       ],
-      "bytes": 589402,
-      "sha256": "548f07589715e867692044429b2b7ca9ed295d4edef5a4cef82d45084e7df8ab",
+      "bytes": 589250,
+      "sha256": "70b29999ed87a1741460c5335d0ade99bab30e9266d0e99a99b664e378171f82",
       "width_px": 4745,
       "height_px": 2382,
-      "pixel_std": 0.13618429005146027
+      "pixel_std": 0.13618536293506622
     },
     {
       "path": "output/figures/synthetic_replay.gif",

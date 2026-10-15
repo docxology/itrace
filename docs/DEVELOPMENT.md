@@ -61,6 +61,11 @@ hosted run; publication receipts record the exact commit and hosted result.
 
 ## Numerical contracts
 
+- Synthetic-domain validation chooses gaze-gap preprocessing from finite input
+  masks before analysis. Bounded gaps of at most 0.08 s are interpolated; remaining
+  invalid edge samples are dropped and reported. Long bounded gaps remain errors.
+  This explicit benchmark policy does not change the raw recording pipeline's
+  missing-data policy or use library exceptions to select a method.
 - Streams own read-only float64 snapshots. Raw NaN measurements and defective
   clocks remain representable for diagnostics; differentiation requires finite,
   strictly increasing timestamps.

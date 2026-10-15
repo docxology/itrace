@@ -264,15 +264,19 @@ def validate_synthetic_domain(
     interpolated = False
     dropped_invalid = False
     config = AnalysisConfig(detection=domain.detection)
-    try:
-        report = pipeline.analyze_session(analysis_gaze, pupil, config=config)
-    except ValueError:
+    finite_before = np.isfinite(gaze.t) & np.isfinite(gaze.x) & np.isfinite(gaze.y)
+    if not np.all(finite_before):
         analysis_gaze = interpolate_gaze_gaps(gaze, max_gap_s=0.08)
-        interpolated = True
-        if not (np.all(np.isfinite(analysis_gaze.x)) and np.all(np.isfinite(analysis_gaze.y))):
+        finite_after = (
+            np.isfinite(analysis_gaze.t)
+            & np.isfinite(analysis_gaze.x)
+            & np.isfinite(analysis_gaze.y)
+        )
+        interpolated = bool(np.sum(finite_after) > np.sum(finite_before))
+        if not np.all(finite_after):
             analysis_gaze = _finite_gaze_stream(analysis_gaze)
             dropped_invalid = True
-        report = pipeline.analyze_session(analysis_gaze, pupil, config=config)
+    report = pipeline.analyze_session(analysis_gaze, pupil, config=config)
     truth_saccades = _truth_as_saccades(truth.saccades)
     recovery = event_prf(truth_saccades, report.saccades, min_overlap_s=min_overlap_s)
     pairs = _match_saccades(truth_saccades, report.saccades, min_overlap_s=min_overlap_s)

@@ -370,6 +370,7 @@ clean `mypy --strict`, all evidenced by real captured command output.
 - [x] ISC-192: Real metadata/artifact corruption fails the release gate, including mismatched versions/dates/DOIs, changed bytes, duplicate or escaping paths, empty inventories, and invalid PDF headers.
 - [x] ISC-193: Asset inventories bind full Git SHAs and payload SHA-256 values, reject ambiguous/nonregular/empty payloads, and refuse to overwrite existing inventories.
 - [x] ISC-194: CI declares core-only Python 3.10-3.13 wheel checks, development gates, and sdist installation/import checks for figures, web, dashboard, capture, and all extras. Hosted execution is separate evidence and must pass on the release commit before publication.
+- [x] ISC-195: Synthetic-domain validation chooses missing-gaze preprocessing from finite-input masks before analysis, records actual interpolation/removal, and preserves long-gap errors. Every seeded dropout run is checked; clean runs report no preprocessing. Numerical-library exceptions do not select the benchmark method.
 
 Verification evidence for this refresh is recorded in `docs/DEVELOPMENT.md`,
 `docs/verification_metrics.json`, and the retained run at
