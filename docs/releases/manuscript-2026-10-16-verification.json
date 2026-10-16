@@ -1,0 +1,100 @@
+{
+  "kind": "itrace_manuscript_publication_verification",
+  "verified_on": "2026-10-16",
+  "revision": "manuscript-2026-10-16-310be17",
+  "source_commit": "310be17ace8ae61621afe01329356427a3e6c861",
+  "source_url": "https://github.com/docxology/itrace/tree/310be17ace8ae61621afe01329356427a3e6c861",
+  "software_baseline": {
+    "version": "0.5.0",
+    "doi": "10.5281/zenodo.23403300",
+    "previous_archive_inventory_unchanged": true
+  },
+  "zenodo": {
+    "record_id": 23419306,
+    "url": "https://zenodo.org/records/23419306",
+    "doi": "10.5281/zenodo.23419306",
+    "concept_doi": "10.5281/zenodo.20614908",
+    "anonymous_downloads_verified": 8
+  },
+  "pdf": {
+    "path": "docs/manuscript/_build.pdf",
+    "published_filename": "itrace-manuscript-2026-10-16.pdf",
+    "pages": 30,
+    "bytes": 5732341,
+    "sha256": "419ca0113ee3816864c5ac8b6441886f471215962359a4601b804bc650c9688e"
+  },
+  "verification": {
+    "source_digest": "572e6d5b5d6372ebc62bc56df56eb4287c9e889f92cb3d22685a2be83f463517",
+    "development_passed": 737,
+    "development_skipped": 2,
+    "combined_coverage_pct": "91.05",
+    "core_only_passed": 612,
+    "core_only_skipped": 70,
+    "artifact_tests_passed": 44,
+    "figure_artifacts": 41,
+    "independent_review": "APPROVE",
+    "hosted_run": "https://github.com/docxology/itrace/actions/runs/38834808643",
+    "hosted_head_sha": "310be17ace8ae61621afe01329356427a3e6c861",
+    "hosted_conclusion": "success",
+    "hosted_jobs_passed": 10
+  },
+  "files": [
+    {
+      "name": "LICENSE",
+      "sha256": "72f87c6cb562ffc6f870dc124d86b45ee0df5460e83fe8443d8e2ae65777e978",
+      "md5": "c39a98bef02b2aa8bf46150269091678",
+      "bytes": 1076,
+      "url": "https://zenodo.org/api/records/23419306/files/LICENSE/content"
+    },
+    {
+      "name": "README.md",
+      "sha256": "d063d41f5c28c57dc8d3e0a693733e08924a58f537a8037aad37d6a3b8ac3f5f",
+      "md5": "5a04226bc70c4ad4398f34a7fe0b4255",
+      "bytes": 1251,
+      "url": "https://zenodo.org/api/records/23419306/files/README.md/content"
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "880883308ef250aa56b5399179c2eefc30f5829c219b1aaff071d115f703287b",
+      "md5": "38fd9c8d0354c1217434b1ed03814473",
+      "bytes": 598,
+      "url": "https://zenodo.org/api/records/23419306/files/SHA256SUMS/content"
+    },
+    {
+      "name": "figure-manifest.json",
+      "sha256": "5aa78eb5443c2f9d88f4cf51c558d505901a2e04a5a1fa38e0a2d460fea5c56a",
+      "md5": "c61eb0f74dd42b257e3aae8aabf87ae3",
+      "bytes": 18665,
+      "url": "https://zenodo.org/api/records/23419306/files/figure-manifest.json/content"
+    },
+    {
+      "name": "itrace-manuscript-2026-10-16.pdf",
+      "sha256": "419ca0113ee3816864c5ac8b6441886f471215962359a4601b804bc650c9688e",
+      "md5": "b994e7cd34254f762b92b5dbc33b2225",
+      "bytes": 5732341,
+      "url": "https://zenodo.org/api/records/23419306/files/itrace-manuscript-2026-10-16.pdf/content"
+    },
+    {
+      "name": "provenance.json",
+      "sha256": "32323bee5995ad8dcdae919e0dff8838eb90a251ef90fc9da6bd6649fee4560d",
+      "md5": "8d9e00c3cc526f72c82d490a5c07ed3e",
+      "bytes": 1635,
+      "url": "https://zenodo.org/api/records/23419306/files/provenance.json/content"
+    },
+    {
+      "name": "scholarship-review.md",
+      "sha256": "33b1c8caa5d97be1708ab5ac5b9b185226de62dd6dc18e4de3b8fae8927fda5b",
+      "md5": "f8a30dfac64f6677f7f5359b10b84ebc",
+      "bytes": 31153,
+      "url": "https://zenodo.org/api/records/23419306/files/scholarship-review.md/content"
+    },
+    {
+      "name": "verification-metrics.json",
+      "sha256": "60c690385c32ed176716a82b48838a5ce1f8d06a27c51aff3dfe0e69602eba78",
+      "md5": "749fedd1f0bc424194695cb62d96f874",
+      "bytes": 1687,
+      "url": "https://zenodo.org/api/records/23419306/files/verification-metrics.json/content"
+    }
+  ],
+  "limits": "Manuscript revision, not a new package release. No new participant or reference-device acquisition, device-accuracy validation, generality claim, or nominal interval-coverage study."
+}

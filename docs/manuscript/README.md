@@ -5,6 +5,13 @@ sections, `config.yaml`, and `references.bib`. Files beginning with `_` are
 generated. `README.md`, `AGENTS.md`, `MANUSCRIPT_STATUS.md`, and `preamble.md`
 are excluded from paper assembly.
 
+The corrected 30-page manuscript from source commit `310be17` is published at
+[DOI 10.5281/zenodo.23419306](https://doi.org/10.5281/zenodo.23419306)
+([PDF](https://zenodo.org/records/23419306/files/itrace-manuscript-2026-10-16.pdf?download=1)).
+See the [revision notes and publication receipt](../releases/manuscript-2026-10-16.md)
+for the source binding, checksums, scientific limits, and distinction from the
+v0.5.0 software archive cited inside the PDF.
+
 ```bash
 uv run python scripts/audit_crossrefs.py
 uv run python scripts/render_manuscript.py --metrics-json docs/verification_metrics.json

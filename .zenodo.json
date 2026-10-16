@@ -29,6 +29,11 @@
       "relation": "isSupplementTo",
       "scheme": "url",
       "resource_type": "software"
+    },
+    {
+      "identifier": "10.5281/zenodo.23419306",
+      "relation": "isDocumentedBy",
+      "scheme": "doi"
     }
   ]
 }

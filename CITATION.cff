@@ -17,7 +17,10 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.23403300"
     description: "Version DOI (v0.5.0)"
-abstract: "MIT-licensed source openly released at https://github.com/docxology/itrace and archived on Zenodo at DOI 10.5281/zenodo.23403300 (concept DOI 10.5281/zenodo.20614908)."
+  - type: doi
+    value: "10.5281/zenodo.23419306"
+    description: "Corrected manuscript revision (2026-10-16; source commit 310be17)"
+abstract: "MIT-licensed source openly released at https://github.com/docxology/itrace. The v0.5.0 software baseline is archived at DOI 10.5281/zenodo.23403300; the corrected manuscript from source commit 310be17 is archived at DOI 10.5281/zenodo.23419306 (concept DOI 10.5281/zenodo.20614908)."
 keywords:
   - eye-tracking
   - webcam

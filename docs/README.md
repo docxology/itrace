@@ -36,6 +36,7 @@ running; this index does not invent commands.
 - [Comprehensive development review and remaining limits](COMPREHENSIVE_REVIEW.md)
 - [Release procedure and artifact verification](RELEASING.md)
 - [v0.5.0 release notes](releases/v0.5.0.md)
+- [Corrected manuscript revision, DOI, and publication verification (2026-10-16)](releases/manuscript-2026-10-16.md)
 
 `verification_metrics.json` records current development checks. The previous
 release ledgers are retained in `releases/v0.4.1-verification.json` and

@@ -8,7 +8,7 @@ progress: 202/202
 mode: build
 iteration: 8
 started: 2026-05-29T00:00:00Z
-updated: 2026-10-15T00:00:00Z
+updated: 2026-10-16T00:00:00Z
 ---
 
 # ISA — iTrace: Open-Source Webcam Eye-Movement Analysis Toolkit
@@ -398,6 +398,19 @@ historical ISC-78 and the automatic-coverage wording associated with ISC-98/99.
 Those historical entries describe earlier decisions, not accepted current claims.
 The v0.5.0 release remains an immutable baseline; current development evidence
 does not retroactively change its archived scorer, numbers, or DOI payload.
+
+### Published correction and manuscript archive (2026-10-16)
+
+The correction commit `310be17ace8ae61621afe01329356427a3e6c861` is on public
+`main`; [hosted run 38834808643](https://github.com/docxology/itrace/actions/runs/38834808643)
+passed all ten jobs. The independently approved, 30-page PDF is published as
+manuscript revision `manuscript-2026-10-16-310be17` at
+[DOI 10.5281/zenodo.23419306](https://doi.org/10.5281/zenodo.23419306).
+Anonymous download verification matched all eight payloads, including the exact
+reviewed PDF. The previous v0.5.0 archive remains unchanged. Public source,
+artifact identities, checksums, acceptance evidence, and remaining scientific
+limits are documented in
+[the revision record](docs/releases/manuscript-2026-10-16.md).
 
 Verification evidence for this refresh is recorded in `docs/DEVELOPMENT.md`,
 `docs/verification_metrics.json`, and the retained run at

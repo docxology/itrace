@@ -4,6 +4,23 @@ A release binds the software, manuscript, evidence, and version DOI to one Git
 commit. Local gates, hosted CI, and publication are separate results. A failed
 gate blocks publication and remains part of the evidence.
 
+## Manuscript-only revisions
+
+A corrected manuscript can be archived as a new version of the existing Zenodo
+concept without declaring a new software release. Label it explicitly as a
+manuscript revision and record the exact source commit, PDF SHA-256, scientific
+review, local gates, and hosted acceptance. Keep software versions, release dates,
+tags, historical ledgers, and published package assets bound to their original
+release. Replace inherited files only in the new unpublished draft, then verify
+the intended inventory before publishing and anonymously download the published
+files to compare their hashes.
+
+Document the resulting DOI and revision in the root README, citation identifiers,
+`.zenodo.json` related identifiers, documentation and manuscript indexes, and a
+dated publication receipt in `docs/releases/`. The
+[2026-10-16 manuscript revision](releases/manuscript-2026-10-16.md) follows this
+route. The steps below describe a full software release.
+
 ## Prepare
 
 1. Verify the public repository identity, mounted development volume, runtime,

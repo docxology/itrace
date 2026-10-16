@@ -5,6 +5,11 @@ follow-up. Its source digest and command receipts identify that earlier cut;
 current release evidence is in [verification_metrics.json](verification_metrics.json)
 and [the v0.5.0 release notes](releases/v0.5.0.md).
 
+The later statistical and scholarly correction pass and its published manuscript
+are documented separately in the
+[2026-10-16 revision record](releases/manuscript-2026-10-16.md). The measurements
+below describe this initial pass, not the later correction or publication.
+
 That pass corrected reproduced defects in the analysis core, input/report
 contracts, live orchestration, publication generation, and verification. It is
 an unreleased working-tree change against

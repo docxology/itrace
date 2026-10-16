@@ -17,9 +17,19 @@ with an optional, thin webcam + MediaPipe capture shell.
 iTrace is MIT-licensed and openly released at
 https://github.com/docxology/itrace. The archived v0.5.0 baseline is on Zenodo at
 DOI [10.5281/zenodo.23403300](https://doi.org/10.5281/zenodo.23403300) (concept
-DOI [10.5281/zenodo.20614908](https://doi.org/10.5281/zenodo.20614908) always
-resolves to the latest version). Current `main` includes subsequent development
-corrections identified by Git history and `docs/verification_metrics.json`.
+DOI [10.5281/zenodo.20614908](https://doi.org/10.5281/zenodo.20614908)
+identifies the version family).
+
+The corrected manuscript from source commit
+[`310be17`](https://github.com/docxology/itrace/commit/310be17ace8ae61621afe01329356427a3e6c861)
+is published at DOI
+[10.5281/zenodo.23419306](https://doi.org/10.5281/zenodo.23419306):
+[download the PDF](https://zenodo.org/records/23419306/files/itrace-manuscript-2026-10-16.pdf?download=1).
+This is the manuscript revision `manuscript-2026-10-16-310be17`; the software
+release remains v0.5.0. See the
+[revision notes and publication verification](docs/releases/manuscript-2026-10-16.md)
+for statistical and scholarly corrections, artifact checksums, and hosted CI.
+Current development checks are recorded in `docs/verification_metrics.json`.
 The repository URL is fixed here, in
 `pyproject.toml`, in `docs/verification_metrics.json`, and in `CITATION.cff` so
 the release and manuscript citation metadata stay aligned. See

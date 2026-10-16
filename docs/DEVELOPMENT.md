@@ -59,6 +59,12 @@ optional-package jobs also install the sdist with each advertised extra and
 exercise the real imports. A declared workflow is distinct from a successful
 hosted run; publication receipts record the exact commit and hosted result.
 
+The [2026-10-16 manuscript publication receipt](releases/manuscript-2026-10-16-verification.json)
+binds the corrected PDF to source commit `310be17`, its successful ten-job hosted
+run, and anonymously verified Zenodo files. Its
+[revision notes](releases/manuscript-2026-10-16.md) separate the manuscript
+archive from the v0.5.0 software release.
+
 ## Numerical contracts
 
 The post-v0.5.0 statistical correction pass adds one-to-one overlap scoring to the
