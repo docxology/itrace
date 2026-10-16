@@ -10,8 +10,13 @@ $$ V = V_{\max}\,\big(1 - e^{-A/C}\big) $$ {#eq:mainseq}
 
 ([@eq:mainseq]; @bahill1975main) by non-linear least squares, and a power law
 $V = aA^b$ by linear regression in log-log space, reporting the coefficient of
-determination. A physiological oculomotor system gives an exponent $b$ of roughly
-0.4–0.9; deviation is a recognised marker, so the fit doubles as a sanity probe.
+determination in log-velocity space. The exponent depends on amplitude range,
+task, sampling, and model choice; iTrace uses it as a descriptive fit, not a
+clinical marker or a universal normal range. The nonlinear fit constrains
+$V_{\max}$ and $C$ to be positive and reports nonconvergence explicitly instead
+of substituting starting values. `fit_power_law` computes the log-log fit
+independently, so resampling that exponent does not require an unrelated
+saturating-model optimisation.
 
 ## Scanpath encoding
 

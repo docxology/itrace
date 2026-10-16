@@ -37,16 +37,17 @@ to deserve much interpretive weight.
 
 ## Distribution fitting and model comparison
 
-Fixation durations and saccade amplitudes are strictly positive and right-skewed,
-so iTrace fits three standard positive-support families by maximum likelihood:
-the **gamma** and **log-normal** distributions, and the **ex-Gaussian**
-(a Gaussian convolved with an exponential), whose right tail has long been used
-to model the shape of reaction-time and fixation-duration distributions
-[@ratcliff1979group; @luce1986response]. For the two SciPy families the location
-parameter is **pinned to zero** (`floc=0`) so the fit respects the positive
-support and the scale parameter is not traded off against a spurious shift; the
-ex-Gaussian is fit by numerically maximising its log-likelihood over
-$(\mu, \sigma, \tau)$ from method-of-moments starting values. Models are ranked by
+The publication payload compares five marginal candidates for detected positive
+amplitudes: **normal, gamma, log-normal, Weibull, and ex-Gaussian**, fitted by
+SciPy maximum-likelihood routines. Gamma, log-normal, and Weibull have positive
+support with location **fixed at zero** (`floc=0`), leaving shape and scale free.
+Normal and ex-Gaussian have support on the whole real line and can assign mass
+to impossible negative amplitudes; they are unconstrained descriptive comparators,
+not positive-truncated models. The ex-Gaussian is a Gaussian convolved with an
+exponential, parameterised by SciPy as $(K,\mathrm{loc},\mathrm{scale})$ with
+$K=\tau/\sigma$ [@ratcliff1979group; @luce1986response]. The free-parameter count
+excludes fixed location parameters, including a caller-fixed normal or
+ex-Gaussian location. Models are ranked by
 the **Akaike and Bayesian information criteria**
 ($\mathrm{AIC} = 2k - 2\ln\hat{L}$, $\mathrm{BIC} = k\ln n - 2\ln\hat{L}$)
 [@akaike1974new; @schwarz1978estimating], which penalise the extra ex-Gaussian
@@ -58,6 +59,12 @@ normalised Akaike weights $w_i \propto \exp(-\Delta_i/2)$ and evidence ratios
 within the same finite candidate set [@burnham2002model]. These weights are
 relative support diagnostics for the compared families; they are not posterior
 probabilities and do not prove that the selected family generated the data.
+Here $n$ counts detected events, not gaze frames. AIC remains the declared
+ranking, weighting, and winner-frequency criterion; AICc and BIC are sensitivity
+descriptors. AICc is undefined for $n\leq k+1$, and this commonly used correction
+is a heuristic for these fitted marginal families, not a finite-sample guarantee
+for every density model [@hurvich1989regression]. The marginal product likelihood
+also does not model serial dependence between events.
 The same sidecar runs a deterministic bootstrap over detected amplitudes,
 refits the same candidate family set on each resample, and records the
 lowest-AIC winner frequencies as a stability diagnostic, not as posterior model
@@ -65,8 +72,12 @@ probabilities [@efron1993introduction; @burnham2002model].
 Absolute goodness of fit is summarised by a one-sample **Kolmogorov–Smirnov** statistic
 $D = \sup_x |F_n(x) - \hat{F}(x)|$ between the empirical CDF and each fitted CDF
 [@massey1951kolmogorov]; we report $D$ as a descriptive distance and treat the
-companion $p$-value with caution, since the parameters were estimated from the
-same sample (the classic fitted-parameter caveat). Fitting requires a minimum
+companion fixed-CDF $p$-value as **uncalibrated**, since the parameters were
+estimated from the same sample. A separate refit-bootstrap KS diagnostic
+simulates from the fitted family, refits each draw, and uses the plus-one
+Monte Carlo tail probability. Its family was selected from these same data:
+this exploratory diagnostic is not adjusted for model selection, serial
+dependence, or multiple comparisons ([@sec:resampling-design]). Fitting requires a minimum
 number of finite positive observations and raises a `ValueError` below it,
 mirroring the guard in `mainsequence.fit`.
 
@@ -90,7 +101,8 @@ DKW/Massart reference width
 `epsilon = sqrt(log(2 / alpha) / (2 n))` for the empirical CDF at $\alpha=0.05$
 [@massart1990tight], plus whether the maximum fitted-CDF residual exceeds that
 width. This band is displayed as a distribution-free visual reference for ECDF
-fluctuation around a fixed CDF; because the distribution family and its
+fluctuation for IID observations around a fixed CDF; it does not account for
+serial dependence. Because the distribution family and its
 parameters were selected from the same sample, it is not a formal acceptance
 test. The quantile and CDF residuals are model-adequacy diagnostics for the
 detected sample; they are not a proof that the family is true or that another
@@ -121,24 +133,31 @@ entropy* reuses the cardinal scanpath string of [@sec:dynamics]: it forms the
 first-order transition-count matrix between successive direction symbols and
 reports the entropy of the transition distribution, a compact index of how
 predictable the scan order is, in the spirit of information-theoretic scanpath
-analysis [@boccignone2004gaze]. Both are normalised against the maximum
-entropy of their respective alphabets so values are comparable across recordings
-of different length, and both degenerate gracefully (zero entropy) when only one
-cell or symbol is observed.
+analysis [@boccignone2004gaze]. Both are reported in bits, without maximum-entropy
+normalisation. Direction-transition entropy is the count-weighted conditional
+entropy $H(\mathrm{next}\mid\mathrm{current})$, not joint transition entropy.
+Spatial binning defaults to the supplied record's extent; cross-record comparisons
+must specify a common grid, extent, and symbol convention. Unequal event counts
+and sparse transition rows introduce estimation uncertainty and finite-sample
+bias [@paninski2003estimation]. Zero observed transitions do not establish zero
+population probability. Both metrics return zero for degenerate one-cell or
+one-symbol inputs.
 
 ## Bootstrap CI on the main-sequence exponent
 
 The power-law main-sequence fit of [@sec:dynamics] reports a point estimate of the
-exponent $b$ (`power_b` from `mainsequence.fit`). To attach uncertainty,
+exponent $b$ (`power_b` from `mainsequence.fit_power_law`). To attach uncertainty,
 `stats.scanpath_metrics.main_sequence_exponent_ci` resamples the matched amplitude / peak-velocity
 pairs with replacement $B$ times (default $B = 2000$, explicit seed), refits the
 log-log regression on each resample, and reports a two-sided 95% **bootstrap
 percentile** confidence interval on $b$ [@efron1993introduction]. We use the
 percentile interval here for the same reason it is used in the noise sweep
 ([@sec:statmethods]): it makes no symmetry assumption and stays inside the range
-supported by the data. The interval describes sampling variability of the exponent
-*across the observed saccades*; it is not a claim about a population of eyes the
-recording did not sample. Resamples that lose enough unique positive amplitudes
-to make the log-log fit ill-conditioned are discarded; if no valid resample
-survives, the interval collapses to the point estimate rather than producing a
-spurious narrow bound.
+of the resampled estimates. Coverage is approximate and not established merely
+by that property. IID resampling perturbs the observed event pairs under an
+exchangeability assumption; moving-block resampling is available with an explicit
+block length. Neither estimates a population of eyes from a single recording.
+The detailed result reports attempted, successful, and failed draws. Rank-deficient
+draws are excluded and the surviving interval is conditional on successful fits;
+if no valid draw survives, the interval is unavailable and the API raises instead
+of returning zero-width uncertainty [@morris2019simulation].

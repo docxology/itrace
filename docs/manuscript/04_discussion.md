@@ -7,9 +7,9 @@ them against constructed ground truth, iTrace makes the scientific layer
 continuously testable and reproducible. A regression in the saccade detector, the
 microsaccade threshold, or the blink interpolation is caught by a headless test
 run, not discovered later on real data. The optional capture shell can then evolve
-— new landmark backends, browser capture, deep-learning gaze — without putting the
-verified core at risk, because the shell only produces the gaze and pupil streams
-the core already analyses. The local HTML orchestrator is an example of this
+with new landmark backends, browser capture, or deep-learning gaze behind the
+same typed stream boundary. This reduces coupling but does not eliminate risk:
+new inputs can violate numerical or scientific assumptions. The local HTML orchestrator is an example of this
 discipline: the browser receives eye crops and plot-ready summaries, but all
 capture, estimation, event detection, statistics, and export remain in the same
 Python package path tested elsewhere. This is the central design message of
@@ -99,8 +99,8 @@ A precise claim matters. What [@sec:results] establishes is *algorithmic
 verification*: each estimator recovers the parameters of signals produced by a
 known forward model. This is not *device validation* — agreement with an
 independent reference measurement of the same physical quantity on real eyes. We
-have not performed the latter. A passing synthetic suite proves the estimation
-mathematics is correct and regression-protected; by itself it is compatible with
+have not performed the latter. A passing synthetic suite supplies regression
+evidence for the tested estimation cases; by itself it is compatible with
 poor real-world performance. The hardware capture path is not exercised by the
 suite, and it is exactly where the dominant error sources live: head-pose and
 calibration confounds in gaze, the pupillary light reflex in pupillometry, and
@@ -111,12 +111,16 @@ reference implementation of the algorithms, not a validated tracker.
 ## The closed loop bounds, but does not establish, real error
 
 The 3-D closed loop ([@sec:closedloop]) exercises the landmark→gaze projection,
-but its guarantee is bounded by what the forward model and estimator *share*. Both
+but its interpretation is conditional on what the forward model and estimator *share*. Both
 assume an ideal pinhole projection with no lens distortion, no corneal refraction
-(the apparent pupil differs from the physical pupil by ~0.5–1 mm), a perfectly
-spherical eyeball, and a zero kappa angle (~5° in real eyes). Any error these
-shared idealizations introduce is identically zero in the loop by construction,
+(the apparent entrance pupil and physical pupil are different optical quantities),
+a perfectly spherical eyeball, and a zero kappa angle. Errors from these
+shared idealisations are absent from the loop by construction,
 and the synthetic landmarks carry none of MediaPipe's real noise, bias, or
-eccentric-gaze foreshortening. The 0.16° residual is thus a *lower bound* on
-real-world error, and the $r = 1.0$ pupil result is a consistency check, not
-accuracy. The quantitative limits this implies are collected in [@sec:limitations].
+eccentric-gaze foreshortening. The 0.16° residual therefore has no established
+ordering relative to real-world error. The $r = 1.0$ pupil result is a consistency
+check: correlation can remain high despite offsets, rescaling, or systematic
+measurement bias. Agreement requires a reference measurement and an analysis
+of differences in stated units [@bland1986agreement]. Repeated observations
+within an individual require a design that preserves that dependence
+[@bland2007multiple]. The limits are collected in [@sec:limitations].

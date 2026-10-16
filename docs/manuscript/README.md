@@ -16,6 +16,13 @@ from their respective ledgers. An absent empirical ledger produces explicit
 unavailable fields. An existing malformed ledger, missing token, source audit
 failure, Pandoc warning, or unresolved rendered reference stops the build.
 
+Noise thresholds and the complete noise table hydrate from
+`output/figures/noise_metrics.json` through `load_noise_tokens`. This deterministic
+ledger is required; a missing or incomplete one fails instead of inserting guessed
+thresholds. Regenerate it with the canonical figure pipeline after scoring changes.
+The archived v0.5.0 verification ledger is retained under `docs/releases/`;
+current development is identified by its own source digest and measured ledger.
+
 Markdown, plain text, LaTeX, and PDF are staged and validated before reader outputs
 are replaced. A failed `.itrace-render-*` directory retains the attempted input
 and intermediate artifacts. Use `--output-dir` for an isolated review render.

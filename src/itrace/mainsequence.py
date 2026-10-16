@@ -6,8 +6,8 @@ peak velocity. Two standard parameterisations are fitted:
 * saturating exponential ``V = V_max * (1 - exp(-A / C))`` (Bahill et al., 1975);
 * power law ``V = a * A^b`` (linear in log-log space).
 
-A healthy oculomotor system gives a power-law exponent ``b`` of roughly
-0.4-0.9. Deviations are a recognised clinical/behavioural marker.
+The exponent depends on the task, amplitude range, sampling, and fit convention;
+this descriptive fit is not a clinical classification.
 """
 
 from __future__ import annotations
@@ -37,26 +37,46 @@ def fit(amplitudes_deg: FloatArray, peak_velocities_deg_s: FloatArray) -> dict[s
     ValueError
         If fewer than three valid (positive) points are supplied.
     """
-    amp = np.asarray(amplitudes_deg, dtype=np.float64)
-    vel = np.asarray(peak_velocities_deg_s, dtype=np.float64)
-    if amp.shape != vel.shape:
-        msg = "amplitude and peak-velocity arrays must match"
-        raise ValueError(msg)
-    valid = np.isfinite(amp) & np.isfinite(vel) & (amp > 0) & (vel > 0)
-    amp, vel = amp[valid], vel[valid]
-    if amp.size < 3:
-        msg = f"main-sequence fit needs >=3 positive points; got {amp.size}"
-        raise ValueError(msg)
+    amp, vel = _positive_pairs(amplitudes_deg, peak_velocities_deg_s)
+    power = fit_power_law(amp, vel)
 
     # Saturating exponential.
     p0 = (float(np.max(vel)), float(np.median(amp)))
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("error", OptimizeWarning)
-            popt, _ = curve_fit(_saturating, amp, vel, p0=p0, maxfev=10000)
-        v_max, c = float(popt[0]), float(abs(popt[1]))
-    except (OptimizeWarning, RuntimeError, ValueError):  # pragma: no cover - rare non-convergence
-        v_max, c = float(np.max(vel)), float(np.median(amp))
+            popt, _ = curve_fit(_saturating, amp, vel, p0=p0, bounds=(0.0, np.inf), maxfev=10000)
+        v_max, c = float(popt[0]), float(popt[1])
+    except (OptimizeWarning, RuntimeError, ValueError) as exc:
+        raise ValueError("saturating main-sequence fit did not converge") from exc
+    if not np.all(np.isfinite(popt)):
+        raise ValueError("saturating main-sequence fit returned nonfinite parameters")
+    return {"v_max": v_max, "C": c, **power}
+
+
+def _positive_pairs(amp: FloatArray, vel: FloatArray) -> tuple[FloatArray, FloatArray]:
+    a = np.asarray(amp, dtype=np.float64)
+    v = np.asarray(vel, dtype=np.float64)
+    if a.ndim != 1 or v.ndim != 1 or a.shape != v.shape:
+        raise ValueError("amplitude and peak-velocity arrays must match and be one-dimensional")
+    valid = np.isfinite(a) & np.isfinite(v) & (a > 0) & (v > 0)
+    a, v = a[valid], v[valid]
+    if a.size < 3:
+        raise ValueError(f"main-sequence fit needs >=3 positive points; got {a.size}")
+    if np.unique(a).size < 2:
+        raise ValueError("power-law fit requires distinct amplitudes")
+    return a, v
+
+
+def fit_power_law(
+    amplitudes_deg: FloatArray, peak_velocities_deg_s: FloatArray
+) -> dict[str, float]:
+    """Fit only log velocity on log amplitude, without a nonlinear surrogate.
+
+    Returns ``power_a``, ``power_b``, and log-space ``r_squared_power``. At least
+    three finite positive pairs and two distinct amplitudes are required.
+    """
+    amp, vel = _positive_pairs(amplitudes_deg, peak_velocities_deg_s)
 
     # Power law via log-log linear regression.
     log_a, log_v = np.log(amp), np.log(vel)
@@ -67,8 +87,6 @@ def fit(amplitudes_deg: FloatArray, peak_velocities_deg_s: FloatArray) -> dict[s
     r_squared = 1.0 - ss_res / ss_tot if ss_tot > 0 else 1.0
 
     return {
-        "v_max": v_max,
-        "C": c,
         "power_a": float(np.exp(log_intercept)),
         "power_b": float(b),
         "r_squared_power": r_squared,

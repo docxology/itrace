@@ -18,7 +18,7 @@ from . import (
     similarity,
     timeseries,
 )
-from .bootstrap import bootstrap_statistic, percentile_interval
+from .bootstrap import bootstrap_indices, bootstrap_statistic, percentile_interval
 from .descriptive import (
     coefficient_of_variation,
     describe,
@@ -31,10 +31,12 @@ from .diagnostics import DEFAULT_DIAGNOSTIC_FAMILIES, session_statistical_diagno
 from .distributions import (
     FAMILIES,
     FitResult,
+    GoodnessOfFitResult,
     best_fit,
     compare_distributions,
     fit_distribution,
     frozen_from_result,
+    parametric_ks_test,
 )
 from .events import event_prf, interval_overlap_s
 from .evidence import (
@@ -55,6 +57,7 @@ from .scanpath_metrics import (
     gaze_dispersion,
     gaze_path_efficiency,
     gaze_path_length,
+    main_sequence_exponent_bootstrap,
     main_sequence_exponent_ci,
     raw_gaze_spatial_summary,
     scanpath_summary,
@@ -80,12 +83,14 @@ __all__ = [
     "DEFAULT_DIAGNOSTIC_FAMILIES",
     "FAMILIES",
     "FitResult",
+    "GoodnessOfFitResult",
     "aoi_dwell_statistics",
     "aoi_transition_matrix",
     "bcea",
     "best_fit",
     "blink_rate_hz",
     "bootstrap",
+    "bootstrap_indices",
     "bootstrap_statistic",
     "build_statistical_interpretation_ledger",
     "build_synthetic_empirical_range_bridge",
@@ -113,10 +118,12 @@ __all__ = [
     "levenshtein",
     "load_statistical_interpretation_ledger",
     "load_synthetic_empirical_range_bridge",
+    "main_sequence_exponent_bootstrap",
     "main_sequence_exponent_ci",
     "microsaccade_rate_hz",
     "ngram_cosine",
     "normalized_levenshtein",
+    "parametric_ks_test",
     "percentile_interval",
     "range_bridge",
     "raw_gaze_spatial_summary",

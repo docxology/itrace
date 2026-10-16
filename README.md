@@ -15,10 +15,12 @@ with an optional, thin webcam + MediaPipe capture shell.
 ## License and citation
 
 iTrace is MIT-licensed and openly released at
-https://github.com/docxology/itrace, with this version archived on Zenodo at
+https://github.com/docxology/itrace. The archived v0.5.0 baseline is on Zenodo at
 DOI [10.5281/zenodo.23403300](https://doi.org/10.5281/zenodo.23403300) (concept
 DOI [10.5281/zenodo.20614908](https://doi.org/10.5281/zenodo.20614908) always
-resolves to the latest version). The repository URL is fixed here, in
+resolves to the latest version). Current `main` includes subsequent development
+corrections identified by Git history and `docs/verification_metrics.json`.
+The repository URL is fixed here, in
 `pyproject.toml`, in `docs/verification_metrics.json`, and in `CITATION.cff` so
 the release and manuscript citation metadata stay aligned. See
 [`LICENSE`](LICENSE) and [`CITATION.cff`](CITATION.cff).
@@ -429,19 +431,18 @@ recovered gaze RMS vs the 3-D truth is **0.16°** for gaze within ±15° and the
 three scripted saccades are recovered exactly.
 
 **What this is — and is not.** This is *internal-consistency / algorithmic
-verification*: it proves the estimator correctly inverts the forward model and
-catches sign flips, axis swaps, unit errors, and frame mismatches. It is **not**
-device validation. The 0.16° is the residual between two of *our own* models, so
-it is a **lower bound on real-world error** — any idealization the two paths
-*share* contributes exactly zero error by construction and is invisible to the
-loop:
+verification*: the tested cases expose sign flips, axis swaps, unit errors, and
+frame mismatches. It is **not** device validation. The 0.16° residual is conditional
+on two model formulations and their shared assumptions. It establishes no
+quantitative lower or upper bound on real-world error. Shared idealisations are
+invisible to the loop:
 
 | Shared idealization (loop is blind to it) | Real-world reality |
 |---|---|
 | Pinhole projection, no lens distortion | webcam lens distortion, foreshortening |
-| No corneal refraction | apparent pupil shifts ~0.5–1 mm |
+| No corneal refraction | entrance-pupil geometry differs from physical pupil geometry |
 | Perfectly spherical eyeball | aspheric cornea |
-| Zero kappa angle (optical = visual axis) | ~5° visual/optical-axis offset |
+| Zero kappa angle (optical = visual axis) | individual visual/optical-axis offsets |
 | Synthetic landmarks | real MediaPipe noise, bias, head-pose/occlusion failures |
 
 The recovered **pupil** is a near-identity check, not a recovery: the projected
@@ -450,6 +451,11 @@ expected by construction — treat it as a *consistency check* that deblinking a
 the pipeline preserve the signal, not as evidence of pupil-size accuracy.
 
 ## Noise-sensitivity analysis
+
+The [statistical design guide](docs/STATISTICAL_DESIGN.md) documents IID and
+moving-block resampling, failed-fit counts, fitted-null KS calibration, and the
+limits of event-level inference. The manuscript includes a generated synthetic
+resampling-sensitivity figure with its JSON source and analytic reference.
 
 A **sensitivity / robustness sweep** (not a hypothesis-testing power calculation):
 how does recovery degrade as observation noise grows? Webcam noise is modelled —
@@ -463,22 +469,19 @@ uv run python scripts/generate_power_figure.py     # -> output/figures/noise_pow
 uv run python scripts/generate_orbs_animation.py   # -> output/figures/eye_orbs.gif (floating orbs)
 ```
 
-| Signal | Usable until (σ, ≈) | ≈ px @640w | Status |
-|--------|--------------------|-----------|--------|
-| **Saccade detection (F1≥0.8)** | 0.0014 | **0.9 px** | **emergent** — rests on *velocity* (a derivative), which amplifies noise → degrades first |
-| **Gaze direction (RMS<2°)** | 0.0048 | 3.1 px | **emergent** — direct position estimate, intermediate |
-| **Pupil correlation (r≥0.9)** | 0.0050 | 3.2 px | **conditional** — robustness is *set by the `pupil_noise_scale` assumption*, not measured; the separate `pupilseg` helper is pixel/relative only |
+The current [noise table](output/figures/noise_summary.md) and
+[machine-readable thresholds](output/figures/noise_metrics.json) come from one
+regenerated sweep. The development scorer uses greedy **one-to-one positive
+overlap**, penalizing fragmented and merged detections. Its results supersede
+the archived release's many-to-many overlap sweep; historical release assets are
+unchanged. Overlap F1 describes event recovery, not onset/offset accuracy or a
+universal webcam timing limit. Pupil correlation remains conditional on the
+separate `pupil_noise_scale` assumption.
 
-**The defensible headline** (translating σ to pixels): saccade detection breaks
-down at σ ≈ 0.9 px, a sub-pixel-to-few-pixel perturbation scale small enough
-that real capture effects from landmark jitter, head pose, illumination, lens
-distortion, and calibration can dominate. So webcam saccade timing is
-theoretically marginal **before** those real-world effects are added, whereas
-gaze and coarse fixation tolerate a few pixels.
-The gaze-vs-saccade ordering emerges from the noise model; the pupil position does
-not — it would move if `pupil_noise_scale` changed, so it is reported as
-conditional, not as a finding. Saccade F1 uses interval-overlap matching; with 25
-seeds the σ crossings are approximate.
+Intervals are shown as mean [lower, upper] endpoints rather than symmetric
+half-widths. They are pointwise approximate percentile intervals over whole
+synthetic trials; bounded endpoints alone do not guarantee nominal coverage.
+The sidecar separately records Monte Carlo standard errors.
 
 ## Validation status — read this carefully
 
@@ -492,7 +495,7 @@ claims and the distinction matters:
   tolerance, the parameters of signals generated by a known forward model — a
   minimum-jerk saccade of known amplitude/direction, an embedded microsaccade, a
   sinusoidal pupil trace with a NaN blink, and a full 3-D-eye → projection →
-  recovery loop (internal-consistency gaze residual 0.16°, a lower bound).
+  recovery loop (internal-consistency gaze residual 0.16°, conditional on its scene).
   Independently-formulated implementations cross-check the detectors
   (`tests/fixtures/reference_impl.py`) and the geometry (`eyemodel`'s perspective
   projection vs the arcsine estimator), plus pure tests for binocular landmark

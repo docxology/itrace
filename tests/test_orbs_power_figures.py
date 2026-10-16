@@ -55,7 +55,9 @@ def test_power_summary_table_written(tmp_path) -> None:  # ISC-94
     assert path.name == "noise_summary.md"
     text = path.read_text()
     assert "| sigma (norm) |" in text
-    assert "+/-" in text
+    assert "+/-" not in text
+    assert "mean [pointwise 95% percentile interval]" in text
+    assert "1.000 [1.000, 1.000]" in text
 
 
 @pytest.mark.timeout(120)

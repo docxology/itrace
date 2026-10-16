@@ -16,8 +16,11 @@ We deliberately avoid a symmetric Student-$t$ interval
 **bounded** — saccade F1 $\in [0,1]$ and pupil correlation $\in [-1,1]$ — and at
 low noise both sit near 1.0, exactly where a symmetric interval can extend past
 the bound and report a nonsensical value above 1. A percentile of resampled means
-can never leave the range of the in-bound observations, so the interval is always
-valid. For the unbounded gaze RMS the two methods agree closely.
+cannot leave the observed bounds. This support property does not establish 95%
+coverage: for example, an all-success Bernoulli sample produces the interval
+$[1,1]$ even when the generating probability is below one. These are approximate,
+pointwise intervals; coverage for the sweep settings has not been established
+[@efron1987better; @morris2019simulation].
 
 ## What the interval means (and the determinism caveat)
 
@@ -25,25 +28,36 @@ The pipeline is fully deterministic: re-running it reproduces every number
 byte-for-byte ([@sec:reproducibility]). The confidence interval therefore does
 **not** describe "what happens if I rerun the code." It describes the variability
 of the mean **across the random landmark-noise realisations sampled by the $n$
-seeded trials** — a Monte Carlo standard error of the mean over the noise
-process. With $n=25$ fixed seeds it quantifies how much the level-mean would move
-under a different finite draw of noise realisations.
+seeded trials** under the declared scene and noise process. This Monte Carlo
+uncertainty interval is distinct from the standard error of the mean,
+$s n^{-1/2}$ for trial standard deviation $s$, reported separately in the sidecar
+[@morris2019simulation]. It estimates neither between-participant variability
+nor uncertainty in how well the noise model represents a real camera.
 
 ## Trial independence and determinism
 
 Each trial uses a distinct deterministic seed (`base_seed + level_index*1000 +
-trial`), and the bootstrap resampler is itself fixed-seeded, so trials are
-independent draws of the landmark-noise process while the whole sweep — including
-every CI — is byte-for-byte reproducible.
+trial`), and the bootstrap resampler is itself fixed-seeded. Pseudorandom draws
+are treated as independent under the generator design; distinct integer seeds
+are a reproducibility policy, not a proof of independence. Reproduction is
+conditional on the recorded runtime and locked numerical dependencies.
 
 ## Saccade detection scoring
 
 Saccade F1 uses **interval-overlap** matching against the ground-truth saccade
-intervals: a true saccade is recalled if any detected interval overlaps it, and a
-detected interval is a true positive if it overlaps any true saccade. There is no
-separate temporal-tolerance parameter; precision, recall, and
-$F_1 = 2PR/(P+R)$ follow directly. This makes the score insensitive to small
-onset/offset shifts while still penalising spurious or missed events.
+intervals using the same greedy one-to-one matcher as external benchmark scoring.
+Predictions are processed in onset order and each selects the unmatched truth
+interval with the largest strictly positive overlap. Touching endpoints do not
+match; no interval can contribute more than one true positive. Fragmentation and
+merging are therefore penalised. Precision, recall, and $F_1 = 2PR/(P+R)$ follow
+from these counts. This greedy rule is deterministic, not a globally optimal
+assignment. Even one-to-one overlap F1 does not establish onset/offset accuracy:
+a greatly extended interval can still overlap a true event. Boundary errors
+require separate matched-event timing metrics.
+
+This revision replaces the archived release's many-to-many any-overlap sweep
+scorer. The regenerated sweep and thresholds belong to the revised scorer;
+historical release artifacts retain their original interpretation.
 
 ## Threshold crossings
 

@@ -61,6 +61,16 @@ hosted run; publication receipts record the exact commit and hosted result.
 
 ## Numerical contracts
 
+The post-v0.5.0 statistical correction pass adds one-to-one overlap scoring to the
+closed-loop sweep, actual percentile endpoints, explicit Monte Carlo standard
+errors, moving-block resampling, failed-fit counts, and fixed-family KS refitting.
+The [statistical design guide](STATISTICAL_DESIGN.md) specifies assumptions,
+compatibility changes, and interpretation. Primary-source checks and their access
+limits are retained in [the scholarship review](SCHOLARSHIP_REVIEW_20261015.md).
+The archived v0.5.0 ledger is preserved byte-for-byte at
+`releases/v0.5.0-verification.json`; current development does not change the
+published Git tag or Zenodo payload.
+
 - Synthetic-domain validation chooses gaze-gap preprocessing from finite input
   masks before analysis. Bounded gaps of at most 0.08 s are interpolated; remaining
   invalid edge samples are dropped and reported. Long bounded gaps remain errors.

@@ -85,7 +85,9 @@ class FitResult:
     ks_statistic:
         Kolmogorov-Smirnov statistic between the data and the fitted CDF.
     ks_pvalue:
-        Two-sided p-value of the KS test (large = consistent with the fit).
+        Uncalibrated fixed-CDF KS p-value retained for compatibility. Parameters
+        were fitted on these data: do not use this value for inference. Use
+        :func:`parametric_ks_test` for a fixed-family refit bootstrap instead.
     n:
         Number of finite samples used in the fit.
     scipy_params:
@@ -102,11 +104,12 @@ class FitResult:
     ks_pvalue: float
     n: int
     scipy_params: tuple[float, ...]
+    free_parameters: int | None = None
 
     @property
     def k(self) -> int:
-        """Number of free (readable) parameters of the fitted family."""
-        return len(self.params)
+        """Number of estimated parameters, excluding a fixed location."""
+        return len(self.params) if self.free_parameters is None else self.free_parameters
 
     @property
     def aicc(self) -> float:
@@ -223,7 +226,7 @@ def fit_distribution(
 
     params = _readable_params(spec, scipy_params)
     n = int(x.size)
-    k = len(params)
+    k = len(params) - int(effective_floc is not None and not spec.positive_support)
     aic = 2.0 * k - 2.0 * loglik
     bic = k * float(np.log(n)) - 2.0 * loglik
 
@@ -241,6 +244,65 @@ def fit_distribution(
         ks_pvalue=ks_pvalue,
         n=n,
         scipy_params=scipy_params,
+        free_parameters=k,
+    )
+
+
+@dataclass(frozen=True)
+class GoodnessOfFitResult:
+    """Fixed-family refit-bootstrap KS result, conditional on IID observations.
+
+    ``minimum_pvalue`` is Monte Carlo resolution, not precision. This procedure
+    does not adjust for choosing the family after looking at the same sample.
+    """
+
+    family: str
+    statistic: float
+    pvalue: float
+    exceedances: int
+    n_boot: int
+    seed: int
+    minimum_pvalue: float
+    fixed_location: float | None
+
+
+def parametric_ks_test(
+    data: FloatArray | object,
+    family: str,
+    *,
+    n_boot: int = 999,
+    seed: int = 12345,
+    floc: float | None = None,
+) -> GoodnessOfFitResult:
+    """Simulate from the fitted family and refit each draw before scoring KS.
+
+    Uses ``(exceedances + 1) / (n_boot + 1)``. Every requested fit must succeed;
+    failed draws raise instead of conditioning the null distribution on success.
+    Fixed locations are held fixed throughout. The family must be prespecified
+    for an inferential test; post-selection use is an exploratory diagnostic.
+    """
+    if isinstance(n_boot, (bool, np.bool_)) or not isinstance(n_boot, (int, np.integer)):
+        raise ValueError("n_boot must be a positive integer")
+    if n_boot < 1:
+        raise ValueError("n_boot must be >= 1")
+    sample = _clean(data)
+    result = fit_distribution(sample, family, floc=floc)
+    frozen = frozen_from_result(result)
+    rng = np.random.default_rng(seed)
+    exceedances = 0
+    for _ in range(n_boot):
+        draw = np.asarray(frozen.rvs(size=sample.size, random_state=rng), dtype=np.float64)
+        refit = fit_distribution(draw, family, floc=floc)
+        exceedances += refit.ks_statistic >= result.ks_statistic
+    return GoodnessOfFitResult(
+        family=family,
+        statistic=result.ks_statistic,
+        pvalue=float((exceedances + 1) / (n_boot + 1)),
+        exceedances=int(exceedances),
+        n_boot=int(n_boot),
+        seed=seed,
+        minimum_pvalue=1.0 / (n_boot + 1),
+        fixed_location=floc,
     )
 
 

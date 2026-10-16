@@ -65,6 +65,14 @@ DEFAULT_EMPIRICAL_SESSIONS_SUMMARY = ROOT / DEFAULT_SESSIONS_SUMMARY
 DEFAULT_EMPIRICAL_SESSIONS_FIGURE = ROOT / DEFAULT_SESSIONS_FIGURE
 
 SOURCE_MAP: dict[str, dict[str, object]] = {
+    "resampling_sensitivity.png": {
+        "script": "scripts/generate_figures.py",
+        "source_data": ["output/figures/resampling_sensitivity.json"],
+    },
+    "resampling_sensitivity.json": {
+        "script": "scripts/generate_figures.py",
+        "source_data": ["src/itrace/stats/bootstrap.py", "src/itrace/viz/resampling.py"],
+    },
     "cover_visual.png": {
         "script": "scripts/generate_graphical_abstract.py",
         "source_data": ["docs/verification_metrics.json"],

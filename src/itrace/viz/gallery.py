@@ -16,6 +16,7 @@ from matplotlib.figure import Figure
 
 from .. import pipeline, saccades
 from ..config import AnalysisConfig, DetectionConfig
+from ..stats.bootstrap import resampling_sensitivity
 from ..stats.diagnostics import session_statistical_diagnostics
 from ..stats.evidence import (
     DEFAULT_STATISTICAL_EVIDENCE_SOURCES,
@@ -42,6 +43,7 @@ from .quality import (
     figure_sampling_intervals,
 )
 from .range_bridge import figure_synthetic_empirical_range_bridge
+from .resampling import figure_resampling_sensitivity
 from .scanpath import figure_microsaccades, figure_scanpath
 from .spatial import figure_aoi, figure_fixation_heatmap, figure_gaze_density
 from .statistics import figure_statistical_diagnostics
@@ -161,10 +163,17 @@ def render_gallery(
     report = pipeline.analyze_session(gaze, pupil, config=cfg)
     props = saccades.saccade_properties(report.saccades)
     statistical_payload = session_statistical_diagnostics(report)
+    resampling_payload = resampling_sensitivity(seed=seed + 2401)
     range_bridge_payload = _range_bridge_payload(statistical_payload)
     evidence_payload = _statistical_evidence_payload(statistical_payload, range_bridge_payload)
 
     paths: list[Path] = [
+        _write_json(resampling_payload, out / "resampling_sensitivity.json"),
+        _save(
+            figure_resampling_sensitivity(resampling_payload),
+            out / "resampling_sensitivity.png",
+            dpi=dpi,
+        ),
         _write_json(statistical_payload, out / "statistical_diagnostics.json"),
         _write_json(range_bridge_payload, out / "synthetic_empirical_range_bridge.json"),
         _write_json(evidence_payload, out / "statistical_interpretation_ledger.json"),

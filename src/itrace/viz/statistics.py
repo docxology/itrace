@@ -96,12 +96,14 @@ def _plot_model_comparison(
     ax.set_yticklabels([str(row["family"]) for row in fit_rows])
     ax.invert_yaxis()
     ax.grid(True, axis="x", alpha=0.25)
-    ax.set_xlim(0.0, max(float(np.max(delta_aic)), 1.0) * 1.65)
+    ax.set_xlim(0.0, max(float(np.max(delta_aic)), 1.0) * 2.05)
+    ax.set_ylim(len(fit_rows) + 2.3, -0.65)
 
     for idx, (delta, row) in enumerate(zip(delta_aic, fit_rows, strict=True)):
+        aicc = "n/a" if row.get("aicc") is None else f"{float(row['aicc']):.1f}"
         label = (
             f"w={float(row.get('akaike_weight', 0.0)):.2f} | "
-            f"BIC={float(row['bic']):.1f} | KS={float(row['ks_statistic']):.2f}"
+            f"AICc={aicc} | KS={float(row['ks_statistic']):.2f}"
         )
         ax.text(
             max(float(delta), 0.05) + 0.05,
@@ -124,14 +126,14 @@ def _plot_model_comparison(
             f"{boot_line}\n"
             f"n={model.get('n', fit_rows[0]['n'])}"
         ),
-        xy=(0.98, 0.96),
+        xy=(0.02, 0.27),
         color=WONG[2],
-        align="right",
+        align="left",
     )
     result_box(
         ax,
         _shape_callout(shape),
-        xy=(0.98, 0.62),
+        xy=(0.98, 0.27),
         color=WONG[1],
         align="right",
     )
@@ -214,6 +216,9 @@ def _quantile_callout(quantile: dict[str, Any], cdf_payload: dict[str, Any]) -> 
         if "dkw_epsilon" in cdf_payload:
             confidence = float(cdf_payload.get("dkw_confidence", 0.95))
             lines.append(f"DKW {confidence:.0%} +/- {float(cdf_payload['dkw_epsilon']):.2f}")
+        gof = cdf_payload.get("refit_bootstrap", {})
+        if gof.get("available"):
+            lines.append(f"refit KS p={float(gof['pvalue']):.2f} (exploratory)")
     return "\n".join(lines)
 
 
@@ -261,26 +266,20 @@ def _plot_main_sequence_ci(ax: Axes, stats_payload: dict[str, Any]) -> None:
     confidence = float(stats_payload.get("confidence", 0.95))
     n_boot = int(stats_payload.get("n_boot", 0))
 
-    lower_err = max(estimate - lo, 0.0)
-    upper_err = max(hi - estimate, 0.0)
-    ax.errorbar(
-        estimate,
-        0,
-        xerr=np.array([[lower_err], [upper_err]], dtype=np.float64),
-        fmt="o",
-        ms=9,
-        capsize=7,
-        color=WONG[4],
-        ecolor=WONG[4],
-        lw=2.5,
-    )
+    ax.plot([lo, hi], [0, 0], color=WONG[4], lw=2.5)
+    ax.plot([lo, hi], [0, 0], "|", ms=14, color=WONG[4])
+    ax.plot(estimate, 0, "o", ms=9, color=WONG[4])
     pad = max((hi - lo) * 1.8, 0.035)
     ax.set_xlim(min(lo, estimate) - pad, max(hi, estimate) + pad)
     ax.axvline(estimate, color=INK, lw=1.0, alpha=0.45)
     ax.grid(True, axis="x", alpha=0.25)
     result_box(
         ax,
-        f"b={estimate:.2f}\n{confidence:.0%} CI {lo:.2f}-{hi:.2f}\nbootstrap B={n_boot}",
+        (
+            f"b={estimate:.2f}\n{confidence:.0%} CI {lo:.2f}-{hi:.2f}\n"
+            f"bootstrap B={n_boot}; valid={stats_payload.get('n_successful', n_boot)}\n"
+            f"block length={stats_payload.get('block_length', 1)} events"
+        ),
         xy=(0.05, 0.92),
         color=WONG[4],
     )
@@ -365,12 +364,23 @@ def _plot_transition_matrix(ax: Axes, transition_payload: dict[str, Any]) -> Non
         _placeholder(ax, "Scanpath transitions", "no encoded saccades")
         return
 
-    image = ax.imshow(matrix, cmap="viridis", vmin=0.0, vmax=1.0)
+    row_counts = transition_payload.get("row_counts", [])
+    if len(row_counts) == len(symbols):
+        mask = np.broadcast_to(np.asarray(row_counts)[:, None] == 0, matrix.shape)
+        displayed = np.where(mask, np.nan, matrix)
+    else:
+        displayed = matrix
+    image = ax.imshow(displayed, cmap="viridis", vmin=0.0, vmax=1.0)
     ax.set_aspect("auto")
     ax.set_xticks(np.arange(len(symbols)))
     ax.set_yticks(np.arange(len(symbols)))
     ax.set_xticklabels(symbols)
-    ax.set_yticklabels(symbols)
+    ax.set_yticklabels(
+        [
+            f"{symbol} (n={row_counts[i]})" if row_counts else symbol
+            for i, symbol in enumerate(symbols)
+        ]
+    )
     ax.set_xlabel("next symbol")
     ax.set_ylabel("current symbol")
     for i in range(matrix.shape[0]):
@@ -387,14 +397,14 @@ def _plot_transition_matrix(ax: Axes, transition_payload: dict[str, Any]) -> Non
                     fontsize=FONT_FLOOR,
                 )
     cbar = ax.figure.colorbar(image, ax=ax, fraction=0.046, pad=0.04)
-    cbar.set_label("p(next | current)")
+    cbar.set_label("observed transition proportion")
     scanpath = str(transition_payload.get("scanpath", "")) or "empty"
     if len(scanpath) > 24:
         scanpath = scanpath[:21] + "..."
     ax.text(
         0.0,
         -0.22,
-        f"scanpath={scanpath}",
+        f"scanpath={scanpath}; blank rows: no outgoing observations",
         transform=ax.transAxes,
         ha="left",
         va="top",

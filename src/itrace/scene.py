@@ -22,6 +22,7 @@ import numpy as np
 from . import pipeline, pupil
 from .capture import iris_landmarks_to_sample
 from .eyemodel import Camera, blink_landmarks, eye_to_landmarks, projected_pupil_ratio
+from .stats.events import interval_prf
 from .synthetic import minimum_jerk_profile
 from .types import BoolArray, FloatArray, GazeStream, PupilStream, PupilUnit, SessionReport
 
@@ -258,23 +259,8 @@ def _metrics(
     }
 
 
-def _overlaps(a: tuple[int, int], b: tuple[int, int]) -> bool:
-    return a[0] <= b[1] and b[0] <= a[1]
-
-
 def _saccade_prf(
     detected: list[tuple[int, int]], truth: list[tuple[int, int]]
 ) -> tuple[float, float, float]:
-    """Precision / recall / F1 of detected saccade intervals vs ground truth.
-
-    A true saccade counts as recalled if any detected interval overlaps it; a
-    detected interval counts as a true positive if it overlaps any true saccade.
-    """
-    if not truth:
-        return 0.0, 0.0, 0.0
-    tp_truth = sum(any(_overlaps(d, g) for d in detected) for g in truth)
-    tp_det = sum(any(_overlaps(d, g) for g in truth) for d in detected)
-    recall = tp_truth / len(truth)
-    precision = tp_det / len(detected) if detected else 0.0
-    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
-    return float(precision), float(recall), float(f1)
+    score = interval_prf(truth, detected)
+    return score["precision"], score["recall"], score["f1"]

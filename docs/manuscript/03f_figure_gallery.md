@@ -37,15 +37,16 @@ saccade-direction polar histogram, and a textual summary into a single
 at-a-glance figure. The statistical diagnostics composite in
 [@fig:statistical-diagnostics] takes the same `SessionReport` view and makes the
 statistics layer inspectable: distribution-family ranking is plotted as
-lower-is-better AIC deltas with AIC weights, AICc, BIC/KS annotations, and robust amplitude-shape
+lower-is-better AIC deltas with AIC weights, AICc/KS annotations, and robust amplitude-shape
 fields (median and IQR with seeded bootstrap intervals, Bowley skewness, and
 IQR outside values), plus a seeded bootstrap of the lowest-AIC family winner to
-show model-ranking stability without treating that frequency as a posterior
+show bootstrap lowest-AIC winner stability without treating that frequency as a posterior
 probability. The
 best-fit amplitude family is checked against empirical quantiles and fitted-CDF
 residuals with integrated/tail-weighted distance summaries and a DKW/Massart
 reference band, the
-main-sequence exponent is shown with a seeded bootstrap interval, fixation
+main-sequence exponent is shown with exact seeded percentile endpoints and the
+successful-draw count, fixation
 centroids are paired with dispersion/BCEA/hull descriptors, and the scanpath
 string is decomposed into a first-order transition matrix. The panel is useful
 because each plotted value is computed by the tested Python statistics modules;
@@ -55,7 +56,7 @@ validation evidence. The same refresh writes
 an audited statistical payload rather than an untracked matplotlib-only
 calculation.
 
-![Statistical diagnostics over a deterministic synthetic session. Panel A ranks amplitude-distribution families by delta AIC while carrying Akaike weights, AICc, BIC, Kolmogorov-Smirnov descriptors, bootstrap lowest-AIC winner stability, robust median/IQR shape summaries with seeded bootstrap intervals, Bowley quartile skewness, and IQR outside-value counts; panel B plots empirical amplitude quantiles against fitted quantiles for the lowest-AIC family, reports QQ residual scale, and adds a P-P/CDF residual inset with integrated and Anderson-Darling-style tail-weighted CDF distances plus a DKW/Massart reference band; panel C shows the seeded bootstrap interval for the main-sequence exponent; panel D overlays fixation centroids with a BCEA-style ellipse and spatial-spread summaries; panel E renders the row-normalised scanpath transition matrix. The figure visualizes tested core descriptors and relative model diagnostics, not real-eye accuracy, population inference, or proof that a fitted family is true.](../../output/figures/statistical_diagnostics.png){#fig:statistical-diagnostics width=100%}
+![Statistical diagnostics over a deterministic synthetic session. Panel A ranks amplitude families by delta AIC with AIC weights, AICc/KS annotations, and event-shape summaries. Panel B shows QQ and fitted-CDF residuals, an IID DKW reference width, and an exploratory refit-bootstrap KS probability that is not adjusted for family selection. Panel C displays actual percentile endpoints for the main-sequence exponent and the successful resample count. Panel D shows fixation-centroid spread. Panel E displays empirical transition proportions with row counts; blank rows contain no observed outgoing transitions. These are conditional sample diagnostics, not real-eye accuracy, population inference, or model acceptance.](../../output/figures/statistical_diagnostics.png){#fig:statistical-diagnostics width=100%}
 
 The statistical panel is intentionally information-dense, so
 [@fig:statistical-interpretation-ledger] records the companion interpretation

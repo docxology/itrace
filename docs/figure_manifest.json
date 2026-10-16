@@ -232,11 +232,11 @@
         "LICENSE",
         "CITATION.cff"
       ],
-      "bytes": 543103,
-      "sha256": "a858566bbc1db13a4403f61b364debe1768be50340a9a8fe79287717250aad34",
+      "bytes": 541458,
+      "sha256": "3fc493758f2d7c5924857b55b8fb3772940b1ad73c66b1b0184e49b10703a777",
       "width_px": 4800,
       "height_px": 2700,
-      "pixel_std": 0.30391526222229004
+      "pixel_std": 0.3039188086986542
     },
     {
       "path": "output/figures/main_sequence.png",
@@ -245,11 +245,11 @@
       "source_data": [
         "src/itrace/synthetic.py"
       ],
-      "bytes": 323364,
-      "sha256": "70743168e3e7f37bdc1bb36c9410a45ac7b500bedd7662ea183ee23d85dc881d",
+      "bytes": 323354,
+      "sha256": "b9a7169792febf474f6d60c9d27bba7f33141bab4712de6a7756782cfde793a0",
       "width_px": 3240,
       "height_px": 1290,
-      "pixel_std": 0.18437834084033966
+      "pixel_std": 0.18437841534614563
     },
     {
       "path": "output/figures/main_sequence_diagnostics.png",
@@ -285,8 +285,8 @@
         "src/itrace/power.py",
         "src/itrace/scene.py"
       ],
-      "bytes": 4530,
-      "sha256": "cddae66d5ea3d73fe20504bddc1b1396b531e7711b1f235b8f25ac16678a2b2b",
+      "bytes": 6556,
+      "sha256": "e621f64c74c271a2641c465d63ad9bd6a1b73c331e56796e54ee29a9d3cb76de",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -298,11 +298,11 @@
       "source_data": [
         "output/figures/noise_metrics.json"
       ],
-      "bytes": 649946,
-      "sha256": "b6db166a74fc5a2da795ff99444f3790ae1f653b0604302032bc41a55df637a7",
+      "bytes": 664674,
+      "sha256": "75e835fedd56b005bb3826fdcb6dc035f80a93f2bd31ab360af489a53fa0196c",
       "width_px": 3180,
       "height_px": 3446,
-      "pixel_std": 0.15797367691993713
+      "pixel_std": 0.16045303642749786
     },
     {
       "path": "output/figures/noise_summary.md",
@@ -311,8 +311,8 @@
       "source_data": [
         "output/figures/noise_metrics.json"
       ],
-      "bytes": 717,
-      "sha256": "0386fc674ba487ae5de794a175107584492278c62ccdae93e23b27d656c1488c",
+      "bytes": 801,
+      "sha256": "33db7234eac28e35060c82755c1b580b73a50d507d85d83934d4675979451cb2",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -355,6 +355,33 @@
       "width_px": 2044,
       "height_px": 844,
       "pixel_std": 0.2824645936489105
+    },
+    {
+      "path": "output/figures/resampling_sensitivity.json",
+      "artifact_kind": "data",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "src/itrace/stats/bootstrap.py",
+        "src/itrace/viz/resampling.py"
+      ],
+      "bytes": 7342,
+      "sha256": "3e916c5c0676d93cc8d19d5275f1aa8dd969dff3a0a845580fa144e0c13447d9",
+      "width_px": 0,
+      "height_px": 0,
+      "pixel_std": 0.0
+    },
+    {
+      "path": "output/figures/resampling_sensitivity.png",
+      "artifact_kind": "image",
+      "script": "scripts/generate_figures.py",
+      "source_data": [
+        "output/figures/resampling_sensitivity.json"
+      ],
+      "bytes": 372802,
+      "sha256": "f65ca88ab9fa97904a4f19825afdb070a089ee104c97d56108e4d4c9e0c5ede7",
+      "width_px": 4234,
+      "height_px": 1354,
+      "pixel_std": 0.23840387165546417
     },
     {
       "path": "output/figures/saccade_rate.png",
@@ -432,8 +459,8 @@
         "src/itrace/stats/scanpath_metrics.py",
         "src/itrace/stats/similarity.py"
       ],
-      "bytes": 11991,
-      "sha256": "b0d5cc7195d1f306c55bac2b6f6bca7af7307a240d5e99a6307439eedca25aca",
+      "bytes": 13779,
+      "sha256": "0c96dfdf952f07612ad170a2cf852b723e60407c3870e1e99b484500fb059cd9",
       "width_px": 0,
       "height_px": 0,
       "pixel_std": 0.0
@@ -445,11 +472,11 @@
       "source_data": [
         "output/figures/statistical_diagnostics.json"
       ],
-      "bytes": 754651,
-      "sha256": "3bc394e5f1465facc667648aef6c4e000ce78686044ec14670e018c19928966d",
+      "bytes": 821547,
+      "sha256": "602f211a7f02a82afb856af5485f44d1da3a52c0d9d857f6d0ea485f24cf4504",
       "width_px": 3989,
       "height_px": 3633,
-      "pixel_std": 0.33854129910469055
+      "pixel_std": 0.33784985542297363
     },
     {
       "path": "output/figures/statistical_interpretation_ledger.json",

@@ -13,6 +13,7 @@ from itrace.manuscript import (
     load_metric_tokens as _metric_tokens,
 )
 from itrace.manuscript import (
+    load_noise_tokens,
     render_manuscript,
     source_files,
 )
@@ -57,6 +58,7 @@ def main() -> int:
     values = load_metric_tokens(args.metrics_json)
     values.update(load_empirical_tokens(args.empirical_json))
     values.update(load_empirical_session_tokens(args.empirical_sessions_json))
+    values.update(load_noise_tokens(ROOT / "output/figures/noise_metrics.json"))
     for key in ("demo_amplitude", "test_count", "coverage_pct"):
         value = getattr(args, key)
         if value is not None:

@@ -11,10 +11,10 @@ dataset, camera, lighting, pose, calibration, and model class; large public
 benchmarks report errors in physical screen units or degrees under their own
 protocols rather than a universal webcam constant [@krafka2016gazecapture;
 @zhang2017mpiigaze; @hempel2022l2cs]. iTrace's noise-sensitivity result sharpens
-the method-level risk: [@sec:noiseresults] shows saccade *timing* breaks down at
-a landmark perturbation of ≈0.9 px, so velocity-thresholded webcam saccade timing
-is theoretically marginal before real-world lens, illumination, head-pose,
-landmark-bias, and calibration effects are added.
+the method-level risk: [@sec:noiseresults] shows overlap-based event recovery
+degrading at small landmark perturbations under the declared model. Overlap F1
+does not establish onset/offset accuracy, and this synthetic result is not a
+universal webcam timing limit.
 
 **Pupil.** Webcam pupil diameter now has dedicated learned-model and dataset work
 [@shah2024eyedentify], mature pupil-detection algorithms and platforms
@@ -27,6 +27,9 @@ calibration path, and its live MediaPipe pupil channel remains a relative proxy.
 The package surfaces this rather than implying IR-grade precision, and the pupil
 noise-sensitivity result is conditional on a modelling assumption
 ([@sec:noisemodel]), not measured.
+Gaze-position-dependent pupil foreshortening is another confound demonstrated
+in controlled artificial-eye experiments [@hayes2016mapping]; iTrace does not
+claim to implement or validate a correction for it.
 
 **The expanded analysis layer describes, it does not validate.** The
 descriptive statistics, distribution fits, scanpath spread and entropy metrics,
@@ -71,7 +74,16 @@ bias are unmodelled.
 
 The honest path to closing the device validation gap is empirical: a head-to-head
 against a reference eye-tracker or a public webcam dataset (MPIIGaze, GazeCapture)
-on real frames, reporting error in degrees and pupil correlation. The guided
+on real frames. Gaze evaluation should report error in degrees under a declared
+participant/session split; GazeCapture and MPIIGaze provide gaze labels, not
+automatically synchronized pupil-size or physiological saccade-onset truth.
+For calibrated pupil measurements in common units, evaluate paired differences,
+bias, absolute errors, and difference-versus-mean plots against a prespecified
+acceptable disagreement. Limits of agreement require an appropriate repeated-
+measurement design, and correlation alone is insufficient
+[@bland1986agreement; @bland2007multiple]. A relative proxy must first have a
+declared calibration or normalization target before comparison with millimetres.
+The guided
 session protocol added here should become a preregistered calibration and
 screen-target block inside that larger study, not a substitute for it. Beyond that, a
 calibrated absolute-diameter pupil model trained on PupilSense/EyeDentify data

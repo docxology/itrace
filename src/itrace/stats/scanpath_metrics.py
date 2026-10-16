@@ -21,6 +21,7 @@ Everything is pure NumPy/SciPy and deterministic: the only randomness lives in
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from itertools import pairwise
 from typing import Any
 
@@ -31,7 +32,7 @@ from itrace.types import AOI, Fixation, FloatArray, Saccade, SessionReport
 
 from .. import mainsequence
 from ..encoding import encode_directions
-from .bootstrap import percentile_interval
+from .bootstrap import bootstrap_indices, percentile_interval
 
 
 def _finite_xy(
@@ -317,14 +318,28 @@ def direction_transition_entropy(
     return conditional
 
 
-def main_sequence_exponent_ci(
+@dataclass(frozen=True)
+class ExponentInterval:
+    """Percentile interval with its resampling design and failed-fit count."""
+
+    estimate: float
+    ci_low: float
+    ci_high: float
+    n_boot: int
+    n_successful: int
+    n_failed: int
+    block_length: int
+
+
+def main_sequence_exponent_bootstrap(
     amp: FloatArray,
     vel: FloatArray,
     *,
     n_boot: int = 2000,
     seed: int = 12345,
     confidence: float = 0.95,
-) -> tuple[float, float, float]:
+    block_length: int = 1,
+) -> ExponentInterval:
     """Bootstrap-percentile confidence interval for the main-sequence exponent.
 
     The point estimate is the power-law exponent ``power_b`` from
@@ -345,43 +360,57 @@ def main_sequence_exponent_ci(
 
     Returns
     -------
-    tuple of float
-        ``(b, lo, hi)`` -- the point estimate and the lower/upper percentile
-        bounds. When no resample yields a valid fit, ``lo`` and ``hi`` both
-        collapse to ``b``.
+    ExponentInterval
+        An :class:`ExponentInterval` with the requested and successful counts.
+        No valid resamples raises; a zero-width interval is never substituted.
 
     Raises
     ------
     ValueError
         If ``n_boot < 1`` or ``confidence`` is not in ``(0, 1)``.
     """
-    if n_boot < 1:
-        msg = f"n_boot must be >= 1; got {n_boot}"
-        raise ValueError(msg)
     if not 0.0 < confidence < 1.0:
         msg = f"confidence must be in (0, 1); got {confidence}"
         raise ValueError(msg)
-    amp_arr = np.asarray(amp, dtype=np.float64).ravel()
-    vel_arr = np.asarray(vel, dtype=np.float64).ravel()
-    b = float(mainsequence.fit(amp_arr, vel_arr)["power_b"])
+    amp_arr = np.asarray(amp, dtype=np.float64)
+    vel_arr = np.asarray(vel, dtype=np.float64)
+    if amp_arr.ndim != 1 or amp_arr.shape != vel_arr.shape:
+        raise ValueError("amplitude and velocity must be aligned one-dimensional arrays")
+    if not np.all(np.isfinite(amp_arr) & np.isfinite(vel_arr) & (amp_arr > 0) & (vel_arr > 0)):
+        raise ValueError("bootstrap amplitude and velocity must be finite and positive")
+    b = float(mainsequence.fit_power_law(amp_arr, vel_arr)["power_b"])
 
-    rng = np.random.default_rng(seed)
     n = amp_arr.shape[0]
     samples: list[float] = []
-    for _ in range(n_boot):
-        idx = rng.integers(0, n, size=n)
-        if np.unique(amp_arr[idx]).size < 3:
+    for idx in bootstrap_indices(n, n_boot=n_boot, seed=seed, block_length=block_length):
+        if np.unique(amp_arr[idx]).size < 2:
             continue
         try:
-            fit_b = float(mainsequence.fit(amp_arr[idx], vel_arr[idx])["power_b"])
+            fit_b = float(mainsequence.fit_power_law(amp_arr[idx], vel_arr[idx])["power_b"])
         except ValueError:
             continue
         samples.append(fit_b)
     if not samples:
-        return b, b, b
+        raise ValueError("no valid bootstrap exponent fits; interval unavailable")
     boot = np.asarray(samples, dtype=np.float64)
     lo, hi = percentile_interval(boot, confidence=confidence)
-    return b, lo, hi
+    return ExponentInterval(b, lo, hi, n_boot, len(samples), n_boot - len(samples), block_length)
+
+
+def main_sequence_exponent_ci(
+    amp: FloatArray,
+    vel: FloatArray,
+    *,
+    n_boot: int = 2000,
+    seed: int = 12345,
+    confidence: float = 0.95,
+    block_length: int = 1,
+) -> tuple[float, float, float]:
+    """Return estimate and bounds; see ``main_sequence_exponent_bootstrap`` for counts."""
+    result = main_sequence_exponent_bootstrap(
+        amp, vel, n_boot=n_boot, seed=seed, confidence=confidence, block_length=block_length
+    )
+    return result.estimate, result.ci_low, result.ci_high
 
 
 def scanpath_summary(

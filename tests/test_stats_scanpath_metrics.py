@@ -266,13 +266,11 @@ def test_exponent_ci_invalid_arguments_raise() -> None:
         sm.main_sequence_exponent_ci(amp, vel, confidence=1.5)
 
 
-def test_exponent_ci_degenerate_resamples_collapse_to_estimate() -> None:
-    # Exactly three points: most index resamples lose a unique point and the
-    # fit raises, so the interval collapses onto the point estimate.
+def test_exponent_ci_degenerate_resamples_report_unavailable() -> None:
     amp = np.array([2.0, 6.0, 18.0])
     vel = 50.0 * amp**0.5
-    b, lo, hi = sm.main_sequence_exponent_ci(amp, vel, n_boot=5, seed=0)
-    assert lo <= b <= hi
+    with pytest.raises(ValueError, match="no valid bootstrap"):
+        sm.main_sequence_exponent_ci(amp, vel, n_boot=1, seed=4)
 
 
 # --- scanpath_summary ------------------------------------------------------

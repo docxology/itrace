@@ -4,11 +4,11 @@ project: iTrace
 effort: comprehensive
 effort_source: classifier
 phase: complete
-progress: 132/132
+progress: 202/202
 mode: build
-iteration: 7
+iteration: 8
 started: 2026-05-29T00:00:00Z
-updated: 2026-05-31T00:00:00Z
+updated: 2026-10-15T00:00:00Z
 ---
 
 # ISA — iTrace: Open-Source Webcam Eye-Movement Analysis Toolkit
@@ -371,6 +371,33 @@ clean `mypy --strict`, all evidenced by real captured command output.
 - [x] ISC-193: Asset inventories bind full Git SHAs and payload SHA-256 values, reject ambiguous/nonregular/empty payloads, and refuse to overwrite existing inventories.
 - [x] ISC-194: CI declares core-only Python 3.10-3.13 wheel checks, development gates, and sdist installation/import checks for figures, web, dashboard, capture, and all extras. Hosted execution is separate evidence and must pass on the release commit before publication.
 - [x] ISC-195: Synthetic-domain validation chooses missing-gaze preprocessing from finite-input masks before analysis, records actual interpolation/removal, and preserves long-gap errors. Every seeded dropout run is checked; clean runs report no preprocessing. Numerical-library exceptions do not select the benchmark method.
+
+### Statistical and scholarly correction pass (October 2026 development)
+
+- [x] ISC-196: All event-recovery paths use the same greedy one-to-one positive-overlap scoring; retained merging, fragmentation, and touching-endpoint controls distinguish it from the archived many-to-many sweep.
+- [x] ISC-197: Noise tables show actual percentile endpoints; pointwise uncertainty and Monte Carlo standard errors are distinguished, and manuscript thresholds/table hydrate from the regenerated sweep ledger.
+- [x] ISC-198: Moving-block resampling preserves ordered adjacency with explicit length and seed; nonfinite input and invalid designs fail. A generated AR(1) illustration is checked against an independent covariance-matrix mean-variance calculation.
+- [x] ISC-199: Main-sequence exponent resampling fits the power law independently, reports successful/failed draws, and never converts total failure into a zero-width interval; nonlinear fits never return silent surrogate parameters.
+- [x] ISC-200: Information criteria count only free parameters. A fixed-family KS refit bootstrap preserves fixed parameters, refits each generated sample, reports Monte Carlo resolution, and declares IID and selection limits.
+- [x] ISC-201: Uncertainty graphics preserve reported endpoints and disclose valid draws; transition graphics show observed denominators and distinguish unobserved rows from estimated zero probabilities.
+- [x] ISC-202: Manuscript methods, captions, discussion, limitations, and README withdraw unsupported real-error bounds, universal clinical exponent ranges, blanket competitor deficits, automatic bootstrap coverage, and entropy-normalization claims. Primary sources and access limits are recorded.
+- [x] ISC-203: Revised figures, four manuscript formats, traceability, and current verification ledger are regenerated and inspected; local source and artifact gates pass, with hosted acceptance bound to the pushed commit by the CI workflow.
+
+The October source gate reports 737 passed, 2 skipped and 91.05% combined
+statement-and-branch coverage over the frozen source digest in the current ledger.
+The separate core-only environment reports 612 passed and 70 skipped. All 41
+figure artifacts are SHA-256-bound by the manifest; the 30-page PDF has been
+rendered and visually inspected. The source gate, product checks, preserved
+negative controls and final review receipts are retained under
+`${GITVAULT_ROOT}/Local/evidence/itrace-scholarship-20261015/`.
+Hosted success is a separate final acceptance state: consult GitHub Actions for
+the exact pushed commit rather than treating a configured workflow as execution.
+
+The October correction supersedes the real-world lower-bound interpretation in
+historical ISC-78 and the automatic-coverage wording associated with ISC-98/99.
+Those historical entries describe earlier decisions, not accepted current claims.
+The v0.5.0 release remains an immutable baseline; current development evidence
+does not retroactively change its archived scorer, numbers, or DOI payload.
 
 Verification evidence for this refresh is recorded in `docs/DEVELOPMENT.md`,
 `docs/verification_metrics.json`, and the retained run at

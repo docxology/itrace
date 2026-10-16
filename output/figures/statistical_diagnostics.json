@@ -1,6 +1,7 @@
 {
   "kind": "itrace_statistical_diagnostics",
   "truth_boundary": "Descriptive statistics over a supplied SessionReport; not population physiology, reference-device validation, or biological ground truth.",
+  "resampling_assumptions": "Amplitude-shape and family-ranking bootstraps use IID detected events. The exponent can use ordered moving blocks. Neither design resamples participants.",
   "n_samples": 1500,
   "duration_s": 5.996,
   "n_fixations": 16,
@@ -12,6 +13,7 @@
       {
         "family": "lognormal",
         "n": 15,
+        "free_parameter_count": 2,
         "params": {
           "shape": 1.6821329344504987,
           "scale": 1.284660373196396
@@ -31,6 +33,7 @@
       {
         "family": "weibull",
         "n": 15,
+        "free_parameter_count": 2,
         "params": {
           "shape": 0.6272733853812972,
           "scale": 3.064364548963195
@@ -50,6 +53,7 @@
       {
         "family": "gamma",
         "n": 15,
+        "free_parameter_count": 2,
         "params": {
           "shape": 0.5162017898369645,
           "scale": 8.467147226652198
@@ -69,6 +73,7 @@
       {
         "family": "exgaussian",
         "n": 15,
+        "free_parameter_count": 3,
         "params": {
           "K": 3026.645990541987,
           "mu": 0.23069570735790335,
@@ -89,6 +94,7 @@
       {
         "family": "normal",
         "n": 15,
+        "free_parameter_count": 2,
         "params": {
           "mu": 4.370756553210955,
           "sigma": 5.350387045706373
@@ -112,6 +118,7 @@
       "criterion": "aic",
       "available": true,
       "successful_bootstraps": 40,
+      "failed_bootstraps": 0,
       "winner_counts": {
         "gamma": 10,
         "lognormal": 30
@@ -123,12 +130,14 @@
       "top_family": "lognormal",
       "top_frequency": 0.75,
       "unique_winner_count": 2,
-      "method_note": "Bootstrap resamples refit the same candidate set and record the lowest-AIC winner; frequencies describe ranking stability, not posterior model probabilities."
+      "method_note": "Bootstrap resamples refit the same candidate set and record the lowest-AIC winner; frequencies describe ranking stability, not posterior model probabilities. Frequencies are conditional on successful fits; failed draws are counted. IID resampling assumes exchangeable events."
     },
     "available": true,
     "best_family": "lognormal",
     "weight_criterion": "aic",
-    "aicc_weight_criterion": "aicc"
+    "aicc_weight_criterion": "aicc",
+    "best_aicc_family": "lognormal",
+    "ks_pvalue_note": "Fixed-CDF KS p-values are uncalibrated because parameters were fitted to these data; use the refit-bootstrap diagnostic, subject to its IID and selection assumptions."
   },
   "amplitude_shape_summary": {
     "sample": "saccade_amplitude_deg",
@@ -328,7 +337,20 @@
     "dkw_epsilon": 0.35066030352816463,
     "dkw_confidence": 0.95,
     "exceeds_dkw_band": false,
-    "method_note": "Empirical-CDF plotting positions are compared with fitted CDF values from the lowest-AIC family; the integrated and tail-weighted residual statistics add descriptive fit diagnostics, and the DKW/Massart band is a distribution-free reference width for an ECDF around a fixed CDF. Because the family parameters were fitted on the same sample, these fields are descriptive rather than formal acceptance tests."
+    "refit_bootstrap": {
+      "available": true,
+      "family": "lognormal",
+      "statistic": 0.2856424955548249,
+      "pvalue": 0.01,
+      "exceedances": 0,
+      "n_boot": 99,
+      "seed": 2704,
+      "minimum_pvalue": 0.01,
+      "fixed_location": null,
+      "selection_adjusted": false,
+      "method_note": "Refit-bootstrap KS under the fitted IID family with a plus-one Monte Carlo p-value. Family selection was not repeated: this is an exploratory post-selection diagnostic, not a confirmatory acceptance test."
+    },
+    "method_note": "Empirical-CDF plotting positions are compared with fitted CDF values from the lowest-AIC family; the integrated and tail-weighted residual statistics add descriptive fit diagnostics, and the DKW/Massart band is a distribution-free reference width for an IID ECDF around a fixed CDF. It does not account for serial dependence. Because the family parameters were fitted on the same sample, these fields are descriptive rather than formal acceptance tests."
   },
   "main_sequence_exponent": {
     "n": 15,
@@ -336,9 +358,14 @@
     "seed": 2401,
     "confidence": 0.95,
     "available": true,
+    "block_length": 1,
+    "resampling_unit": "event_pair",
     "estimate": 0.9055025692346136,
     "ci_low": 0.8771985386403616,
-    "ci_high": 0.923992779696919
+    "ci_high": 0.923992779696919,
+    "n_successful": 500,
+    "n_failed": 0,
+    "method_note": "Conditional on detected event pairs; failed rank-deficient draws are counted. IID draws require exchangeability; moving blocks require approximate stationarity and a defensible block length. No participant-level inference."
   },
   "spatial_stability": {
     "gaze_dispersion": 14.861395722492276,
@@ -424,6 +451,16 @@
         0.0
       ]
     ],
-    "scanpath": "DdulrLlrUdLlrLr"
+    "scanpath": "DdulrLlrUdLlrLr",
+    "observed_transitions": 14,
+    "row_counts": [
+      1,
+      3,
+      1,
+      2,
+      3,
+      3,
+      1
+    ]
   }
 }

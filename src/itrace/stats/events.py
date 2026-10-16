@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from math import isfinite
 
 from ..types import PSO, Fixation, Saccade
 
@@ -27,20 +28,37 @@ def event_prf(
     predictions are processed in onset order, and each chooses the unmatched
     truth interval with the largest overlap.
     """
-    if min_overlap_s < 0.0:
+    return interval_prf(
+        [(item.onset_t, item.offset_t) for item in truth],
+        [(item.onset_t, item.offset_t) for item in predicted],
+        min_overlap=min_overlap_s,
+    )
+
+
+def interval_prf(
+    truth: Sequence[tuple[float, float]],
+    predicted: Sequence[tuple[float, float]],
+    *,
+    min_overlap: float = 0.0,
+) -> dict[str, float]:
+    """Greedy one-to-one matching with strictly positive overlap in shared units."""
+    if not isfinite(min_overlap) or min_overlap < 0.0:
         msg = "min_overlap_s must be non-negative"
         raise ValueError(msg)
-    truth_sorted = sorted(truth, key=lambda e: e.onset_t)
-    pred_sorted = sorted(predicted, key=lambda e: e.onset_t)
+    for onset, offset in (*truth, *predicted):
+        if not isfinite(onset) or not isfinite(offset) or offset < onset:
+            raise ValueError("event intervals must have finite, ordered endpoints")
+    truth_sorted = sorted(truth, key=lambda event: event[0])
+    pred_sorted = sorted(predicted, key=lambda event: event[0])
     matched: set[int] = set()
     true_positive = 0
     for pred in pred_sorted:
         best_idx = -1
-        best_overlap = min_overlap_s
+        best_overlap = min_overlap
         for idx, item in enumerate(truth_sorted):
             if idx in matched:
                 continue
-            overlap = interval_overlap_s(pred.onset_t, pred.offset_t, item.onset_t, item.offset_t)
+            overlap = interval_overlap_s(*pred, *item)
             if overlap > best_overlap:
                 best_idx = idx
                 best_overlap = overlap

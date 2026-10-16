@@ -21,9 +21,10 @@ model projects known gaze through a pinhole camera to landmarks and back through
 the estimator, recovering gaze to 0.16 deg RMS; this exercises the geometry path
 without claiming real-device accuracy. A seeded Monte-Carlo landmark-noise sweep
 then shows the expected ordering of fragility: gaze remains below a 2 deg RMS
-bound to sigma approximately 0.005 (about 3 px at 640 px width), while
-velocity-thresholded saccade recovery falls below F1 = 0.8 near sigma 0.0014
-(about 0.9 px). The pupil channel is reported conditionally because its
+bound to sigma approximately {{NOISE_GAZE_SIGMA}} (about {{NOISE_GAZE_PX}} px at 640 px width), while
+one-to-one overlap-based saccade recovery falls below F1 = 0.8 near sigma {{NOISE_SACCADE_SIGMA}}
+(about {{NOISE_SACCADE_PX}} px). This is event recovery, not a timing-accuracy measurement.
+The pupil channel is reported conditionally because its
 noise-sweep robustness follows from the modelling assumption used to inject
 pupil noise. iTrace also ships a typer CLI, Streamlit dashboard, local
 HTML/WebSocket orchestrator, guided derived-record empirical workflow, and
@@ -32,6 +33,7 @@ coverage. Its contribution is not a claim that webcams are validated eye
 trackers; it is a verification-first reference implementation whose evidence
 boundaries are visible in the code, figures, reports, and manuscript. iTrace is
 MIT-licensed and openly released at
-https://github.com/docxology/itrace, with this version archived at DOI
+https://github.com/docxology/itrace. The archived v0.5.0 baseline is at DOI
 10.5281/zenodo.23403300 (concept DOI 10.5281/zenodo.20614908 resolves to the
-latest version).
+latest version). This development manuscript includes subsequent corrections;
+its current evidence is identified by the source digest and verification ledger.

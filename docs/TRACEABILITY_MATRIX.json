@@ -1,9 +1,20 @@
 {
   "kind": "itrace_documentation_visualization_analysis_traceability",
   "version": "0.5.0",
-  "updated": "2026-06-07",
+  "updated": "2026-10-15",
   "truth_boundary": "Algorithmic verification uses synthetic truth, independent reference implementations, and the 3-D closed loop. Guided webcam sessions are session diagnostics. Device-level accuracy requires public-dataset or reference-device evidence that is not bundled here.",
   "claims": [
+    {
+      "id": "statistical_design_and_scoring_corrections",
+      "category": "bounded_diagnostic",
+      "claim": "Development event scores share one-to-one positive overlap; uncertainty discloses its sampling unit, failed draws, exact percentile endpoints, and conditional fitted-model calibration.",
+      "docs": ["docs/STATISTICAL_DESIGN.md", "docs/SCHOLARSHIP_REVIEW_20261015.md", "docs/manuscript/S03_resampling_and_inference.md"],
+      "methods": ["src/itrace/stats/bootstrap.py", "src/itrace/stats/distributions.py", "src/itrace/stats/scanpath_metrics.py", "src/itrace/stats/events.py", "src/itrace/viz/resampling.py"],
+      "method_symbols": ["itrace.stats.bootstrap.bootstrap_indices", "itrace.stats.distributions.parametric_ks_test", "itrace.stats.scanpath_metrics.main_sequence_exponent_bootstrap", "itrace.stats.events.interval_prf"],
+      "tests": ["tests/test_statistical_contracts.py", "tests/test_viz_statistics.py"],
+      "evidence": ["output/figures/resampling_sensitivity.json", "output/figures/resampling_sensitivity.png", "output/figures/noise_metrics.json", "output/figures/noise_summary.md"],
+      "boundary": "Conditional synthetic sensitivity and detected-event diagnostics; no demonstrated interval coverage, participant population inference, selection-adjusted goodness-of-fit, or real-device error bounds."
+    },
     {
       "id": "gate_metrics_and_render_hydration",
       "category": "reproducibility_gate",
@@ -208,6 +219,15 @@
     }
   ],
   "figures": [
+    {
+      "id": "resampling_sensitivity",
+      "path": "output/figures/resampling_sensitivity.png",
+      "script": "scripts/generate_figures.py",
+      "source_data": ["output/figures/resampling_sensitivity.json", "src/itrace/stats/bootstrap.py"],
+      "method_symbols": ["itrace.stats.bootstrap.resampling_sensitivity", "itrace.viz.resampling.figure_resampling_sensitivity"],
+      "tests": ["tests/test_statistical_contracts.py", "tests/test_viz_statistics.py"],
+      "boundary": "One seeded stationary AR(1) sensitivity illustration with an analytic mean-variance reference; not empirical eye data, coverage validation, or a recommended block length."
+    },
     {
       "id": "graphical_abstract",
       "path": "output/figures/graphical_abstract.png",

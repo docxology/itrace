@@ -9,11 +9,13 @@ uncertainty, spatial spread, and scanpath-transition structure.
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import Any, cast
 
 import numpy as np
 
 from .. import saccades
+from ..encoding import encode_directions
 from ..types import FloatArray, SessionReport
 from . import distributions, scanpath_metrics, similarity
 
@@ -37,11 +39,10 @@ def _positive_pairs(
     x: FloatArray | list[float],
     y: FloatArray | list[float],
 ) -> tuple[FloatArray, FloatArray]:
-    """Return aligned finite positive pairs, truncating to the shorter input."""
     a = np.asarray(x, dtype=np.float64).ravel()
     b = np.asarray(y, dtype=np.float64).ravel()
-    n = min(a.size, b.size)
-    a, b = a[:n], b[:n]
+    if a.shape != b.shape:
+        raise ValueError("statistical pairs must have equal lengths")
     mask = np.isfinite(a) & np.isfinite(b) & (a > 0.0) & (b > 0.0)
     return cast(FloatArray, a[mask]), cast(FloatArray, b[mask])
 
@@ -99,6 +100,13 @@ def _model_comparison_payload(
     payload["best_family"] = results[0].family
     payload["weight_criterion"] = "aic"
     payload["aicc_weight_criterion"] = "aicc"
+    payload["best_aicc_family"] = (
+        min(results, key=lambda result: result.aicc).family if best_aicc is not None else None
+    )
+    payload["ks_pvalue_note"] = (
+        "Fixed-CDF KS p-values are uncalibrated because parameters were fitted to these data; "
+        "use the refit-bootstrap diagnostic, subject to its IID and selection assumptions."
+    )
     payload["model_selection_bootstrap"] = _model_selection_bootstrap(
         sample,
         families=families,
@@ -109,6 +117,7 @@ def _model_comparison_payload(
         {
             "family": result.family,
             "n": int(result.n),
+            "free_parameter_count": result.k,
             "params": {key: float(value) for key, value in result.params.items()},
             "loglik": float(result.loglik),
             "aic": float(result.aic),
@@ -179,6 +188,7 @@ def _model_selection_bootstrap(
         {
             "available": True,
             "successful_bootstraps": int(successful),
+            "failed_bootstraps": int(n_boot - successful),
             "winner_counts": {family: int(count) for family, count in counts.items() if count > 0},
             "winner_frequencies": frequencies,
             "top_family": top_family,
@@ -187,7 +197,8 @@ def _model_selection_bootstrap(
             "method_note": (
                 "Bootstrap resamples refit the same candidate set and record the "
                 "lowest-AIC winner; frequencies describe ranking stability, not "
-                "posterior model probabilities."
+                "posterior model probabilities. Frequencies are conditional on successful "
+                "fits; failed draws are counted. IID resampling assumes exchangeable events."
             ),
         }
     )
@@ -357,6 +368,8 @@ def _amplitude_cdf_payload(
     *,
     families: tuple[str, ...],
     alpha: float = 0.05,
+    gof_boot: int = 99,
+    seed: int = 2401,
 ) -> dict[str, object]:
     """JSON-friendly empirical-CDF residual diagnostics for the best amplitude fit."""
     payload: dict[str, object] = {
@@ -379,6 +392,21 @@ def _amplitude_cdf_payload(
         return payload
 
     best = results[0]
+    try:
+        gof: dict[str, object] = {
+            "available": True,
+            **asdict(
+                distributions.parametric_ks_test(sample, best.family, n_boot=gof_boot, seed=seed)
+            ),
+            "selection_adjusted": False,
+            "method_note": (
+                "Refit-bootstrap KS under the fitted IID family with a plus-one Monte Carlo "
+                "p-value. Family selection was not repeated: this is an exploratory "
+                "post-selection diagnostic, not a confirmatory acceptance test."
+            ),
+        }
+    except ValueError as exc:
+        gof = {"available": False, "reason": str(exc)}
     frozen = distributions.frozen_from_result(best)
     empirical = np.sort(sample)
     empirical_cdf = (np.arange(sample.size, dtype=np.float64) + 0.5) / float(sample.size)
@@ -432,12 +460,14 @@ def _amplitude_cdf_payload(
             "dkw_epsilon": dkw_epsilon,
             "dkw_confidence": float(1.0 - alpha),
             "exceeds_dkw_band": bool(max_abs > dkw_epsilon),
+            "refit_bootstrap": gof,
             "method_note": (
                 "Empirical-CDF plotting positions are compared with fitted CDF "
                 "values from the lowest-AIC family; the integrated and "
                 "tail-weighted residual statistics add descriptive fit diagnostics, "
                 "and the DKW/Massart band is a distribution-free reference width "
-                "for an ECDF around a fixed CDF. Because the family parameters "
+                "for an IID ECDF around a fixed CDF. It does not account for serial "
+                "dependence. Because the family parameters "
                 "were fitted on the same sample, these fields are descriptive "
                 "rather than formal acceptance tests."
             ),
@@ -453,6 +483,7 @@ def _main_sequence_payload(
     n_boot: int,
     seed: int,
     confidence: float,
+    block_length: int,
 ) -> dict[str, object]:
     """JSON-friendly bootstrap interval payload for the main-sequence exponent."""
     payload: dict[str, object] = {
@@ -461,17 +492,20 @@ def _main_sequence_payload(
         "seed": int(seed),
         "confidence": float(confidence),
         "available": False,
+        "block_length": block_length,
+        "resampling_unit": "event_pair" if block_length == 1 else "consecutive_event_block",
     }
-    if amplitude.size < 3 or np.unique(amplitude).size < 3:
-        payload["reason"] = "need >=3 unique saccades"
+    if amplitude.size < 3 or np.unique(amplitude).size < 2:
+        payload["reason"] = "need >=3 positive pairs with distinct amplitudes"
         return payload
     try:
-        estimate, lo, hi = scanpath_metrics.main_sequence_exponent_ci(
+        result = scanpath_metrics.main_sequence_exponent_bootstrap(
             amplitude,
             velocity,
             n_boot=n_boot,
             seed=seed,
             confidence=confidence,
+            block_length=block_length,
         )
     except ValueError as exc:
         payload["reason"] = str(exc)
@@ -480,9 +514,12 @@ def _main_sequence_payload(
     payload.update(
         {
             "available": True,
-            "estimate": float(estimate),
-            "ci_low": float(lo),
-            "ci_high": float(hi),
+            **asdict(result),
+            "method_note": (
+                "Conditional on detected event pairs; failed rank-deficient draws are counted. "
+                "IID draws require exchangeability; moving blocks require approximate "
+                "stationarity and a defensible block length. No participant-level inference."
+            ),
         }
     )
     return payload
@@ -497,6 +534,8 @@ def session_statistical_diagnostics(
     confidence: float = 0.95,
     cdf_band_alpha: float = 0.05,
     families: tuple[str, ...] = DEFAULT_DIAGNOSTIC_FAMILIES,
+    exponent_block_length: int = 1,
+    gof_boot: int = 99,
 ) -> dict[str, Any]:
     """Return the audited statistical diagnostics payload for a session report.
 
@@ -517,6 +556,10 @@ def session_statistical_diagnostics(
         band reported in ``amplitude_cdf_diagnostics``.
     families
         Distribution families compared on the positive amplitude sample.
+    exponent_block_length
+        Consecutive event count for the exponent interval only; one uses IID pairs.
+    gof_boot
+        Refit-bootstrap draws for the exploratory, post-selection KS diagnostic.
 
     Returns
     -------
@@ -528,12 +571,17 @@ def session_statistical_diagnostics(
     amplitude = _positive_sample(props["amplitude_deg"])
     amp_pair, vel_pair = _positive_pairs(props["amplitude_deg"], props["peak_velocity_deg_s"])
     symbols, matrix = similarity.transition_matrix(report.saccades)
+    scanpath = encode_directions(report.saccades)
 
     return {
         "kind": "itrace_statistical_diagnostics",
         "truth_boundary": (
             "Descriptive statistics over a supplied SessionReport; not population physiology, "
             "reference-device validation, or biological ground truth."
+        ),
+        "resampling_assumptions": (
+            "Amplitude-shape and family-ranking bootstraps use IID detected events. "
+            "The exponent can use ordered moving blocks. Neither design resamples participants."
         ),
         "n_samples": int(report.n_samples),
         "duration_s": float(report.duration_s),
@@ -559,6 +607,8 @@ def session_statistical_diagnostics(
             amplitude,
             families=families,
             alpha=cdf_band_alpha,
+            gof_boot=gof_boot,
+            seed=seed + 303,
         ),
         "main_sequence_exponent": _main_sequence_payload(
             amp_pair,
@@ -566,11 +616,14 @@ def session_statistical_diagnostics(
             n_boot=n_boot,
             seed=seed,
             confidence=confidence,
+            block_length=exponent_block_length,
         ),
         "spatial_stability": scanpath_metrics.scanpath_summary(report),
         "transition_matrix": {
             "symbols": symbols,
             "matrix": matrix.tolist(),
-            "scanpath": report.scanpath,
+            "scanpath": scanpath,
+            "observed_transitions": max(len(scanpath) - 1, 0),
+            "row_counts": [scanpath[:-1].count(symbol) for symbol in symbols],
         },
     }

@@ -29,6 +29,8 @@ running; this index does not invent commands.
 - [Validation protocols](VALIDATION_PROTOCOLS.md)
 - [Manual annotation protocol](manual_annotation_protocol.md)
 - [Scholarship audit](SCHOLARSHIP_AUDIT.md) / [Traceability matrix](TRACEABILITY_MATRIX.json)
+- [Primary-source scholarship and statistics review, October 2026](SCHOLARSHIP_REVIEW_20261015.md)
+- [Statistical design and interpretation guide](STATISTICAL_DESIGN.md)
 - [Prepublication review](PREPUBLICATION_REVIEW.md)
 - [Development, verification, numerical contracts, and manuscript rendering](DEVELOPMENT.md)
 - [Comprehensive development review and remaining limits](COMPREHENSIVE_REVIEW.md)
@@ -36,7 +38,8 @@ running; this index does not invent commands.
 - [v0.5.0 release notes](releases/v0.5.0.md)
 
 `verification_metrics.json` records current development checks. The previous
-release ledger is retained in `releases/v0.4.1-verification.json`; dated audit
+release ledgers are retained in `releases/v0.4.1-verification.json` and
+`releases/v0.5.0-verification.json`; dated audit
 reports retain their original evidence rather than claiming a later gate run.
 
 Empirical session ledgers: `empirical_sessions_manifest.json`,

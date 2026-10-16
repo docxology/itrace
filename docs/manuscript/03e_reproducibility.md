@@ -15,8 +15,9 @@ the source tree. The test count, coverage, version, gate date, and render
 evidence are stored once in `docs/verification_metrics.json`; the manuscript
 renderer hydrates these tokens from that JSON so stale literal metrics are caught
 by tests rather than silently carried into public artifacts.
-The historical release ledger is preserved separately at
-`docs/releases/v0.4.1-verification.json`; dated audit evidence is not rewritten
+The historical release ledgers are preserved separately at
+`docs/releases/v0.4.1-verification.json` and `docs/releases/v0.5.0-verification.json`;
+dated audit evidence is not rewritten
 to impersonate a new execution. `scripts/verify.py` records individual exit
 codes, combined logs, runtime prefixes, a source digest, JUnit results, and
 machine-readable coverage in a new evidence directory, stopping at the first

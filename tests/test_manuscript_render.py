@@ -11,6 +11,7 @@ from itrace.manuscript import (
     load_empirical_session_tokens,
     load_empirical_tokens,
     load_metric_tokens,
+    load_noise_tokens,
     render_manuscript,
     substitute_tokens,
     validate_rendered_text,
@@ -41,6 +42,15 @@ def test_tokens_require_explicit_sources(tmp_path: Path) -> None:
         metrics.write_text("[]")
         with pytest.raises(ValueError, match="must be an object"):
             loader(metrics)
+
+
+def test_noise_tokens_require_an_existing_complete_ledger(tmp_path: Path) -> None:
+    path = tmp_path / "noise.json"
+    with pytest.raises(FileNotFoundError, match="required noise-sweep"):
+        load_noise_tokens(path)
+    path.write_text('{"manuscript_tokens": {"NOISE_TABLE": "incomplete"}}')
+    with pytest.raises(ValueError, match="missing or invalid"):
+        load_noise_tokens(path)
 
 
 def _fixture(tmp_path: Path) -> tuple[Path, Path]:

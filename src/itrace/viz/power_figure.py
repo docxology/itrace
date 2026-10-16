@@ -67,7 +67,14 @@ def _panel(
         ms=6,
         label="mean",
     )
-    ax.fill_between(x, curve.ci_low, curve.ci_high, color=style["color"], alpha=0.2, label="95% CI")
+    ax.fill_between(
+        x,
+        curve.ci_low,
+        curve.ci_high,
+        color=style["color"],
+        alpha=0.2,
+        label="pointwise 95% interval",
+    )
     ax.axhline(bound, color="0.35", ls="-.", lw=1.2, label=f"bound = {bound:g}")
     thr = power.recovery_threshold(curve, bound)
     title = f"{panel_label}. {style['label']}"
@@ -163,6 +170,9 @@ def write_noise_metrics(
         "noise_levels": res.noise_levels,
         "thresholds": thresholds,
         "records": power.summary_records(res, IMAGE_WIDTH_PX),
+        "event_matching": "greedy one-to-one positive interval overlap; onset order",
+        "interval_scope": "pointwise approximate percentile bootstrap over whole trials",
+        "manuscript_tokens": power.noise_manuscript_tokens(res),
     }
     path = out_dir / "noise_metrics.json"
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

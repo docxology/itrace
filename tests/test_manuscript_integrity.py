@@ -582,9 +582,14 @@ def test_rendered_pdf_smoke_matches_public_contract() -> None:
 
 
 def test_noise_table_matches_generated_summary() -> None:
+    from itrace.manuscript import load_noise_tokens, substitute_tokens
+
     generated = (ROOT / "output" / "figures" / "noise_summary.md").read_text()
     manuscript = (MANUSCRIPT / "03d_noise_sensitivity.md").read_text()
-    assert _normalise_noise_table(manuscript) == _normalise_noise_table(generated)
+    hydrated = substitute_tokens(
+        manuscript, load_noise_tokens(ROOT / "output/figures/noise_metrics.json")
+    )
+    assert _normalise_noise_table(hydrated) == _normalise_noise_table(generated)
 
 
 def test_pending_empirical_values_are_hydrated_honestly() -> None:

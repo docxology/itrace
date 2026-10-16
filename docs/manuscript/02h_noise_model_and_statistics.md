@@ -22,9 +22,9 @@ Pupil-size measurement, which a real pipeline derives from a separate segmentati
 we do not implement, carries its own observation noise scaled with $\sigma$ as a
 stated modelling assumption — so the pupil channel's noise behaviour is *assumed*,
 not emergent. The model is chosen to be the simplest perturbation that is
-falsifiable rather than the most realistic one: it is a lower bound on the kinds
-of corruption a real webcam imposes, and the recovery curves it produces are best
-read as best-case envelopes.
+falsifiable rather than the most realistic one. The recovery curves are
+conditional sensitivity results; omitted error sources do not make them a
+quantitative lower or upper bound on a real webcam's performance.
 
 ## Statistical design
 
@@ -40,7 +40,7 @@ leave the range of the in-bound observations. We then locate the noise level at
 which each outcome crosses a usability bound by linear interpolation between grid
 points. The interval describes variability of the mean across the random
 landmark-noise realisations sampled by the $n$ seeded trials (a Monte Carlo
-standard error over the noise process), not variability from re-running the
+uncertainty interval over the noise process), not variability from re-running the
 deterministic pipeline. Saccade F1 scores a detected event as a true positive when
 its sample interval **overlaps** a ground-truth saccade interval (no separate
 temporal tolerance); precision and recall are computed from the same overlap match
@@ -51,13 +51,13 @@ every figure and table number — is reproducible. Full statistical detail is in
 [@sec:statmethods]. The sweep is falsifiable: were recovery independent of noise,
 gaze RMS would be flat across the grid.
 
-The same percentile-bootstrap discipline is reused wherever the package attaches
-uncertainty to a point estimate — the main-sequence exponent interval of
-[@sec:diststats] and the event-rate summaries of [@sec:advdetect] — for the
-identical reason: it assumes no symmetry and stays inside the range the data
-support. None of these intervals describe a population of eyes or sessions the
-recording was not designed to sample; they describe sampling variability of the
-statistic over the realisations actually observed, and they are reported as such.
+Event-level resampling in [@sec:diststats] has a different sampling unit from
+these whole synthetic trials. Its IID form assumes exchangeable detected events;
+ordered moving blocks preserve some local dependence under approximate
+stationarity, with an explicitly chosen block length [@kunsch1989jackknife].
+Neither form resamples participants. Support-respecting endpoints alone do not
+establish nominal coverage [@efron1987better]. The design, failed-draw counts,
+and interpretive limits are stated in [@sec:resampling-design].
 
 For package-level validation, `itrace.validation` separates two cases that are
 often conflated. Synthetic-domain validation has event truth: seeded clean,

@@ -31,8 +31,7 @@ What is — and is not — emergent
   *assumption*, not a finding, and would move if ``pupil_noise_scale`` changed.
   Report it as conditional.
 
-Saccade F1 uses **interval-overlap** matching: a true saccade counts as recalled
-if any detected interval overlaps it (no separate temporal tolerance). Means use
+Saccade F1 uses greedy one-to-one positive interval-overlap matching. Means use
 a **bootstrap percentile** 95% CI (bound-respecting for F1/correlation); with ~25
 seeds, threshold crossings are approximate.
 """
@@ -40,10 +39,12 @@ seeds, threshold crossings are approximate.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import pairwise
 
 import numpy as np
 
 from .scene import EyeSceneSpec, closed_loop
+from .stats.bootstrap import bootstrap_statistic, percentile_interval
 from .types import FloatArray
 
 # Metrics tracked across the sweep (key in ClosedLoopResult.metrics, "higher is
@@ -85,7 +86,7 @@ def _mean_ci(
 ) -> tuple[float, float, float, float]:
     """Return (mean, ci_low, ci_high, std) via a **bootstrap percentile** interval.
 
-    A symmetric Student-t interval is invalid for the bounded metrics here
+    A symmetric Student-t interval can exceed the support of bounded metrics here
     (F1 in [0, 1], correlation in [-1, 1]): near 1.0 it can run past the bound.
     A percentile of resampled means can never leave the range of the observed
     (in-bound) values. The resampling rng is fixed-seeded, so the CI is
@@ -93,18 +94,25 @@ def _mean_ci(
 
     Interpretation: the interval describes variability of the mean across the
     random landmark-noise realisations sampled by the n seeded trials (a Monte
-    Carlo standard error over the noise process), not rerun variability of the
+    Carlo uncertainty interval over the noise process), not rerun variability of the
     deterministic pipeline.
     """
+    values = np.asarray(values, dtype=np.float64)
+    if values.ndim != 1 or values.size == 0 or not np.all(np.isfinite(values)):
+        raise ValueError("trial values must be a nonempty finite one-dimensional array")
+    if not 0.0 < confidence < 1.0:
+        raise ValueError("confidence must be in (0, 1)")
+    if isinstance(n_boot, bool) or not isinstance(n_boot, int) or n_boot < 1:
+        raise ValueError("n_boot must be a positive integer")
     n = values.size
     mean = float(np.mean(values))
     std = float(np.std(values, ddof=1)) if n > 1 else 0.0
     if n < 2 or std == 0.0:
         return mean, mean, mean, std
-    rng = np.random.default_rng(seed)
-    boot_means = values[rng.integers(0, n, size=(n_boot, n))].mean(axis=1)
-    lo = float(np.percentile(boot_means, 100.0 * (1.0 - confidence) / 2.0))
-    hi = float(np.percentile(boot_means, 100.0 * (1.0 + confidence) / 2.0))
+    boot_means = bootstrap_statistic(
+        values, lambda arr: float(np.mean(arr)), n_boot=n_boot, seed=seed
+    )
+    lo, hi = percentile_interval(boot_means, confidence=confidence)
     return mean, lo, hi, std
 
 
@@ -120,8 +128,14 @@ def run_noise_sweep(
     Each (noise level, trial) runs one closed loop with a distinct deterministic
     seed, so the whole sweep is reproducible.
     """
+    if isinstance(n_trials, bool) or not isinstance(n_trials, int) or n_trials < 1:
+        raise ValueError("n_trials must be a positive integer")
     if noise_levels is None:
         noise_levels = [0.0, 0.001, 0.002, 0.004, 0.008, 0.016]
+    if not noise_levels or any(not np.isfinite(level) or level < 0 for level in noise_levels):
+        raise ValueError("noise_levels must contain finite nonnegative values")
+    if any(b <= a for a, b in pairwise(noise_levels)):
+        raise ValueError("noise_levels must be strictly increasing")
     spec = spec or EyeSceneSpec()
 
     samples: dict[str, list[FloatArray]] = {m: [] for m in METRICS}
@@ -207,6 +221,7 @@ def summary_records(
             row[f"{metric}_ci_low"] = curve.ci_low[i]
             row[f"{metric}_ci_high"] = curve.ci_high[i]
             row[f"{metric}_std"] = curve.std[i]
+            row[f"{metric}_mcse"] = curve.std[i] / float(np.sqrt(result.n_trials))
         rows.append(row)
     return rows
 
@@ -219,7 +234,7 @@ _TABLE_COLS: tuple[tuple[str, str], ...] = (
 
 
 def format_summary_markdown(result: NoiseSweepResult, image_width_px: float = 640.0) -> str:
-    """Render the sweep as an accessible Markdown table (mean ± half-CI per cell).
+    """Render means and actual lower/upper percentile endpoints without symmetrising.
 
     Accessible by construction: every cell carries its own uncertainty, units are
     in the header, and a pixel column grounds σ physically — the statistics are
@@ -235,12 +250,29 @@ def format_summary_markdown(result: NoiseSweepResult, image_width_px: float = 64
     for r in rows:
         cells = [f"{r['noise_sigma']:.4f}", f"{r['noise_px']:.2f}"]
         for key, _label in _TABLE_COLS:
-            half = (r[f"{key}_ci_high"] - r[f"{key}_ci_low"]) / 2.0
-            cells.append(f"{r[f'{key}_mean']:.3f} +/- {half:.3f}")
+            cells.append(
+                f"{r[f'{key}_mean']:.3f} [{r[f'{key}_ci_low']:.3f}, {r[f'{key}_ci_high']:.3f}]"
+            )
         lines.append("| " + " | ".join(cells) + " |")
     caption = (
         f"\n*Recovery vs landmark noise sigma (n={result.n_trials} seeded trials/level; "
-        f"mean +/- 95% bootstrap-percentile half-CI, bound-respecting for F1/r). sigma in "
+        f"mean [pointwise 95% percentile interval], approximate coverage). sigma in "
         f"normalised units and pixels at {int(image_width_px)} px width.*"
     )
     return "\n".join(lines) + "\n" + caption
+
+
+def noise_manuscript_tokens(result: NoiseSweepResult) -> dict[str, str]:
+    """Derive manuscript thresholds and table from the same scored sweep as the plot."""
+    tokens = {"NOISE_TABLE": format_summary_markdown(result)}
+    for label, metric, bound in (
+        ("GAZE", "gaze_rms_deg", 2.0),
+        ("SACCADE", "saccade_f1", 0.8),
+        ("PUPIL", "pupil_corr", 0.9),
+    ):
+        crossing = recovery_threshold(result.curve(metric), bound)
+        tokens[f"NOISE_{label}_SIGMA"] = "not crossed" if crossing is None else f"{crossing:.2g}"
+        tokens[f"NOISE_{label}_PX"] = (
+            "not crossed" if crossing is None else f"{sigma_to_pixels(crossing):.2g}"
+        )
+    return tokens

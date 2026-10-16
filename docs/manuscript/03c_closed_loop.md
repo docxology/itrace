@@ -5,22 +5,22 @@ Running the full loop — 3-D eyeball → perspective projection → landmark ex
 three saccades, two pupil dilation events, one blink, at 120 Hz)
 recovers gaze with an RMS residual of **0.16°** against the 3-D truth (maximum
 0.23°) for gaze within ±15°, and recovers the three scripted saccades exactly
-([@fig:loop]). The residual is small but strictly non-zero, confirming the forward
-model and estimator are independent ([@sec:forward]).
+([@fig:loop]). The residual is small but strictly non-zero. Independence of the
+formulations is established by their separate equations and implementations
+([@sec:forward]); a nonzero residual alone would not establish independence.
 
-This is an *internal-consistency verification*: it proves the estimator correctly
-inverts the forward model and would expose sign flips, axis swaps, unit errors,
-and coordinate-frame mismatches. It is **not** device validation. The 0.16° is a
-*lower bound* on real-world error — any idealization the two paths share (pinhole
-projection, no corneal refraction, a spherical eye, zero kappa) contributes
-exactly zero residual by construction ([@sec:limitations]). The recovered pupil
+This is an *internal-consistency verification*: the tested configurations can
+expose sign flips, axis swaps, unit errors, and coordinate-frame mismatches.
+It is **not** device validation or a proof for untested configurations. The
+0.16° residual is conditional on the simulated scene. Shared idealisations
+(pinhole projection, no corneal refraction, a spherical eye, zero kappa) are
+absent from its error budget, but omitting them does not establish a mathematical
+lower or upper bound on real-device error ([@sec:limitations]). The recovered pupil
 ($r = 1.0$) is a near-identity consistency check (the projected pupil/iris ratio
 is a monotone function of pupil radius), confirming the deblink/pipeline preserve
-the signal — not pupil-size accuracy. This is the strongest possible evidence for
-software geometry consistency inside the current assumptions and deliberately
-weaker evidence for the real optical system.
+the signal in this example, not pupil-size accuracy or agreement in millimetres.
 
-![Closed-loop recovery on the default synthetic scene. Panel A shows the projected binocular landmark geometry and the two iris-centre paths. Panel B overlays true and recovered yaw/pitch, with scripted and detected saccade intervals shaded. Panel C overlays true and recovered pupil dynamics after normalisation, with the blink interval shaded. The figure verifies consistency between an independent 3-D generator and the estimator; shared idealisations mean the residual is a lower bound, not a measured webcam error.](../../output/figures/closed_loop_summary.png){#fig:loop width=100%}
+![Closed-loop recovery on the default synthetic scene. Panel A shows projected binocular landmark geometry and iris-centre paths. Panel B overlays true and recovered yaw/pitch with scripted and detected saccade intervals. Panel C overlays normalised pupil dynamics and the blink interval. The independently formulated generator and estimator are checked on this scene; the residual is conditional on shared idealisations and is not a bound on measured webcam error.](../../output/figures/closed_loop_summary.png){#fig:loop width=100%}
 
 The synthetic generator supplies all three target signals jointly — gaze
 direction, saccade intervals, and pupil diameter — animated as floating 3-D

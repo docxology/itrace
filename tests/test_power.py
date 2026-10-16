@@ -127,7 +127,9 @@ def test_format_summary_markdown_is_valid_table() -> None:  # ISC-94
     lines = md.splitlines()
     assert lines[0].startswith("| sigma (norm) |")
     assert set(lines[1]) <= set("|-")  # separator row
-    assert "+/-" in md  # every cell carries uncertainty
+    assert "[" in md
+    assert "]" in md
+    assert "+/-" not in md
     assert "n=5" in md  # n disclosed
     # one data row per noise level + header + separator (+ caption block)
     data_rows = [ln for ln in lines if ln.startswith("| 0.")]

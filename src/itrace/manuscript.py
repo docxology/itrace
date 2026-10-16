@@ -178,6 +178,23 @@ def load_empirical_session_tokens(path: Path) -> dict[str, str]:
     return _empirical_tokens(path, SESSION_TOKENS)
 
 
+def load_noise_tokens(path: Path) -> dict[str, str]:
+    if not path.is_file():
+        raise FileNotFoundError(f"required noise-sweep ledger is missing: {path}")
+    return _empirical_tokens(
+        path,
+        (
+            "NOISE_TABLE",
+            "NOISE_GAZE_SIGMA",
+            "NOISE_GAZE_PX",
+            "NOISE_SACCADE_SIGMA",
+            "NOISE_SACCADE_PX",
+            "NOISE_PUPIL_SIGMA",
+            "NOISE_PUPIL_PX",
+        ),
+    )
+
+
 def validate_rendered_text(text: str) -> None:
     """Reject unresolved tokens or references; never invent replacement numbers."""
     if TOKEN_RE.search(text) or re.search(r"¿[^?\n]+\?|\[@[A-Za-z]|\?\?", text):

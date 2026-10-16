@@ -4,8 +4,11 @@ Eye movements are a rich, non-invasive window onto attention, cognition, and
 oculomotor health. Three signal families dominate research use: the **gaze
 trajectory** (where the eyes point over time), **saccades** (the fast ballistic
 movements between fixations, with characteristic direction, amplitude, and
-peak-velocity dynamics), and **pupil diameter** (a marker of arousal and
-cognitive load). Dedicated infrared eye-trackers measure all three at high
+peak-velocity dynamics), and **pupil diameter**. Primary experiments associate
+pupil diameter with memory load in a specific human task and with neuromodulatory
+activity in mouse cortex [@kahneman1966pupil; @reimer2016pupil]. These associations
+motivate measurement; pupil diameter is not a specific readout of human cognitive
+load or a single transmitter. Dedicated infrared eye-trackers measure all three at high
 precision, but their cost restricts access; commodity cameras offer reach but
 force software to confront poorer optics, lower frame rates, browser/camera
 permission boundaries, illumination changes, and weaker calibration. A maturing
@@ -23,14 +26,15 @@ webcam or offline pupillometry tools [@shah2024eyedentify; @zandi2021pupilext;
 @fuhl2015else; @santini2018pure; @zhang2026pupeyes; @mittner2020pypillometry;
 @cai2024opendpsm].
 
-Two problems recur across these tools. First, the *capture* layer (camera
-drivers, MediaPipe, browser WebRTC [@papoutsaki2016webgazer], integrated
-open-source platforms such as Pupil [@kassner2014pupil]) is tightly coupled
-to the *analysis* layer, so the scientific algorithms cannot be exercised or
-checked without hardware — which makes continuous integration, regression
-testing, and reproducible benchmarking awkward. Second, "validation" is often
-demonstrated on recorded data without a ground-truth oracle, so a detector that
-silently mis-handles noise, blinks, or NaNs can pass unnoticed.
+Two engineering requirements motivate this implementation. First, capture
+through camera drivers, MediaPipe, browser WebRTC [@papoutsaki2016webgazer], or
+integrated platforms such as Pupil [@kassner2014pupil] should have a boundary
+that allows analysis to run on ordinary arrays without hardware. Second,
+verification against constructed signals should be distinguished from agreement
+with independent measurements of real eyes. These are requirements for iTrace,
+not claims that existing packages lack modularity or validation. The established
+file-oriented tools already show the value of separating acquisition from
+analysis [@krause2023pymovements; @dar2021remodnav].
 
 The existing tools each occupy a different point in this design space, and
 iTrace is positioned deliberately against them. WebGazer
