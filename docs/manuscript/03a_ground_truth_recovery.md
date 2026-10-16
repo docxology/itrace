@@ -27,8 +27,10 @@ below half the plain standard deviation in the presence of velocity outliers),
 the property checked directly in [@sec:events]. Recovered microsaccade amplitude
 and peak velocity fall on a tight, low-amplitude main-sequence cluster, distinct
 from the large-saccade branch — the expected separation of the two scales rather
-than a fitted claim. The main-sequence fit recovers the saturating $V_{\max}$ and
-$C$ of a synthetic relationship [@bahill1975main] to within 10% and returns a
-power-law exponent inside the physiological 0.4–0.9 range ([@fig:mainseq]).
+than a fitted claim. In a separate known-parameter fixture, the main-sequence fit
+recovers the saturating $V_{\max}$ and $C$ of a synthetic relationship
+[@bahill1975main] to within 10%. The saturating and power-law fits in
+[@fig:mainseq] describe the detected events in that generated recording; their
+parameters are not physiological population estimates.
 
 ![Main-sequence recovery from a synthetic multi-amplitude recording. Panel A plots detected saccades by amplitude, peak velocity, and direction, with the fitted saturating curve and recovered parameters. Panel B repeats the same detections on log-log axes with the fitted power law, making the exponent and goodness-of-fit explicit. The evidence is recovery of a seeded synthetic relationship and detector property extraction; it is not a physiological population estimate or real-device validation.](../../output/figures/main_sequence.png){#fig:mainseq width=100%}

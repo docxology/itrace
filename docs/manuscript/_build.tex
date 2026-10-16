@@ -1280,11 +1280,13 @@ standard deviation in the presence of velocity outliers), the property
 checked directly in sec.~\ref{sec:events}. Recovered microsaccade
 amplitude and peak velocity fall on a tight, low-amplitude main-sequence
 cluster, distinct from the large-saccade branch --- the expected
-separation of the two scales rather than a fitted claim. The
-main-sequence fit recovers the saturating \(V_{\max}\) and \(C\) of a
-synthetic relationship (\citeproc{ref-bahill1975main}{Bahill et al.
-1975}) to within 10\% and returns a power-law exponent inside the
-physiological 0.4--0.9 range (fig.~\ref{fig:mainseq}).
+separation of the two scales rather than a fitted claim. In a separate
+known-parameter fixture, the main-sequence fit recovers the saturating
+\(V_{\max}\) and \(C\) of a synthetic relationship
+(\citeproc{ref-bahill1975main}{Bahill et al. 1975}) to within 10\%. The
+saturating and power-law fits in fig.~\ref{fig:mainseq} describe the
+detected events in that generated recording; their parameters are not
+physiological population estimates.
 
 \begin{figure}
 \centering
@@ -2204,8 +2206,8 @@ head-to-head against a reference tracker or a public dataset exists,
 iTrace should be cited as a verified reference implementation of the
 algorithms, not a validated tracker.
 
-\subsection{The closed loop bounds, but does not establish, real
-error}\label{the-closed-loop-bounds-but-does-not-establish-real-error}
+\subsection{The closed loop measures a conditional model
+residual}\label{the-closed-loop-measures-a-conditional-model-residual}
 
 The 3-D closed loop (sec.~\ref{sec:closedloop}) exercises the
 landmark→gaze projection, but its interpretation is conditional on what

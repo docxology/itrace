@@ -1020,10 +1020,12 @@ the presence of velocity outliers), the property checked directly in
 sec. 5. Recovered microsaccade amplitude and peak velocity fall on a
 tight, low-amplitude main-sequence cluster, distinct from the
 large-saccade branch --- the expected separation of the two scales
-rather than a fitted claim. The main-sequence fit recovers the
-saturating $V_{\max}$ and $C$ of a synthetic relationship ([Bahill et
-al. 1975](#ref-bahill1975main)) to within 10% and returns a power-law
-exponent inside the physiological 0.4--0.9 range (fig. 2).
+rather than a fitted claim. In a separate known-parameter fixture, the
+main-sequence fit recovers the saturating $V_{\max}$ and $C$ of a
+synthetic relationship ([Bahill et al. 1975](#ref-bahill1975main)) to
+within 10%. The saturating and power-law fits in fig. 2 describe the
+detected events in that generated recording; their parameters are not
+physiological population estimates.
 
 ![Figure 2: Main-sequence recovery from a synthetic multi-amplitude
 recording. Panel A plots detected saccades by amplitude, peak velocity,
@@ -1774,7 +1776,7 @@ reference tracker or a public dataset exists, iTrace should be cited as
 a verified reference implementation of the algorithms, not a validated
 tracker.
 
-## The closed loop bounds, but does not establish, real error
+## The closed loop measures a conditional model residual
 
 The 3-D closed loop (sec. 16) exercises the landmark→gaze projection,
 but its interpretation is conditional on what the forward model and

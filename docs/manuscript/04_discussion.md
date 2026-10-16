@@ -108,7 +108,7 @@ saccade undersampling at about 30 Hz. Until a head-to-head against a
 reference tracker or a public dataset exists, iTrace should be cited as a verified
 reference implementation of the algorithms, not a validated tracker.
 
-## The closed loop bounds, but does not establish, real error
+## The closed loop measures a conditional model residual
 
 The 3-D closed loop ([@sec:closedloop]) exercises the landmark→gaze projection,
 but its interpretation is conditional on what the forward model and estimator *share*. Both
