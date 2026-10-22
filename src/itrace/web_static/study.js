@@ -19,6 +19,7 @@ function render(body) {
   const previousState = current?.state;
   current = body.status;
   camera = body.camera;
+  const terminal = ["complete", "aborted", "interrupted"].includes(current.state);
   el("phaseLabel").textContent = current.state.replaceAll("_", " ");
   el("outputPath").textContent = current.output_dir;
   el("trialProgress").textContent = `${current.trial_index} / ${current.trial_count}`;
@@ -29,7 +30,8 @@ function render(body) {
   const postAdequate = current.calibration?.post_validation_adequate;
   el("calibrationState").textContent = typeof postAdequate === "boolean" ? (postAdequate ? "Pre / post checks adequate" : "Post-check inadequate") : validated ? "Held-out check passed" : current.target?.phase || "Not validated";
   el("progressFill").style.width = `${100 * current.trial_index / current.trial_count}%`;
-  el("captureButton").disabled = busy || camera.running || !prepared || cancelled;
+  el("captureButton").disabled = busy || terminal || camera.running || !prepared || cancelled;
+  el("taskActions").hidden = terminal;
   const sampleReady = current.state === "post_validation" || current.capture_quality?.ready_to_calibrate;
   el("calibrateButton").disabled = busy || !current.capture_active || !current.target || !sampleReady || cancelled;
   el("calibrateButton").textContent = current.state === "post_validation" ? "Finish gaze validation" : "Calibrate and validate";
@@ -44,7 +46,11 @@ function render(body) {
   el("abortButton").disabled = restarting || ["setup", "complete", "aborted", "interrupted"].includes(current.state);
   if (camera.error) message(`Capture stopped: ${camera.error}. Save the partial session.`, "error");
   qualityGuidance(current, manifest.limits);
-  if (current.state === "complete") el("recoveryPanel").hidden = false;
+  if (current.state === "complete") {
+    el("recoveryPanel").hidden = false;
+    el("eyePreview").hidden = true;
+    el("stageInstruction").querySelector("p").textContent = "Responses and post-session checks are recorded. Save the completed session and review its diagnostics.";
+  }
   if (["interrupted", "aborted"].includes(current.state)) {
     cancelled = true;
     clearTimeout(deadlineTimer);
@@ -176,8 +182,8 @@ async function poll() {
     if (camera.running && !activeTrial && !busy) {
       const preview = await api.get("preview");
       if (preview.available) {
-        el("eyePreview").hidden = false;
-        el("eyePreview").src = preview.eye_crop;
+        el("eyePreview").hidden = !preview.eye_crop;
+        if (preview.eye_crop) el("eyePreview").src = preview.eye_crop;
         el("faceState").textContent = `${preview.face_detected ? "Face" : "No face"} / ${preview.gaze_valid ? "finite gaze" : "missing gaze"}`;
       }
     }

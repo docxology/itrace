@@ -25,7 +25,8 @@ export function qualityGuidance(status, limits) {
   const label = document.getElementById("gazeQuality");
   label.textContent = quality ? `${quality.valid_samples} / ${quality.recent_samples} valid in ${quality.window_s}s` : "Not observed";
   const hint = document.getElementById("readinessHint");
-  if (!status.capture_active) hint.textContent = "Start the webcam, then wait for face and finite gaze before calibration.";
+  if (status.state === "complete") hint.textContent = "Collection is complete. Save your records and review the session diagnostics.";
+  else if (!status.capture_active) hint.textContent = "Start the webcam, then wait for face and finite gaze before calibration.";
   else if (status.state === "post_validation") hint.textContent = "Finish the five post-session checks even if gaze quality declined. Inadequate gaze remains explicit in your saved report.";
   else if (status.target && !quality?.ready_to_calibrate) hint.textContent = `Waiting for at least ${limits.min_samples} fresh finite gaze samples and ${(limits.min_valid_fraction * 100).toFixed(0)}% valid samples. Keep your face framed and well lit.`;
   else if (status.target) hint.textContent = "Fresh gaze samples are available. Follow each dot through calibration and independent validation.";
