@@ -40,6 +40,10 @@ html:has(body.study) { scrollbar-gutter: stable; }
 .study .detected p { margin-bottom: 0; font-variant-numeric: tabular-nums; }
 .study .recovery { border-inline-start: 3px solid var(--orange); padding: var(--space-4); margin-block: var(--space-4); background: var(--warn-bg); }
 .study summary { cursor: pointer; font-weight: 600; padding-block: var(--space-3); }
+.study .protocol-guide { margin-block: var(--space-4); padding: var(--space-3) var(--space-4); background: var(--page); border-radius: 8px; }
+.study .protocol-guide ul { padding-inline-start: var(--space-6); }
+.study .protocol-guide li + li { margin-block-start: var(--space-4); }
+.study #savedSummary { margin-block-start: var(--space-6); border-top: 1px solid var(--line); padding-block-start: var(--space-6); }
 .study button:hover:not(:disabled) { border-color: var(--blue); }
 .study button:active:not(:disabled) { filter: brightness(.94); }
 .study .acknowledgement { display: flex; gap: var(--space-3); align-items: start; margin: var(--space-4) 0; }

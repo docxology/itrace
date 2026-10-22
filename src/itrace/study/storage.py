@@ -13,6 +13,7 @@ from uuid import uuid4
 from ..capture import CaptureSample
 from .jsonio import JsonValue, StudyError, encoded
 from .model import StudyManifest
+from .paths import validate_private_root
 from .provenance import provenance
 
 
@@ -23,26 +24,7 @@ class Journal:
         self.session_id = uuid4().hex
         self.path = output_root / self.session_id
         try:
-            for component in (output_root, *output_root.parents):
-                if component.is_symlink():
-                    raise StudyError("output_root", "symlink output directory forbidden")
-            resolved = output_root.resolve()
-            package = Path(__file__).resolve().parent.parent
-            repo = next(
-                (
-                    parent
-                    for parent in (resolved, *resolved.parents)
-                    if (parent / "pyproject.toml").is_file()
-                    and (parent / "src/itrace/__init__.py").is_file()
-                ),
-                None,
-            )
-            if resolved.is_relative_to(package) or (
-                repo is not None and not resolved.is_relative_to(repo / "output/studies")
-            ):
-                raise StudyError(
-                    "output_root", "use explicit private storage outside public source"
-                )
+            validate_private_root(output_root)
             output_root.mkdir(parents=True, exist_ok=True, mode=0o700)
             self.path.mkdir(mode=0o700)
             self.write_new(self.path / "manifest.json", manifest.original_bytes)

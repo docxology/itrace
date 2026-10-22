@@ -14,7 +14,10 @@ export async function collectTargets(api, status, update, interrupted) {
       dot.style.left = `${position.x}px`;
       dot.style.top = `${position.y}px`;
       const label = target.phase === "post_validation" ? "Post-session validation" : target.phase === "validation" ? "Independent validation" : "Calibration";
-      instruction.textContent = `${label}: look at the dot. Escape stops the session.`;
+      const index = Number(target.target_id.slice(7));
+      const phaseIndex = target.phase === "post_validation" ? index - 14 : target.phase === "validation" ? index - 9 : index;
+      const total = target.phase === "calibration" ? 9 : 5;
+      instruction.textContent = `${label} ${phaseIndex} of ${total}: look at the dot until it moves. Escape stops the session.`;
       const onsetMs = await afterPaint();
       await api.event("target_onset", {
         target_id: target.target_id, rect: rectangle(dot), position,

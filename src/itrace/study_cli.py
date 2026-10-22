@@ -50,3 +50,28 @@ def study_report(session_dir: Path, out: Annotated[Path, typer.Option()]) -> Non
         typer.echo(f"study report failed: {error}", err=True)
         raise typer.Exit(2) from error
     typer.echo(f"Study report: {out}")
+
+
+def study_check(
+    manifest: Annotated[Path, typer.Option(help="Private study manifest to validate.")],
+    output_dir: Annotated[Path, typer.Option(help="Private session storage to probe.")],
+    out: Annotated[Path | None, typer.Option(help="New private preflight JSON receipt.")] = None,
+) -> None:
+    from .study import StudyError
+    from .study.paths import validate_private_root
+    from .study.preflight import check_study
+
+    try:
+        report = check_study(manifest, output_dir)
+        payload = json.dumps(report, indent=2, allow_nan=False) + "\n"
+        if out is not None:
+            validate_private_root(out.parent)
+            if out.is_symlink():
+                raise StudyError("out", "symlink receipt forbidden")
+            from .study.storage import Journal
+
+            Journal.write_new(out, payload.encode("utf-8"))
+        typer.echo(payload)
+    except (StudyError, OSError) as error:
+        typer.echo(f"study preflight failed: {error}", err=True)
+        raise typer.Exit(2) from error

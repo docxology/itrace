@@ -38,6 +38,10 @@ Current interface contracts:
   geometry, and explicit renewed acknowledgements after replacement. A terminal
   session is saved before allocating its replacement; save, Stop, setup and
   restart retries preserve acknowledged state. Stale session controls are rejected.
+- Non-collecting `study-check` verifies frozen inputs and private writable storage.
+  The camera probe reports actual acquired frames and rejects absent finite gaze.
+  Setup shows fresh sample availability, task rules, target progress and saved
+  diagnostics; these do not replace independent calibration or device validation.
 - N=1 exploratory scope only: no population, device-accuracy, physical pupil-mm,
   or saccade-onset claim. Camera access and session calibration are separate
   from reference-device validation, which is not established by this interface.

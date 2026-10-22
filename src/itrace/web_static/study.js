@@ -1,6 +1,7 @@
 import {StudyApi, afterPaint, rectangle} from "/static/study-api.js";
 import {collectTargets} from "/static/study-targets.js";
 import {enterFullscreen, refreshGeometry, setupPayload} from "/static/study-setup.js";
+import {protocolGuide, qualityGuidance, savedSummary} from "/static/study-guidance.js";
 
 const api = new StudyApi();
 const el = id => document.getElementById(id);
@@ -29,18 +30,20 @@ function render(body) {
   el("calibrationState").textContent = typeof postAdequate === "boolean" ? (postAdequate ? "Pre / post checks adequate" : "Post-check inadequate") : validated ? "Held-out check passed" : current.target?.phase || "Not validated";
   el("progressFill").style.width = `${100 * current.trial_index / current.trial_count}%`;
   el("captureButton").disabled = busy || camera.running || !prepared || cancelled;
-  el("calibrateButton").disabled = busy || !current.capture_active || !current.target || cancelled;
+  const sampleReady = current.state === "post_validation" || current.capture_quality?.ready_to_calibrate;
+  el("calibrateButton").disabled = busy || !current.capture_active || !current.target || !sampleReady || cancelled;
   el("calibrateButton").textContent = current.state === "post_validation" ? "Finish gaze validation" : "Calibrate and validate";
   const restDone = current.state === "rest" && performance.now() / 1000 + (api.offset || 0) >= current.rest_until_s;
   el("nextButton").disabled = busy || cancelled || (!current.ready && !restDone);
-  el("nextButton").textContent = current.state === "rest" && !restDone ? "Rest before next trial" : "Start next trial";
+  const restSeconds = Math.max(0, Math.ceil((current.rest_until_s || 0) - performance.now() / 1000 - (api.offset || 0)));
+  el("nextButton").textContent = current.state === "rest" && !restDone ? `Rest · ${restSeconds}s remaining` : "Start next trial";
   el("exportButton").textContent = current.state === "complete" ? "Save completed session" : "Save partial session";
   el("exportButton").disabled = busy;
   el("prepareButton").disabled = busy;
   el("restartButton").disabled = busy;
   el("abortButton").disabled = restarting || ["setup", "complete", "aborted", "interrupted"].includes(current.state);
   if (camera.error) message(`Capture stopped: ${camera.error}. Save the partial session.`, "error");
-  el("readinessHint").textContent = !current.capture_active ? "Start the webcam, then wait for face and finite gaze before calibration." : current.target ? "Follow every dot through calibration and independent validation. Keep your viewing position fixed." : current.ready ? "Calibration passed. Start the next trial when ready." : "Keep the window unchanged. Trial and rest controls follow the frozen protocol.";
+  qualityGuidance(current, manifest.limits);
   if (current.state === "complete") el("recoveryPanel").hidden = false;
   if (["interrupted", "aborted"].includes(current.state)) {
     cancelled = true;
@@ -209,6 +212,7 @@ el("targetStopButton").addEventListener("click", () => el("abortButton").click()
 el("exportButton").addEventListener("click", () => action(async () => {
   const result = await api.post("save");
   el("exportPath").textContent = result.export_dir;
+  savedSummary(result.report);
   message("Private export saved. Review completeness, timing and gaze quality in the report.", "success");
 }));
 el("restartButton").addEventListener("click", () => action(async () => {
@@ -226,6 +230,7 @@ el("restartButton").addEventListener("click", () => action(async () => {
     el("recoveryPanel").hidden = true;
     el("setupForm").hidden = false;
     el("taskArea").hidden = true;
+    el("savedSummary").hidden = true;
     el("setupForm").elements.storage_acknowledged.checked = false;
     el("setupForm").elements.geometry_confirmed.checked = false;
     el("exportPath").textContent = `Previous session saved: ${result.saved_export_dir}`;
@@ -252,6 +257,7 @@ try {
   const context = await api.get("context");
   api.token = context.token; api.sessionId = context.status.session_id;
   manifest = context.manifest; render(context);
+  protocolGuide(manifest);
   el("setupForm").elements.device_id.value = `webcam-${camera.camera_index}`;
   refreshGeometry();
   el("studyTitle").textContent = manifest.title;

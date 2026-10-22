@@ -2,6 +2,6 @@
   "schema": "itrace.development-surface.v1",
   "scope": "Current Python file surface only; gate outcomes and scientific evidence remain source-bound receipts",
   "historical_verification_metrics_sha256": "60c690385c32ed176716a82b48838a5ce1f8d06a27c51aff3dfe0e69602eba78",
-  "ruff_format_summary": "186 files already formatted",
-  "mypy_summary": "Success: no issues found in 93 source files"
+  "ruff_format_summary": "190 files already formatted",
+  "mypy_summary": "Success: no issues found in 96 source files"
 }

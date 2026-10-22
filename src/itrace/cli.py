@@ -35,7 +35,7 @@ from .capture import (
 from .config import AnalysisConfig, analysis_config_from_json
 from .reporting import validate_report_payload
 from .stats import bootstrap, descriptive, distributions, scanpath_metrics
-from .study_cli import study, study_report
+from .study_cli import study, study_check, study_report
 from .synthetic import gaze_with_saccade, pupil_sine_with_blink
 from .types import SessionReport
 from .version import __version__
@@ -392,15 +392,26 @@ def record(
 def camera_probe(camera: int = 0, frames: int = 5, backend_logs: bool = False) -> None:
     """Probe webcam dependency and camera access without writing data."""
     from .capture import WebcamSource
+    from .study import StudyError
+    from .study.readiness import probe_quality
 
     try:
+        if camera < 0 or not 1 <= frames <= 300:
+            raise StudyError("camera", "camera must be nonnegative; frames must be 1 through 300")
         with _native_stderr(backend_logs):
             source = WebcamSource(camera_index=camera)  # pragma: no cover - hardware
-            samples = list(source.frames(max_frames=frames))  # pragma: no cover - hardware
-    except RuntimeError as exc:  # pragma: no cover - hardware/environment
+            samples = [
+                frame.capture for frame in source.live_frames(max_frames=frames)
+            ]  # pragma: no cover - hardware
+        quality = probe_quality(samples)
+    except (RuntimeError, StudyError) as exc:
         typer.echo(f"camera probe failed: {exc}", err=True)
         raise typer.Exit(2) from exc
-    typer.echo(f"camera={camera} read_frames={frames} detected_face_samples={len(samples)}")
+    typer.echo(
+        f"camera={camera} read_frames={quality['read_frames']} "
+        f"detected_face_samples={quality['detected_face_samples']} "
+        f"finite_gaze_samples={quality['finite_gaze_samples']}"
+    )
 
 
 @app.command("live-html")
@@ -437,6 +448,7 @@ def live_html(
 
 
 app.command("study")(study)
+app.command("study-check")(study_check)
 app.command("study-report")(study_report)
 
 

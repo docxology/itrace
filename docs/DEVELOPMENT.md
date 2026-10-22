@@ -130,8 +130,18 @@ an available source digest is not a clean-Git attestation.
 Focused checks live in `tests/study/`, `tests/test_capture_service.py`, and
 `tests/test_study_server.py`; run the applicable checks in an existing verified
 environment. Software/synthetic browser checks do not establish hardware validity.
-The current macOS probe for camera index 0 was denied (authorization status 0),
-so real-camera study validation remains unavailable.
+Camera availability and finite gaze depend on the intended runtime, current
+permissions, framing and illumination. Run `camera-probe` there; a failed probe
+must remain a failed observation. Neither successful access nor synthetic browser
+checks establish real gaze adequacy or reference-device accuracy.
+
+`study-check` validates the frozen manifest/images, checks the web/capture module
+surface and probes private storage without opening a camera or creating a
+session. Its receipt binds current runtime/source bytes; it cannot certify a
+future session. Live `capture_quality` reports a recent window using the declared
+collection duration/sample/fraction settings. The initial calibration button waits
+for fresh finite face-valid samples, while post-validation remains attemptable
+with poor gaze so inadequacy can be retained explicitly.
 
 Keep private manifests, PNGs, answers, identifiers, and session records outside
 public source. This workflow leaves the original scientific publications,

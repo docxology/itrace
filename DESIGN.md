@@ -66,6 +66,13 @@ visible saved-export path. Repeated requests reuse their acknowledged result;
 new sessions always require renewed acknowledgements and calibration. Existing
 instrument tokens and page-owned scrolling remain the layout contract.
 
+Before collection, an expandable protocol guide exposes frozen task rules and
+response keys without displaying stimuli or answers. The supporting pane shows
+fresh sample availability separately from held-out calibration quality. Target
+instructions include phase and progress; rest controls show remaining seconds.
+Saved diagnostics use a compact definition list and retain explicit incomplete
+and inadequate outcomes. No scored correctness is shown during collection.
+
 ## 5. Reusable primitives and states
 
 - Panel: neutral surface, title and grouped content; empty/loading/error states

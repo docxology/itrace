@@ -13,6 +13,7 @@ from .calibration import Calibration, Frame
 from .events import transition, validate_shape
 from .jsonio import JsonValue, StudyError, fields, number, parse_object, text
 from .model import StudyManifest
+from .readiness import capture_quality
 from .runtime import Runtime
 from .setup import parse_setup
 from .storage import Journal
@@ -48,12 +49,19 @@ class StudySession:
         with self._lock:
             if self._journal.failed:
                 self._runtime.invalidate("durable storage failed")
-            result = self._runtime.payload(self._now())
+            now = self._now()
+            result = self._runtime.payload(now)
             result.update(
                 {
                     "session_id": self._journal.session_id,
                     "output_dir": str(self._journal.path),
                     "storage_failed": self._journal.failed,
+                    "capture_quality": capture_quality(
+                        list(self._frames),
+                        now,
+                        self._runtime.manifest.limits,
+                        active=self._runtime.capture_active,
+                    ),
                 }
             )
             return result

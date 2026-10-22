@@ -13,6 +13,8 @@ answers, and all session/report output. The placeholders below are operator
 choices, not bundled data or repository directories.
 
 ```bash
+itrace study-check --manifest PRIVATE/study.json --output-dir PRIVATE/sessions --out PRIVATE/preflight.json
+itrace camera-probe --camera 0 --frames 15
 itrace study --manifest PRIVATE/study.json --output-dir PRIVATE/sessions
 itrace study-report SESSION_DIR --out NEW_REPORT
 ```
@@ -22,6 +24,11 @@ the service on loopback. `--camera` defaults to 0. Launching creates a unique
 session directory; capture begins only when **Start webcam** is pressed.
 `SESSION_DIR` is that directory, not an export subdirectory. `NEW_REPORT` must be
 a new file with an existing parent; reconstruction needs no camera or browser.
+The optional preflight receipt must also be a new file. Preflight checks software,
+input hashes and private storage only; it does not open a camera or allocate a
+session. The camera probe counts actual acquired frames and rejects an empty,
+nonmonotonic or entirely face-invalid/nonfinite gaze stream. Its success is an
+access/sample check, not calibration or accuracy validation.
 
 1. Close other camera applications and use one display. Measure the display's
    physical width/height and eye-to-display distance in millimetres. Enter display
@@ -36,6 +43,9 @@ a new file with an existing parent; reconstruction needs no camera or browser.
    missing dependencies, or unavailable finite gaze must be resolved before
    calibration. A camera-access probe does not establish real gaze quality;
    the live face/gaze check and held-out calibration must pass for this session.
+   The page shows fresh valid-sample counts and enables initial calibration only
+   after the declared minimum count/fraction are available and the latest sample
+   is valid. If it waits, improve framing/illumination and keep the face visible.
 4. Press **Calibrate and validate**. Follow nine fit targets and five distinct
    held-out targets. Each uses the manifest's settle/collect window. Readiness
    requires sufficient valid samples, acceptable held-out residuals, active
@@ -48,6 +58,10 @@ a new file with an existing parent; reconstruction needs no camera or browser.
    Five held-out positions repeat with the initial fit frozen. Each is collected
    once; inadequate post data remain explicit rather than triggering a refit.
    Save the completed session, then inspect its report.
+   Saved diagnostics show explicit answers, omissions, unattempted trials, frame
+   consistency and post-check adequacy without supplying scored feedback during
+   collection. The task-rule disclosure is available before preparation; target
+   phase/progress and rest countdowns explain the next step.
 
 ## Version 1 manifest
 

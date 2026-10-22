@@ -26,6 +26,7 @@
       <form id="setupForm" class="setup-only">
         <h2>Prepare your session</h2>
         <p>Use one display and close other camera applications. We detect the pixel dimensions; you only need your identifiers and three physical measurements.</p>
+        <details class="protocol-guide"><summary>Read the task rules before starting</summary><p>Practice gives feedback. Scored trials do not. Use a printed key or click a response before its deadline; a timeout is kept as an omission. Full scenes are shown.</p><ul id="protocolGuide"></ul><p class="quiet">For collection, use a dedicated browser window in fullscreen. Keep this page visible; switching tabs, resizing or exiting fullscreen interrupts the session.</p></details>
         <fieldset><legend><span class="step-number">1</span> Identify this session</legend>
         <div class="fields">
           <label>Participant identifier<input name="participant_id" required maxlength="128" autocomplete="off" placeholder="Your private study label"></label>
@@ -68,6 +69,7 @@
       </div>
       <p class="quiet">Escape stops the session. Use the printed response keys or click a choice. Practice feedback is separate from scored trials.</p>
       <p class="mono" id="exportPath"></p>
+      <section id="savedSummary" hidden aria-labelledby="savedHeading"><h2 id="savedHeading">Saved session diagnostics</h2><dl id="savedValues"></dl><p class="quiet">These describe this recording. Structural consistency and gaze adequacy are separate; neither establishes device accuracy or population effects.</p></section>
     </section>
     <aside class="study-panel" aria-label="Acquisition and protocol">
       <h2>Session overview</h2>
@@ -78,6 +80,7 @@
         <div><dt>Webcam</dt><dd id="cameraState">Not started</dd></div>
         <div><dt>Recorded frames</dt><dd id="frameCount">0</dd></div>
         <div><dt>Face / gaze</dt><dd id="faceState">Not measured</dd></div>
+        <div><dt>Fresh gaze samples</dt><dd id="gazeQuality">Not observed</dd></div>
         <div><dt>Clock uncertainty</dt><dd id="syncError">Not measured</dd></div>
         <div><dt>Calibration</dt><dd id="calibrationState">Not measured</dd></div>
       </dl>

@@ -58,7 +58,7 @@ src/itrace/      pure analysis core + thin capture/dashboard shells + cli
   capture.py     optional webcam backend + canonical capture I/O helpers
   live/          local HTML orchestrator (state, analysis, server submodules)
   study/         private manifest, session state, calibration, journal/reconstruction
-  study_cli.py   study and study-report CLI adapters
+  study_cli.py   study, study-check and study-report CLI adapters
   web_static/    separate diagnostic and private-study browser assets
   eyemodel.py    3-D eyeball forward model + pinhole projection → landmarks
   scene.py       animated gaze/pupil trajectory + full closed-loop validation

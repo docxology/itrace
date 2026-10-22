@@ -143,6 +143,8 @@ rectangles, key/click responses, and deadline omissions; these are software timi
 estimates, not physical display-onset measurements.
 
 ```bash
+itrace study-check --manifest PRIVATE/study.json --output-dir PRIVATE/sessions
+itrace camera-probe --camera 0 --frames 15
 itrace study --manifest PRIVATE/study.json --output-dir PRIVATE/sessions
 itrace study-report SESSION_DIR --out NEW_REPORT
 ```
@@ -156,6 +158,10 @@ interface supports N=1 exploratory diagnostics, with no population/device accura
 physical pupil-mm, or saccade-onset claims. Camera access alone does not validate
 gaze quality; each session needs its own live and held-out checks. See [Private study](docs/PRIVATE_STUDY.md)
 for the manifest contract, operator steps, exports, and failure handling.
+The [self-experiment run guide](docs/RUN_SELF_EXPERIMENT.md) gives the complete
+preflight, launch, calibration, collection and recovery sequence. Keep the server
+in a dedicated terminal or operator-managed service so restarting an agent host
+does not terminate it.
 
 The original scientific publications, manuscript, pilot ledgers, figures, and
 release evidence are unchanged by this interface.

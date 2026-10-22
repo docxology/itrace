@@ -31,6 +31,7 @@ running; this index does not invent commands.
 - [Research brief](RESEARCH_BRIEF.md)
 - [Validation protocols](VALIDATION_PROTOCOLS.md)
 - [Private visual study: manifest, measured setup, capture, trials, and recovery](PRIVATE_STUDY.md)
+- [Run a private self-experiment: preflight through saved records](RUN_SELF_EXPERIMENT.md)
 - [Manual annotation protocol](manual_annotation_protocol.md)
 - [Scholarship audit](SCHOLARSHIP_AUDIT.md) / [Traceability matrix](TRACEABILITY_MATRIX.json)
 - [Primary-source scholarship and statistics review, October 2026](SCHOLARSHIP_REVIEW_20261015.md)
@@ -42,7 +43,8 @@ running; this index does not invent commands.
 - [v0.5.0 release notes](releases/v0.5.0.md)
 - [Corrected manuscript revision, DOI, and publication verification (2026-10-16)](releases/manuscript-2026-10-16.md)
 
-`verification_metrics.json` records current development checks. The previous
+`verification_metrics.json` preserves historical manuscript checks; current
+source-bound verification receipts record development outcomes. The previous
 release ledgers are retained in `releases/v0.4.1-verification.json` and
 `releases/v0.5.0-verification.json`; dated audit
 reports retain their original evidence rather than claiming a later gate run.
