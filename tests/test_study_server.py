@@ -137,8 +137,13 @@ def test_control_boundary_rejects_forged_or_malformed_requests(
 ) -> None:
     app = create_study_app(manifest_path=manifest_path, output_root=tmp_path / "records")
     with TestClient(app, base_url="http://127.0.0.1") as client:
-        token = client.get("/api/study/context").json()["token"]
-        accepted = {"X-iTrace-Control": token, "Content-Type": "application/json"}
+        context = client.get("/api/study/context").json()
+        token = context["token"]
+        accepted = {
+            "X-iTrace-Control": token,
+            "X-iTrace-Session": context["status"]["session_id"],
+            "Content-Type": "application/json",
+        }
         if expected == 401:
             accepted.pop("X-iTrace-Control")
         response = client.post(
@@ -155,7 +160,10 @@ def test_partial_export_and_abort_are_explicit_and_never_start_camera(
     app = create_study_app(manifest_path=manifest_path, output_root=tmp_path / "records")
     with TestClient(app, base_url="http://127.0.0.1") as client:
         context = client.get("/api/study/context").json()
-        headers = {"X-iTrace-Control": context["token"]}
+        headers = {
+            "X-iTrace-Control": context["token"],
+            "X-iTrace-Session": context["status"]["session_id"],
+        }
         first = client.post("/api/study/export", headers=headers, json={})
         assert first.status_code == 200
         result = first.json()["result"]

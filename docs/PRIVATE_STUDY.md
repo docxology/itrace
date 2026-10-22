@@ -25,14 +25,17 @@ a new file with an existing parent; reconstruction needs no camera or browser.
 
 1. Close other camera applications and use one display. Measure the display's
    physical width/height and eye-to-display distance in millimetres. Enter display
-   pixel dimensions and pseudonymous participant/device identifiers.
+   pseudonymous participant/device identifiers. The page detects window CSS
+   pixels and estimates display device pixels from the browser screen and scale;
+   it refreshes the measurement after fullscreen settles. Physical dimensions
+   and viewing distance must still be measured, never inferred from pixels.
 2. Acknowledge private derived storage and confirm the measurements. **Prepare in
    fullscreen** binds browser, viewport, device-pixel ratio, and browser epoch;
    physical measurements are stored in metres. Keep geometry and camera fixed.
 3. Press **Start webcam** and inspect camera/face/gaze status. Missing permission,
    missing dependencies, or unavailable finite gaze must be resolved before
-   calibration. The current macOS probe for camera index 0 was denied
-   (authorization status 0); no real-camera study validation is claimed.
+   calibration. A camera-access probe does not establish real gaze quality;
+   the live face/gaze check and held-out calibration must pass for this session.
 4. Press **Calibrate and validate**. Follow nine fit targets and five distinct
    held-out targets. Each uses the manifest's settle/collect window. Readiness
    requires sufficient valid samples, acceptable held-out residuals, active
@@ -141,6 +144,22 @@ fullscreen exit, capture faults, or browser connection loss invalidate readiness
 Stop and retain the partial session; start a new session after resolving the
 cause. Do not treat a reload/reconnect as resuming scored trials. Connection-loss
 handling does not promise an exact hardware shutdown deadline.
+
+The recovery panel's **Save records and start a new session** first saves the
+stopped session, then allocates a separate session directory and capture service.
+It never clears or rewrites the earlier journal, captures or exports. Measurements
+remain in the form for a same-page retry, but both acknowledgements are cleared
+and calibration must be repeated. Identifiers and measurements are not saved in
+browser local storage. After a reload, enter them again.
+
+Terminal saves, repeated Stop, identical setup retries and new-session request
+IDs are idempotent within the running server. The server retains the latest
+new-session receipt so a lost acknowledgement can be retried without allocating
+another session. Controls carry the intended session ID; an old tab cannot stop
+or overwrite its replacement. An active session must be stopped before it can
+be replaced. Repeated saves during active collection remain distinct snapshots.
+If a request times out, retry its visible action; a timeout is not proof that the
+server failed. Storage failures retain partial files and prevent replacement.
 
 After a crash or failed export, preserve original files and run `study-report`
 with a new report path. Reconstruction accepts a valid journal prefix with an

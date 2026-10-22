@@ -13,6 +13,7 @@ from .capture_service import CaptureService
 from .server import FrameSourceFactory
 from .study_control import StudyController
 from .study_routes import install_study_routes
+from .study_workspace import StudyWorkspace
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -31,28 +32,28 @@ def create_study_app(
     from fastapi.staticfiles import StaticFiles
 
     manifest = load_manifest(manifest_path)
-    session = StudySession(manifest, output_root)
 
     def factory(camera: int, limit: int | None) -> Iterable[LiveFrameSample]:
         with native_stderr(backend_logs):
             source = WebcamSource(camera_index=camera, timestamp_origin_s=0.0)
             yield from source.live_frames(max_frames=limit)
 
-    def record(frame: LiveFrameSample, epoch: str, received_s: float) -> None:
-        session.capture(frame.capture, epoch, received_s)
+    token = secrets.token_urlsafe(32)
 
-    def changed(active: bool, reason: str, error: str | None) -> None:
-        epoch = capture.status()["epoch"]
-        session.capture_state(active, str(epoch), error or reason)
+    def build() -> StudyController:
+        session = StudySession(manifest, output_root)
 
-    capture = CaptureService(frame_source_factory or factory, record, changed)
-    controller = StudyController(
-        manifest,
-        session,
-        capture,
-        secrets.token_urlsafe(32),
-        camera_index,
-    )
+        def record(frame: LiveFrameSample, epoch: str, received_s: float) -> None:
+            session.capture(frame.capture, epoch, received_s)
+
+        def changed(active: bool, reason: str, error: str | None) -> None:
+            epoch = capture.status()["epoch"]
+            session.capture_state(active, str(epoch), error or reason)
+
+        capture = CaptureService(frame_source_factory or factory, record, changed)
+        return StudyController(manifest, session, capture, token, camera_index)
+
+    controller = StudyWorkspace(build)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -73,7 +74,7 @@ def create_study_app(
         finally:
             stopped.set()
             await watcher
-            await run_in_threadpool(capture.stop)
+            await run_in_threadpool(controller.stop)
 
     app = FastAPI(title="iTrace visual study", version=__version__, lifespan=lifespan)
     app.state.study_controller = controller

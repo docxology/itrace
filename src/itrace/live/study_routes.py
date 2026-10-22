@@ -4,12 +4,13 @@ from urllib.parse import urlsplit
 from ..study import JsonValue, StudyError
 from .capture_service import CaptureBusyError, CaptureParameterError, CaptureStopTimeout
 from .study_control import StudyAction, StudyController
+from .study_workspace import StudyWorkspace
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
 
 
-def install_study_routes(app: "FastAPI", controller: StudyController) -> None:
+def install_study_routes(app: "FastAPI", controller: StudyController | StudyWorkspace) -> None:
     from fastapi import HTTPException, Request
     from fastapi.responses import Response
     from starlette.concurrency import run_in_threadpool
@@ -57,6 +58,8 @@ def install_study_routes(app: "FastAPI", controller: StudyController) -> None:
                 raise HTTPException(status_code=413, detail="study request exceeds 1 MiB")
         payload = bytes(chunks)
         try:
-            return await run_in_threadpool(controller.dispatch, operation, payload)
+            return await run_in_threadpool(
+                controller.dispatch, operation, payload, request.headers.get("x-itrace-session")
+            )
         except (StudyError, CaptureBusyError, CaptureParameterError, CaptureStopTimeout) as error:
             raise HTTPException(status_code=400, detail=str(error)) from error

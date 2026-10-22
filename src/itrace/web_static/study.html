@@ -17,21 +17,35 @@
   <div class="study-grid">
     <section class="study-panel" aria-label="Experiment">
       <p class="status" id="message" aria-live="polite">Checking the study server.</p>
+      <section id="recoveryPanel" class="recovery" hidden aria-labelledby="recoveryTitle">
+        <h2 id="recoveryTitle">Keep your records. Start fresh.</h2>
+        <p>The previous session is retained. Save it and create a new session to repeat setup and calibration. Scored trials never resume.</p>
+        <button type="button" class="primary" id="restartButton">Save records and start a new session</button>
+        <p id="recoverySaved" class="mono" aria-live="polite"></p>
+      </section>
       <form id="setupForm" class="setup-only">
         <h2>Prepare your session</h2>
-        <p>Measure the display and your viewing distance. Use one display, keep the camera still, and close other camera applications. The next step enters fullscreen.</p>
+        <p>Use one display and close other camera applications. We detect the pixel dimensions; you only need your identifiers and three physical measurements.</p>
+        <fieldset><legend><span class="step-number">1</span> Identify this session</legend>
         <div class="fields">
-          <label>Participant identifier<input name="participant_id" required maxlength="128" autocomplete="off"></label>
+          <label>Participant identifier<input name="participant_id" required maxlength="128" autocomplete="off" placeholder="Your private study label"></label>
           <label>Webcam / device identifier<input name="device_id" required maxlength="128" autocomplete="off"></label>
-          <label>Display width (mm)<input name="display_width_mm" type="number" min="50" max="10000" step="any" required></label>
-          <label>Display height (mm)<input name="display_height_mm" type="number" min="50" max="10000" step="any" required></label>
-          <label>Viewing distance (mm)<input name="distance_mm" type="number" min="50" max="10000" step="any" required></label>
-          <label>Display pixel width<input name="screen_width_px" type="number" min="100" max="32768" step="1" required></label>
-          <label>Display pixel height<input name="screen_height_px" type="number" min="100" max="32768" step="1" required></label>
-        </div>
+        </div></fieldset>
+        <fieldset><legend><span class="step-number">2</span> Measure your viewing setup</legend>
+        <p class="quiet">Measure the lit screen, excluding the bezel. Measure from your eyes to the display. Browser APIs cannot determine these physical distances.</p>
+        <div class="fields physical-fields">
+          <label>Screen width (mm)<input name="display_width_mm" type="number" min="50" max="10000" step="any" inputmode="decimal" required></label>
+          <label>Screen height (mm)<input name="display_height_mm" type="number" min="50" max="10000" step="any" inputmode="decimal" required></label>
+          <label>Eye-to-screen distance (mm)<input name="distance_mm" type="number" min="50" max="10000" step="any" inputmode="decimal" required></label>
+        </div></fieldset>
+        <fieldset><legend><span class="step-number">3</span> Confirm and prepare</legend>
+        <div class="detected"><strong>Pixel dimensions detected automatically</strong><p id="geometrySummary" class="quiet"></p></div>
+        <input name="screen_width_px" type="hidden"><input name="screen_height_px" type="hidden">
         <label class="acknowledgement"><input name="storage_acknowledged" type="checkbox" required><span>I agree to save derived gaze and response records privately for this session. No raw video or eye images are saved.</span></label>
         <label class="acknowledgement"><input name="geometry_confirmed" type="checkbox" required><span>I measured these values and will keep the display, camera and viewing distance unchanged.</span></label>
         <button type="submit" class="primary" id="prepareButton">Prepare in fullscreen</button>
+        <p class="quiet">Next: start webcam → follow calibration dots → practice → scored trials. Keep this page visible and the window fixed after preparing.</p>
+        </fieldset>
       </form>
       <div id="taskArea" hidden>
         <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
@@ -46,6 +60,7 @@
           <button type="button" id="calibrateButton" disabled>Calibrate and validate</button>
           <button type="button" id="nextButton" disabled>Start next trial</button>
         </div>
+        <p id="readinessHint" class="quiet" aria-live="polite"></p>
       </div>
       <div class="actions">
         <button type="button" id="abortButton">Stop session</button>
@@ -68,9 +83,10 @@
       </dl>
       <img id="eyePreview" alt="Live eye preview during preparation" hidden>
       <p class="quiet">One participant remains N=1 across trials and sessions. Webcam gaze and relative pupil estimates are exploratory measurements, without reference-device accuracy claims.</p>
-      <h2>Private storage</h2>
+      <details><summary>Private storage and recovery</summary>
       <p class="mono" id="outputPath">Checking output location…</p>
       <p class="quiet">Partial records survive interruption. New exports preserve earlier exports; the historical iTrace pilot is separate.</p>
+      </details>
     </aside>
   </div>
 </main>

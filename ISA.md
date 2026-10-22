@@ -34,9 +34,13 @@ Current interface contracts:
   completion and gaze adequacy reported separately.
 - Durable partial journals/exports and offline reconstruction without resuming
   trials. Connection loss invalidates readiness.
+- Automatically detected window/display pixels, manually measured physical
+  geometry, and explicit renewed acknowledgements after replacement. A terminal
+  session is saved before allocating its replacement; save, Stop, setup and
+  restart retries preserve acknowledged state. Stale session controls are rejected.
 - N=1 exploratory scope only: no population, device-accuracy, physical pupil-mm,
-  or saccade-onset claim. The current macOS camera-index-0 probe was denied
-  (authorization status 0); hardware validation is not established.
+  or saccade-onset claim. Camera access and session calibration are separate
+  from reference-device validation, which is not established by this interface.
 
 Implementation references: `src/itrace/study/`, `src/itrace/live/study_*`,
 `src/itrace/study_cli.py`, and `src/itrace/web_static/study*`.

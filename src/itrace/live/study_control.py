@@ -23,6 +23,8 @@ class StudyAction(Enum):
     CAPTURE_START = "capture-start"
     CAPTURE_STOP = "capture-stop"
     HEARTBEAT = "heartbeat"
+    SAVE = "save"
+    NEW_SESSION = "new-session"
 
 
 def _unreachable(value: NoReturn) -> NoReturn:
@@ -51,7 +53,7 @@ class StudyController:
             "active": camera["active"],
             "running": camera["running"],
             "epoch": camera["epoch"],
-            "camera_index": camera["camera_index"],
+            "camera_index": self.camera_index,
             "max_frames": camera["max_frames"],
             "reason": camera["reason"],
             "error": camera["error"],
@@ -78,7 +80,9 @@ class StudyController:
             "timestamp_s": sample.timestamp_s if isfinite(sample.timestamp_s) else None,
         }
 
-    def dispatch(self, action: StudyAction, payload: bytes) -> dict[str, JsonValue]:
+    def dispatch(
+        self, action: StudyAction, payload: bytes, session_id: str | None = None
+    ) -> dict[str, JsonValue]:
         from ..study import parse_object
 
         body = parse_object(payload)
@@ -116,6 +120,8 @@ class StudyController:
                 self._empty(body)
                 self.capture.stop()
                 result = {}
+            case StudyAction.SAVE | StudyAction.NEW_SESSION:
+                raise StudyError("action", "session recovery requires the workspace controller")
             case unreachable:
                 _unreachable(unreachable)
         return {"ok": True, "result": result, **self.status()}

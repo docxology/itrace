@@ -1,10 +1,12 @@
 import {StudyApi, afterPaint, rectangle} from "/static/study-api.js";
 import {collectTargets} from "/static/study-targets.js";
+import {enterFullscreen, refreshGeometry, setupPayload} from "/static/study-setup.js";
 
 const api = new StudyApi();
 const el = id => document.getElementById(id);
 let manifest, current, camera, prepared = false, busy = false, cancelled = false;
 let activeTrial = null, deadlineTimer = null, imageUrl = null, polling = false;
+let restartKey = null, restarting = false, boundGeometry = null;
 
 function message(text, tone = "neutral") {
   el("message").textContent = text;
@@ -12,6 +14,8 @@ function message(text, tone = "neutral") {
 }
 
 function render(body) {
+  if (api.sessionId && body.status.session_id !== api.sessionId) return;
+  const previousState = current?.state;
   current = body.status;
   camera = body.camera;
   el("phaseLabel").textContent = current.state.replaceAll("_", " ");
@@ -32,15 +36,24 @@ function render(body) {
   el("nextButton").textContent = current.state === "rest" && !restDone ? "Rest before next trial" : "Start next trial";
   el("exportButton").textContent = current.state === "complete" ? "Save completed session" : "Save partial session";
   el("exportButton").disabled = busy;
+  el("prepareButton").disabled = busy;
+  el("restartButton").disabled = busy;
+  el("abortButton").disabled = restarting || ["setup", "complete", "aborted", "interrupted"].includes(current.state);
   if (camera.error) message(`Capture stopped: ${camera.error}. Save the partial session.`, "error");
+  el("readinessHint").textContent = !current.capture_active ? "Start the webcam, then wait for face and finite gaze before calibration." : current.target ? "Follow every dot through calibration and independent validation. Keep your viewing position fixed." : current.ready ? "Calibration passed. Start the next trial when ready." : "Keep the window unchanged. Trial and rest controls follow the frozen protocol.";
+  if (current.state === "complete") el("recoveryPanel").hidden = false;
   if (["interrupted", "aborted"].includes(current.state)) {
     cancelled = true;
     clearTimeout(deadlineTimer);
     activeTrial = null;
     document.body.classList.remove("collecting");
     el("targetOverlay").hidden = true;
+    el("eyePreview").hidden = true;
     lockChoices();
-    message(`Session ${current.state}. Save the partial records; scored trials cannot resume.`, "warning");
+    el("taskArea").hidden = true;
+    el("setupForm").hidden = true;
+    el("recoveryPanel").hidden = false;
+    if (previousState !== current.state) message(`Session ${current.state}. Your records remain private. Save them and start a fresh session below.`, "warning");
   }
 }
 api.onStatus = render;
@@ -58,28 +71,9 @@ async function prepare(event) {
   event.preventDefault();
   if (!el("setupForm").reportValidity()) return;
   await action(async () => {
-    await document.documentElement.requestFullscreen();
-    const entered = performance.now();
-    let lastChange = entered, size = `${innerWidth}x${innerHeight}`;
-    while (performance.now() - entered < 5000) {
-      await afterPaint();
-      const nextSize = `${innerWidth}x${innerHeight}`;
-      if (nextSize !== size) { size = nextSize; lastChange = performance.now(); }
-      if (performance.now() - entered >= 1000 && performance.now() - lastChange >= 300) break;
-    }
-    if (!document.fullscreenElement || performance.now() - lastChange < 300) throw new Error("Fullscreen geometry did not settle. Try preparation again.");
-    const data = new FormData(el("setupForm"));
-    await api.post("prepare", {
-      participant_id: data.get("participant_id"), device_id: data.get("device_id"),
-      display_width_m: Number(data.get("display_width_mm")) / 1000,
-      display_height_m: Number(data.get("display_height_mm")) / 1000,
-      distance_m: Number(data.get("distance_mm")) / 1000,
-      screen_width_px: Number(data.get("screen_width_px")), screen_height_px: Number(data.get("screen_height_px")),
-      dpr: devicePixelRatio, viewport_width_px: innerWidth, viewport_height_px: innerHeight,
-      browser: navigator.userAgent, client_epoch: api.epoch,
-      storage_acknowledged: data.get("storage_acknowledged") === "on",
-      geometry_confirmed: data.get("geometry_confirmed") === "on", fullscreen: Boolean(document.fullscreenElement),
-    });
+    const detected = await enterFullscreen();
+    await api.post("prepare", setupPayload(api, detected));
+    boundGeometry = `${innerWidth}x${innerHeight}x${devicePixelRatio}`;
     prepared = true;
     el("setupForm").hidden = true;
     el("taskArea").hidden = false;
@@ -205,6 +199,7 @@ el("calibrateButton").addEventListener("click", () => action(async () => {
 el("nextButton").addEventListener("click", startTrial);
 el("abortButton").addEventListener("click", async () => {
   cancelled = true; clearTimeout(deadlineTimer); activeTrial = null;
+  document.body.classList.remove("collecting");
   el("targetOverlay").hidden = true;
   lockChoices();
   try { await api.post("abort", {reason: "participant stopped the session"}); }
@@ -212,9 +207,32 @@ el("abortButton").addEventListener("click", async () => {
 });
 el("targetStopButton").addEventListener("click", () => el("abortButton").click());
 el("exportButton").addEventListener("click", () => action(async () => {
-  const result = await api.post("export");
+  const result = await api.post("save");
   el("exportPath").textContent = result.export_dir;
   message("Private export saved. Review completeness, timing and gaze quality in the report.", "success");
+}));
+el("restartButton").addEventListener("click", () => action(async () => {
+  restarting = true;
+  prepared = false;
+  cancelled = true;
+  clearTimeout(deadlineTimer);
+  activeTrial = null;
+  try {
+    if (!["complete", "aborted", "interrupted"].includes(current.state)) await api.post("abort", {reason: "new session requested after page reload"});
+    restartKey ??= crypto.randomUUID();
+    const result = await api.post("new-session", {request_id: restartKey});
+    api.epoch = crypto.randomUUID(); api.syncId = null; api.offset = null; api.uncertainty = null;
+    cancelled = false; restartKey = null; boundGeometry = null;
+    el("recoveryPanel").hidden = true;
+    el("setupForm").hidden = false;
+    el("taskArea").hidden = true;
+    el("setupForm").elements.storage_acknowledged.checked = false;
+    el("setupForm").elements.geometry_confirmed.checked = false;
+    el("exportPath").textContent = `Previous session saved: ${result.saved_export_dir}`;
+    refreshGeometry();
+    message("Fresh session created. Check your measurements, confirm storage and prepare again. Previous records are saved.", "success");
+    el("setupForm").elements.participant_id.focus();
+  } finally { restarting = false; }
 }));
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") { el("abortButton").click(); return; }
@@ -223,19 +241,26 @@ document.addEventListener("keydown", event => {
   if (option) { event.preventDefault(); finishTrial("response", option.key, performance.now()); }
 });
 document.addEventListener("visibilitychange", () => { if (document.hidden) interrupt("tab hidden"); });
-window.addEventListener("resize", () => interrupt("viewport resized"));
+window.addEventListener("resize", () => {
+  if (!prepared) refreshGeometry();
+  else if (boundGeometry !== `${innerWidth}x${innerHeight}x${devicePixelRatio}`) interrupt("viewport resized");
+});
 document.addEventListener("fullscreenchange", () => { if (prepared && !document.fullscreenElement) interrupt("fullscreen ended"); });
 window.addEventListener("pagehide", () => interrupt("page closed or reloaded"));
 
 try {
   const context = await api.get("context");
-  api.token = context.token; manifest = context.manifest; render(context);
+  api.token = context.token; api.sessionId = context.status.session_id;
+  manifest = context.manifest; render(context);
+  el("setupForm").elements.device_id.value = `webcam-${camera.camera_index}`;
+  refreshGeometry();
   el("studyTitle").textContent = manifest.title;
   el("practiceCount").textContent = manifest.trials.filter(x => x.role === "practice").length;
   el("scoredCount").textContent = manifest.trials.filter(x => x.role === "scored").length;
   if (current.state !== "setup") {
     el("setupForm").hidden = true;
-    message("This session belongs to an earlier page. Stop and export it; scored trials cannot resume after reload.", "warning");
+    el("recoveryPanel").hidden = false;
+    message("This session belongs to an earlier page. Save it and start fresh below; scored trials cannot resume after reload.", "warning");
   } else message("Private protocol loaded. Complete the measured setup to begin.");
   setInterval(poll, 500);
 } catch (error) { message(`Cannot load the study: ${error.message}`, "error"); }

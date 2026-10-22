@@ -2,6 +2,7 @@ export class StudyApi {
   constructor() {
     this.epoch = crypto.randomUUID();
     this.token = "";
+    this.sessionId = null;
     this.syncId = null;
     this.uncertainty = null;
     this.offset = null;
@@ -9,7 +10,7 @@ export class StudyApi {
   }
 
   async get(path) {
-    const response = await fetch(`/api/study/${path}`, {cache: "no-store"});
+    const response = await fetch(`/api/study/${path}`, {cache: "no-store", signal: AbortSignal.timeout(15000)});
     const body = await response.json();
     if (!response.ok) throw new Error(body.detail || "Study request failed.");
     return body;
@@ -17,10 +18,12 @@ export class StudyApi {
 
   async post(action, payload = {}) {
     const response = await fetch(`/api/study/${action}`, {
-      method: "POST", headers: {"Content-Type": "application/json", "X-iTrace-Control": this.token},
+      method: "POST", headers: {"Content-Type": "application/json", "X-iTrace-Control": this.token, "X-iTrace-Session": this.sessionId},
       body: JSON.stringify(payload), keepalive: action === "event" || action === "abort",
+      signal: AbortSignal.timeout(15000),
     });
     const body = await response.json();
+    if (response.ok && action === "new-session") this.sessionId = body.status.session_id;
     if (body.status) this.onStatus(body);
     if (!response.ok) throw new Error(body.detail || "Study control failed.");
     return body.result;

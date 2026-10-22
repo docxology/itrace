@@ -19,6 +19,7 @@ body.study {
   font-size: var(--text-body);
   line-height: 1.5;
 }
+html:has(body.study) { scrollbar-gutter: stable; }
 .study [hidden] { display: none !important; }
 .study-shell { max-width: 1440px; margin: auto; padding: var(--space-6); }
 .study-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); align-items: center; margin-bottom: var(--space-6); }
@@ -32,6 +33,15 @@ body.study {
 .study input:not([type="checkbox"]) { width: 100%; min-width: 0; padding: var(--space-3); background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; font-size: var(--text-body); }
 .study .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
 .study .full { grid-column: 1 / -1; }
+.study fieldset { min-inline-size: 0; border: 0; border-top: 1px solid var(--line); margin: var(--space-6) 0 0; padding: var(--space-4) 0 0; }
+.study legend { font-weight: 600; padding-inline-end: var(--space-3); }
+.study .step-number { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-inline-end: var(--space-2); background: var(--page); border: 1px solid var(--line); border-radius: 50%; font-variant-numeric: tabular-nums; }
+.study .detected { padding: var(--space-4); background: var(--page); border-radius: 8px; }
+.study .detected p { margin-bottom: 0; font-variant-numeric: tabular-nums; }
+.study .recovery { border-inline-start: 3px solid var(--orange); padding: var(--space-4); margin-block: var(--space-4); background: var(--warn-bg); }
+.study summary { cursor: pointer; font-weight: 600; padding-block: var(--space-3); }
+.study button:hover:not(:disabled) { border-color: var(--blue); }
+.study button:active:not(:disabled) { filter: brightness(.94); }
 .study .acknowledgement { display: flex; gap: var(--space-3); align-items: start; margin: var(--space-4) 0; }
 .study .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .study button { min-height: 44px; font-size: var(--text-body); padding: var(--space-2) var(--space-4); border-radius: 8px; border: 1px solid var(--line); color: var(--ink); background: var(--panel); cursor: pointer; }

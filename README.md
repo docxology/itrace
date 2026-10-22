@@ -132,6 +132,10 @@ The separate `study` interface runs a local, single-participant visual task from
 a versioned private manifest and hash-bound PNGs. It requires the existing
 `capture` and `web` extras. Measure display dimensions and viewing distance,
 confirm private derived storage, and enter fullscreen before starting capture.
+Window and display pixel dimensions are detected automatically. Physical screen
+dimensions and eye-to-screen distance still require measurement. A stopped or
+reloaded session has a save-and-start-fresh action; repeated requests preserve
+the earlier records and never resume scored trials.
 The sequence is nine calibration targets, five held-out targets, practice/scored
 trials in frozen order, then five repeated held-out checks using the initial fit.
 The browser records actual requestAnimationFrame callback timestamps, image
@@ -149,8 +153,8 @@ Durable partial records support offline report reconstruction, not trial resumpt
 Connection loss invalidates readiness; retain the partial session and start a new
 session. Completion does not establish adequate post-session gaze quality. This
 interface supports N=1 exploratory diagnostics, with no population/device accuracy,
-physical pupil-mm, or saccade-onset claims. The current macOS camera probe was
-denied; no hardware validation is claimed. See [Private study](docs/PRIVATE_STUDY.md)
+physical pupil-mm, or saccade-onset claims. Camera access alone does not validate
+gaze quality; each session needs its own live and held-out checks. See [Private study](docs/PRIVATE_STUDY.md)
 for the manifest contract, operator steps, exports, and failure handling.
 
 The original scientific publications, manuscript, pilot ledgers, figures, and

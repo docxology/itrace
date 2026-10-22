@@ -57,6 +57,15 @@ the eye preview and changing diagnostics; preserve a stable, aspect-correct
 stimulus rectangle and record its actual bounds. Resizing or hiding a presented
 trial interrupts it rather than silently changing its geometry.
 
+Setup uses numbered groups for identity, physical measurements and detected
+display geometry. Window dimensions are live CSS pixels; display estimates
+include device pixel ratio and are refreshed after fullscreen settles. The
+supporting pane retains diagnostics, while technical paths live in a disclosure.
+Recovery is an inline panel with one save-and-new-session action and a separately
+visible saved-export path. Repeated requests reuse their acknowledged result;
+new sessions always require renewed acknowledgements and calibration. Existing
+instrument tokens and page-owned scrolling remain the layout contract.
+
 ## 5. Reusable primitives and states
 
 - Panel: neutral surface, title and grouped content; empty/loading/error states
