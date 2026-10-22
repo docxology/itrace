@@ -29,7 +29,8 @@ This is the manuscript revision `manuscript-2026-10-16-310be17`; the software
 release remains v0.5.0. See the
 [revision notes and publication verification](docs/releases/manuscript-2026-10-16.md)
 for statistical and scholarly corrections, artifact checksums, and hosted CI.
-Current development checks are recorded in `docs/verification_metrics.json`.
+Historical manuscript checks are retained in `docs/verification_metrics.json`;
+run the source-bound verification below for current development checks.
 The repository URL is fixed here, in
 `pyproject.toml`, in `docs/verification_metrics.json`, and in `CITATION.cff` so
 the release and manuscript citation metadata stay aligned. See
@@ -59,6 +60,7 @@ the release and manuscript citation metadata stay aligned. See
 | Guided empirical sessions | `experiments` | derived live trial protocols and session-specific quality/target-residual reports |
 | Live capture (optional) | `capture` | OpenCV + MediaPipe Face Mesh iris landmarks, binocular diagnostics, relative proxy |
 | Local HTML orchestrator (optional) | `live` | FastAPI/WebSocket backend + native Canvas/SVG diagnostics |
+| Private visual study (optional) | `study`, `live.study_*`, `study_cli` | frozen local PNG protocol, measured setup, calibration, responses, durable private records |
 
 ## Install & run
 
@@ -124,7 +126,40 @@ empirical summaries explicitly:
 uv run python scripts/generate_figures.py --reuse-empirical-summaries
 ```
 
+## Private webcam visual study
+
+The separate `study` interface runs a local, single-participant visual task from
+a versioned private manifest and hash-bound PNGs. It requires the existing
+`capture` and `web` extras. Measure display dimensions and viewing distance,
+confirm private derived storage, and enter fullscreen before starting capture.
+The sequence is nine calibration targets, five held-out targets, practice/scored
+trials in frozen order, then five repeated held-out checks using the initial fit.
+The browser records actual requestAnimationFrame callback timestamps, image
+rectangles, key/click responses, and deadline omissions; these are software timing
+estimates, not physical display-onset measurements.
+
+```bash
+itrace study --manifest PRIVATE/study.json --output-dir PRIVATE/sessions
+itrace study-report SESSION_DIR --out NEW_REPORT
+```
+
+`PRIVATE` denotes operator-selected storage outside this public checkout;
+`SESSION_DIR` is the allocated session directory and `NEW_REPORT` must not exist.
+Durable partial records support offline report reconstruction, not trial resumption.
+Connection loss invalidates readiness; retain the partial session and start a new
+session. Completion does not establish adequate post-session gaze quality. This
+interface supports N=1 exploratory diagnostics, with no population/device accuracy,
+physical pupil-mm, or saccade-onset claims. The current macOS camera probe was
+denied; no hardware validation is claimed. See [Private study](docs/PRIVATE_STUDY.md)
+for the manifest contract, operator steps, exports, and failure handling.
+
+The original scientific publications, manuscript, pilot ledgers, figures, and
+release evidence are unchanged by this interface.
+
 ## Live HTML orchestrator
+
+`live-html` remains the separate diagnostic workflow; it does not run the private
+PNG trial protocol or write private-study session bundles.
 
 `itrace live-html` runs a local, single-user FastAPI app whose browser page is
 only a thin orchestrator. The Python backend still owns webcam capture,

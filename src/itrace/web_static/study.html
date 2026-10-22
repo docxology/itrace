@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Private iTrace visual-task session with webcam capture, calibration and explicit responses.">
+  <title>iTrace · Visual experiment</title>
+  <link rel="stylesheet" href="/static/study.css">
+  <script type="module" src="/static/study.js"></script>
+</head>
+<body class="study">
+<main class="study-shell">
+  <header class="study-header">
+    <div><h1>iTrace visual experiment</h1><p id="studyTitle">Loading the private protocol…</p></div>
+    <span class="status" id="phaseLabel">Preparation</span>
+  </header>
+  <div class="study-grid">
+    <section class="study-panel" aria-label="Experiment">
+      <p class="status" id="message" aria-live="polite">Checking the study server.</p>
+      <form id="setupForm" class="setup-only">
+        <h2>Prepare your session</h2>
+        <p>Measure the display and your viewing distance. Use one display, keep the camera still, and close other camera applications. The next step enters fullscreen.</p>
+        <div class="fields">
+          <label>Participant identifier<input name="participant_id" required maxlength="128" autocomplete="off"></label>
+          <label>Webcam / device identifier<input name="device_id" required maxlength="128" autocomplete="off"></label>
+          <label>Display width (mm)<input name="display_width_mm" type="number" min="50" max="10000" step="any" required></label>
+          <label>Display height (mm)<input name="display_height_mm" type="number" min="50" max="10000" step="any" required></label>
+          <label>Viewing distance (mm)<input name="distance_mm" type="number" min="50" max="10000" step="any" required></label>
+          <label>Display pixel width<input name="screen_width_px" type="number" min="100" max="32768" step="1" required></label>
+          <label>Display pixel height<input name="screen_height_px" type="number" min="100" max="32768" step="1" required></label>
+        </div>
+        <label class="acknowledgement"><input name="storage_acknowledged" type="checkbox" required><span>I agree to save derived gaze and response records privately for this session. No raw video or eye images are saved.</span></label>
+        <label class="acknowledgement"><input name="geometry_confirmed" type="checkbox" required><span>I measured these values and will keep the display, camera and viewing distance unchanged.</span></label>
+        <button type="submit" class="primary" id="prepareButton">Prepare in fullscreen</button>
+      </form>
+      <div id="taskArea" hidden>
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="stage" id="stage">
+          <div id="stageInstruction"><h2>Check your camera</h2><p>Start capture, then follow the calibration targets. Look at each dot until it moves.</p></div>
+          <img id="stimulus" alt="Visual task stimulus" hidden>
+        </div>
+        <p id="query" class="trial-query"></p>
+        <div id="responses" class="responses" aria-label="Response choices"></div>
+        <div class="actions" id="taskActions">
+          <button type="button" id="captureButton" class="primary">Start webcam</button>
+          <button type="button" id="calibrateButton" disabled>Calibrate and validate</button>
+          <button type="button" id="nextButton" disabled>Start next trial</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" id="abortButton">Stop session</button>
+        <button type="button" id="exportButton">Save partial session</button>
+      </div>
+      <p class="quiet">Escape stops the session. Use the printed response keys or click a choice. Practice feedback is separate from scored trials.</p>
+      <p class="mono" id="exportPath"></p>
+    </section>
+    <aside class="study-panel" aria-label="Acquisition and protocol">
+      <h2>Session overview</h2>
+      <dl>
+        <div><dt>Practice trials</dt><dd id="practiceCount">—</dd></div>
+        <div><dt>Scored trials</dt><dd id="scoredCount">—</dd></div>
+        <div><dt>Trial progress</dt><dd id="trialProgress">0</dd></div>
+        <div><dt>Webcam</dt><dd id="cameraState">Not started</dd></div>
+        <div><dt>Recorded frames</dt><dd id="frameCount">0</dd></div>
+        <div><dt>Face / gaze</dt><dd id="faceState">Not measured</dd></div>
+        <div><dt>Clock uncertainty</dt><dd id="syncError">Not measured</dd></div>
+        <div><dt>Calibration</dt><dd id="calibrationState">Not measured</dd></div>
+      </dl>
+      <img id="eyePreview" alt="Live eye preview during preparation" hidden>
+      <p class="quiet">One participant remains N=1 across trials and sessions. Webcam gaze and relative pupil estimates are exploratory measurements, without reference-device accuracy claims.</p>
+      <h2>Private storage</h2>
+      <p class="mono" id="outputPath">Checking output location…</p>
+      <p class="quiet">Partial records survive interruption. New exports preserve earlier exports; the historical iTrace pilot is separate.</p>
+    </aside>
+  </div>
+</main>
+<div id="targetOverlay" class="target-overlay" hidden aria-label="Calibration target presentation">
+  <button type="button" id="targetStopButton" class="target-stop">Stop session</button>
+  <div id="targetDot" class="target-dot" aria-hidden="true"></div>
+  <p id="targetInstruction" class="target-instruction" aria-live="polite">Look at the dot. Escape stops the session.</p>
+</div>
+</body>
+</html>

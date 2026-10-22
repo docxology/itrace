@@ -35,6 +35,7 @@ from .capture import (
 from .config import AnalysisConfig, analysis_config_from_json
 from .reporting import validate_report_payload
 from .stats import bootstrap, descriptive, distributions, scanpath_metrics
+from .study_cli import study, study_report
 from .synthetic import gaze_with_saccade, pupil_sine_with_blink
 from .types import SessionReport
 from .version import __version__
@@ -433,6 +434,10 @@ def live_html(
     except RuntimeError as exc:
         typer.echo(str(exc), err=True)
         raise typer.Exit(2) from exc
+
+
+app.command("study")(study)
+app.command("study-report")(study_report)
 
 
 @app.command()

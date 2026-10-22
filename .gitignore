@@ -14,6 +14,9 @@ coverage.xml
 .venv/
 .claude/
 .benchmarks/
+.omo/
+output/verification/
+output/studies/
 manuscript/_build.aux
 manuscript/_build.log
 .itrace-render-*/

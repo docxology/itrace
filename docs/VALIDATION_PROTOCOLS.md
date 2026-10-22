@@ -5,6 +5,38 @@ iTrace is currently algorithmically verified against synthetic truth and an
 independent 3-D closed loop. Device-level accuracy still requires real frames, calibrated
 targets, and/or a reference eye tracker.
 
+## Private visual-study diagnostics
+
+Use [PRIVATE_STUDY.md](PRIVATE_STUDY.md) for the manifest schema, measured setup,
+capture and recovery commands. This local N=1 protocol is separate from stock
+`live-html` and the historical manuscript pilot. Original scientific publications,
+manuscript, release evidence, and empirical ledgers remain unchanged.
+
+Freeze the versioned manifest and PNG hashes before collection. Record measured
+display geometry, viewing distance, participant/device identifiers, browser
+viewport, and storage acknowledgement. Fit only on nine calibration targets;
+use five distinct held-out targets to establish initial readiness. After the PNG
+trials, repeat the five held-out positions with the initial fit frozen. Report
+pre/post residuals, sample quality, and post-validation adequacy separately from
+behavioral completion. Five collected post dwells can complete a session while
+remaining inadequate for gaze interpretation.
+
+Retain actual browser rAF timestamps, image CSS rectangles, raw clock exchanges,
+native capture timestamps/epochs, explicit key/click responses, deadline omissions,
+and interrupted/unattempted outcomes. The correctness denominator includes scored
+explicit responses only; report omissions separately. Technical interruptions and
+abandonment are not wrong answers. Clock mapping bounds software uncertainty; it
+does not measure physical display onset, sensor exposure, or saccade onset.
+Connection loss invalidates readiness and requires a new collection session.
+
+Review partial exports and reconstructed reports for completeness, capture defects,
+timing eligibility, and calibration adequacy before interpretation. Reconstruction
+recomputes fit/residuals from saved dwell means, not a second raw-gaze replay.
+These are session-specific engineering diagnostics, without population inference,
+device-accuracy validation, pupil diameter in millimetres, or saccade-onset claims.
+The current macOS camera-index-0 probe was denied (authorization status 0);
+software checks do not constitute a real-camera validation result.
+
 ## Public webcam datasets
 
 Goal: estimate real-frame gaze error without claiming hardware validation beyond

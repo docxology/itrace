@@ -27,6 +27,9 @@ jobs:
           uv pip install --python wheel-env/bin/python dist/*.whl
           wheel-env/bin/python -I -c "import importlib.util, itrace; from pathlib import Path; assert 'site-packages' in itrace.__file__; assert (Path(itrace.__file__).parent / 'py.typed').is_file(); assert (Path(itrace.__file__).parent / 'web_static' / 'app.js').is_file(); assert all(importlib.util.find_spec(m) is None for m in ('cv2','mediapipe','streamlit','matplotlib','fastapi')); from itrace.synthetic import gaze_with_saccade; from itrace.pipeline import analyze_gaze; assert len(analyze_gaze(gaze_with_saccade()[0]).saccades) == 1"
           wheel-env/bin/itrace demo
+          wheel-env/bin/itrace study --help
+          wheel-env/bin/itrace study-report --help
+          wheel-env/bin/python -I -c "from pathlib import Path; import itrace; from itrace.study.provenance import provenance; p = provenance(); assert p['installation_kind'] == 'installed-package'; assert len(p['source_files']) > 20; assets = Path(itrace.__file__).parent / 'web_static'; assert all((assets / name).is_file() for name in ('study.html', 'study.css', 'study.js', 'study-api.js', 'study-targets.js'))"
   development:
     runs-on: ubuntu-latest
     steps:

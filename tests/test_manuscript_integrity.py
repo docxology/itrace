@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import shutil
@@ -354,7 +355,11 @@ def test_public_claim_surfaces_reject_stale_or_overclaim_phrases() -> None:
 
 
 def test_verification_metric_summaries_match_current_file_surface() -> None:
-    metrics = _verification_metrics()
+    metrics = json.loads((ROOT / "docs" / "development_surface.json").read_text())
+    assert (
+        metrics["historical_verification_metrics_sha256"]
+        == hashlib.sha256(METRICS.read_bytes()).hexdigest()
+    )
     ruff_files = sum(
         1
         for root in ("src", "tests", "scripts")

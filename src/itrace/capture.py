@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import base64
 import csv
+import math
 import os
 import time
 from collections.abc import Iterable, Iterator, Sequence
@@ -466,8 +467,20 @@ class WebcamSource:
     max_angle_deg: float = 25.0
     _cv2: object = field(default=None, repr=False)
     _mp_face: object = field(default=None, repr=False)
+    timestamp_origin_s: float | None = field(default=None, kw_only=True)
 
     def __post_init__(self) -> None:
+        if self.timestamp_origin_s is not None:
+            try:
+                valid_origin = type(self.timestamp_origin_s) in (int, float) and math.isfinite(
+                    self.timestamp_origin_s
+                )
+            except OverflowError as exc:
+                msg = "timestamp_origin_s must be finite"
+                raise ValueError(msg) from exc
+            if not valid_origin:
+                msg = "timestamp_origin_s must be finite"
+                raise ValueError(msg)
         self._cv2, mp = _require_capture_deps()
         self._mp_face = mp.solutions.face_mesh.FaceMesh
 
@@ -493,8 +506,10 @@ class WebcamSource:
                 read_count += 1
                 if not ok:
                     break
-                t = time.monotonic() - start
-                fps = read_count / t if t > 0.0 else 0.0
+                now = time.monotonic()
+                elapsed = now - start
+                t = now - (start if self.timestamp_origin_s is None else self.timestamp_origin_s)
+                fps = read_count / elapsed if elapsed > 0.0 else 0.0
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # type: ignore[attr-defined]
                 result = face_mesh.process(rgb)  # type: ignore[attr-defined]
                 landmarks: FloatArray | None = None
@@ -507,7 +522,9 @@ class WebcamSource:
                     frame_index=frame_index,
                     timestamp_s=t,
                     landmarks=landmarks,
-                    fps_estimate_hz=yielded / t if landmarks is not None and t > 0.0 else fps,
+                    fps_estimate_hz=yielded / elapsed
+                    if landmarks is not None and elapsed > 0.0
+                    else fps,
                 )
         finally:
             cap.release()

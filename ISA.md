@@ -13,6 +13,37 @@ updated: 2026-10-16T00:00:00Z
 
 # ISA — iTrace: Open-Source Webcam Eye-Movement Analysis Toolkit
 
+## Private visual-study interface (current development)
+
+The [private-study protocol](docs/PRIVATE_STUDY.md) documents a separate local
+interface: `itrace study --manifest PRIVATE/study.json --output-dir PRIVATE/sessions`
+and offline `itrace study-report SESSION_DIR --out NEW_REPORT`. The existing
+`live-html` diagnostic workflow remains available. Original scientific publications,
+manuscript, historical ledgers, figures, and release evidence remain untouched;
+the completed historical criteria below do not certify this new interface.
+
+Current interface contracts:
+
+- Versioned local manifest, immutable trial order, hash-bound private PNGs,
+  separate practice/scored families, and explicit measured setup/storage consent.
+- Webcam acquisition with native timestamps and quality/epoch records; nine
+  calibration targets and five held-out targets before trials.
+- Actual browser rAF timestamps and image rectangles, confirmed clock exchanges,
+  explicit responses, deadline omissions, and distinct technical interruptions.
+- Five post-session held-out repeats using the frozen initial fit; behavioral
+  completion and gaze adequacy reported separately.
+- Durable partial journals/exports and offline reconstruction without resuming
+  trials. Connection loss invalidates readiness.
+- N=1 exploratory scope only: no population, device-accuracy, physical pupil-mm,
+  or saccade-onset claim. The current macOS camera-index-0 probe was denied
+  (authorization status 0); hardware validation is not established.
+
+Implementation references: `src/itrace/study/`, `src/itrace/live/study_*`,
+`src/itrace/study_cli.py`, and `src/itrace/web_static/study*`.
+Documentation checks for this addition are recorded in
+[the scoped receipt](.omo/evidence/study-docs.md), independently of historical
+publication and full-suite receipts.
+
 ## Problem
 
 `working/iTrace` contained exactly one artifact: a 833-line literature survey

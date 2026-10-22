@@ -4,9 +4,14 @@ iTrace separates synthetic algorithm verification, recording diagnostics, and
 reference-device validation. Passing software gates does not turn the existing
 single-participant pilot into a device-accuracy study.
 
+`verification_metrics.json` retains the manuscript's historical evidence.
+`development_surface.json` separately binds today's formatter/type-checker file
+counts and the historical ledger's exact hash. It records the file surface, not
+a successful gate run. Fresh gate results belong in each verification receipt.
+
 ## Runtime and gates
 
-Use Python 3.10 or later and the committed `uv.lock`. On Daniel's workstation,
+Use Python 3.10 or later and the committed `uv.lock`. On a GitVault workstation,
 source, environments, caches, and temporary files belong on the mounted GitVault
 volume. Select a GitVault interpreter and a separate environment before syncing;
 check both `sys.prefix` and `sys.base_prefix`, since a virtual environment on the
@@ -99,7 +104,42 @@ published Git tag or Zenodo payload.
   fractional integer settings, and malformed windows. Report validation checks
   nonnegative integer counts, finite duration, and event-list totals.
 
+## Private-study development
+
+[PRIVATE_STUDY.md](PRIVATE_STUDY.md) is the operator and manifest reference.
+`src/itrace/study/` owns the camera-independent protocol, native-clock records,
+calibration, journal, exports, and reconstruction. `live/capture_service.py` owns
+the capture worker; `live/study_server.py`, `live/study_control.py`, and
+`live/study_routes.py` connect it to `study_cli.py` and `web_static/study*`.
+Use the existing `capture` and `web` extras; the interface adds no dependency.
+
+Preserve frozen trial order and input bytes. Readiness requires measured setup,
+active capture, nine fit targets, five separate held-out targets, and a current
+confirmed browser/host clock exchange. Actual rAF callback timestamps and image
+CSS rectangles accompany presentation events. Raw capture timestamps and frame
+indices remain native, with epoch/quality diagnostics. Browser connection loss
+invalidates readiness; do not resume scored collection after interruption.
+
+After trials, five held-out positions repeat with the initial fit frozen. Keep
+behavioral completion, post-validation adequacy, explicit responses, omissions,
+and technical interruptions separate in reports. Reconstruction uses durable
+clock/events and saved dwell means; it does not rerun a camera or resume trials.
+Inspect session provenance for the actual source/installed-package bindings;
+an available source digest is not a clean-Git attestation.
+
+Focused checks live in `tests/study/`, `tests/test_capture_service.py`, and
+`tests/test_study_server.py`; run the applicable checks in an existing verified
+environment. Software/synthetic browser checks do not establish hardware validity.
+The current macOS probe for camera index 0 was denied (authorization status 0),
+so real-camera study validation remains unavailable.
+
+Keep private manifests, PNGs, answers, identifiers, and session records outside
+public source. This workflow leaves the original scientific publications,
+manuscript, historical ledgers, figures, and release evidence untouched.
+
 ## Live analysis and exports
+
+This section describes the separate stock `live-html` diagnostic workflow.
 
 The dashboard plots the effective threshold computed by the Python analysis,
 including zero. Export sends the last displayed detector method, requested
