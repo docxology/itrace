@@ -81,7 +81,7 @@ dev = [
     # in dev rather than the runtime web extra so local serving has a smaller
     # network-client dependency surface.
     "httpx>=0.27.0",
-    "httpx2>=0.28.0",
+    "httpx2>=2.0.0",
     "uvicorn[standard]>=0.30.0",
 ]
 

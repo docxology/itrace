@@ -24,7 +24,7 @@ claims. Software checks do not substitute for your measured setup and calibratio
 
 Run `itrace study --manifest PRIVATE/study.json --output-dir PRIVATE/sessions`.
 Use a dedicated terminal or an operator-managed process outside an agent host's
-cancelled background commands. The server binds loopback, defaults to port8766,
+cancelled background commands. The server binds loopback, defaults to port 8766,
 and keeps capture off until you explicitly start it. `--host`/`--port`/`--camera`
 are explicit operator choices; never terminate a foreign server to claim its port.
 

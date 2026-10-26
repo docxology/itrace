@@ -1,6 +1,6 @@
 # TODO - iTrace Roadmap
 
-This file tracks upcoming improvements after the v0.4.0 package refresh. Keep
+This file tracks upcoming improvements after the v0.5.0 package refresh. Keep
 items scoped, verifiable, and honest about the current validation boundary:
 iTrace is algorithmically verified against synthetic truth, but device-level
 accuracy still needs reference eye-tracker or public-dataset validation.

@@ -14,7 +14,7 @@ subset iTrace uses for line/scatter series.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 # Wong (2011) colour-blind-safe qualitative palette.
 WONG: list[str] = [
@@ -69,7 +69,9 @@ def apply_house_style() -> None:
     """
     import matplotlib.pyplot as plt
 
-    plt.rcParams.update(HOUSE_RC)
+    # ``HOUSE_RC`` uses plain ``str`` keys; matplotlib validates the names at
+    # runtime, while its stubs type the mapping keys as an rc-key literal union.
+    plt.rcParams.update(cast(Any, HOUSE_RC))
 
 
 def panel_label(ax: Any, label: str, *, x: float = -0.08, y: float = 1.04) -> None:

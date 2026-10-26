@@ -8,7 +8,7 @@ import re
 from collections.abc import Mapping
 from typing import Final, TypeAlias
 
-JsonValue: TypeAlias = "None | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]"
+JsonValue: TypeAlias = "bool | int | float | str | list[JsonValue] | dict[str, JsonValue] | None"
 MAX_JSON: Final = 2 * 1024 * 1024
 
 
