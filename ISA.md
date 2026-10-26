@@ -48,9 +48,9 @@ Current interface contracts:
 
 Implementation references: `src/itrace/study/`, `src/itrace/live/study_*`,
 `src/itrace/study_cli.py`, and `src/itrace/web_static/study*`.
-Documentation checks for this addition are recorded in
-[the scoped receipt](.omo/evidence/study-docs.md), independently of historical
-publication and full-suite receipts.
+Documentation checks for this addition are recorded in the scoped receipt
+(`.omo/evidence/study-docs.md`), independently of historical publication and
+full-suite receipts.
 
 ## Problem
 
