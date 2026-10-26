@@ -162,6 +162,9 @@ The [self-experiment run guide](docs/RUN_SELF_EXPERIMENT.md) gives the complete
 preflight, launch, calibration, collection and recovery sequence. Keep the server
 in a dedicated terminal or operator-managed service so restarting an agent host
 does not terminate it.
+For a separate generative-model workflow, see
+[GNN compatibility](docs/GNN_COMPATIBILITY.md); GNN and the pinned webcam backend
+require different NumPy versions and separate environments.
 
 The original scientific publications, manuscript, pilot ledgers, figures, and
 release evidence are unchanged by this interface.

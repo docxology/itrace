@@ -32,6 +32,7 @@ running; this index does not invent commands.
 - [Validation protocols](VALIDATION_PROTOCOLS.md)
 - [Private visual study: manifest, measured setup, capture, trials, and recovery](PRIVATE_STUDY.md)
 - [Run a private self-experiment: preflight through saved records](RUN_SELF_EXPERIMENT.md)
+- [Running GNN alongside iTrace: isolated environments and evidence boundaries](GNN_COMPATIBILITY.md)
 - [Manual annotation protocol](manual_annotation_protocol.md)
 - [Scholarship audit](SCHOLARSHIP_AUDIT.md) / [Traceability matrix](TRACEABILITY_MATRIX.json)
 - [Primary-source scholarship and statistics review, October 2026](SCHOLARSHIP_REVIEW_20261015.md)
