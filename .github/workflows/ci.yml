@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
-          python-version: "3.12"
+          python-version-file: ".python-version"
       - run: uv sync --locked --extra dev
       - run: uv run --locked python scripts/verify.py --out-dir output/verification/ci
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
-          python-version: "3.12"
+          python-version-file: ".python-version"
       - run: uv build --out-dir dist
       - name: Install source distribution with advertised extra
         env:
