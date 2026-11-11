@@ -1227,8 +1227,9 @@ function render(data) {
   state.calibrationRangeDeg = data.calibration?.target_range_deg || state.calibrationRangeDeg;
   state.calibrationSessionPoints = data.calibration?.session_points || state.calibrationSessionPoints;
 
-  if (data.frame?.eye_crop_jpeg) {
-    ui.eyeCrop.src = data.frame.eye_crop_jpeg;
+  const eyeCrop = data.frame?.eye_crop_jpeg;
+  if (typeof eyeCrop === "string" && eyeCrop.startsWith("data:image/jpeg;base64,")) {
+    ui.eyeCrop.src = eyeCrop;
     ui.eyeCrop.style.display = "block";
     ui.eyeOverlay.style.display = "block";
     ui.eyePlaceholder.style.display = "none";
