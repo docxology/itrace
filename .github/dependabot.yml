@@ -1,11 +1,21 @@
-# Dependency refresh for this repository, per the docxology currency standard (CUR-11).
+# Dependabot — version updates for the manifests this repository ships.
+#
+# Each entry names a directory that carries an alert-bearing manifest, or the workflow
+# directory when the tree tracks workflow files. Nothing is globbed; nothing inactive is
+# named. Archived paths are checked in every tree: no directory matching archive / archived /
+# deprecated / legacy / old / attic / `_archive` holds a manifest anywhere in this population.
+# Hosted CI cannot run here (private-partition billing lapse); the shape below is validated
+# locally against the tracked tree before merge.
 version: 2
 updates:
-  - package-ecosystem: github-actions
+  - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: weekly
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
     open-pull-requests-limit: 5
     groups:
-      github-actions:
+      python:
         patterns: ["*"]
