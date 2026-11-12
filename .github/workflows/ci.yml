@@ -37,8 +37,10 @@ jobs:
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           python-version-file: ".python-version"
-      - run: uv sync --locked --extra dev
-      - run: uv run --locked python scripts/verify.py --out-dir output/verification/ci
+      # The locked dev toolchain (numpy 1.26 / scipy 1.17, held there by the
+      # mediapipe capture pin) has no CPython 3.15 wheels, so this job runs on 3.12.
+      - run: uv sync --locked --python 3.12 --extra dev
+      - run: uv run --locked --python 3.12 python scripts/verify.py --out-dir output/verification/ci
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -60,7 +62,11 @@ jobs:
         env:
           EXTRA: ${{ matrix.extra }}
         run: |
-          uv venv package-env
+          # The capture pin (mediapipe 0.10.21) only ships wheels up to CPython 3.12.
+          case "$EXTRA" in
+            capture|all) uv venv --python 3.12 package-env ;;
+            *) uv venv package-env ;;
+          esac
           for artifact in dist/*.tar.gz; do
             uv pip install --python package-env/bin/python "${artifact}[${EXTRA}]"
           done
