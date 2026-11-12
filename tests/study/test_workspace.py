@@ -123,6 +123,7 @@ def test_restart_rejects_bad_identities_without_new_files(
 def test_http_session_binding_rejects_missing_or_stale_identity(
     harness: Harness, tmp_path: Path
 ) -> None:
+    pytest.importorskip("fastapi")
     from fastapi.testclient import TestClient
 
     app = create_study_app(manifest_path=tmp_path / "study.json", output_root=tmp_path / "http")
