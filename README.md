@@ -3,7 +3,7 @@
 A real, installable Python toolkit for the three webcam eye-tracking signals —
 **gaze trajectory, saccade direction & dynamics, and pupil diameter** — built as
 a pure NumPy/SciPy analysis core (algorithmically verified against synthetic
-ground truth; see [Validation status](#validation-status--read-this-carefully))
+ground truth; see [Validation status](#validation-status-read-this-carefully))
 with an optional, thin webcam + MediaPipe capture shell.
 
 > The design principle: the hardware-fragile part (camera, MediaPipe) is a
