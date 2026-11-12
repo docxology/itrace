@@ -26,4 +26,9 @@ manuscript/_build.log
 # summaries in docs/empirical_*.json and output/figures/empirical_*.png.
 output/empirical_pilot/
 output/live_smoke/
+output/manuscript/
+output/pdf/
 output/pdf_preview/manuscript_cover.png
+output/slides/
+output/standalone_manuscript/
+output/web/
