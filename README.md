@@ -1,5 +1,16 @@
 # iTrace — open-source webcam eye-movement analysis
 
+<p align="center">
+  <a href="https://github.com/docxology/itrace/actions/workflows/ci.yml"><img alt="ci.yml workflow status on main" src="https://github.com/docxology/itrace/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+  <a href="https://doi.org/10.5281/zenodo.20614908"><img alt="Digital Object Identifier (DOI), concept record: 10.5281/zenodo.20614908" src="https://zenodo.org/badge/DOI/10.5281/zenodo.20614908.svg"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue"></a>
+  <img alt="Requires Python 3.11 or newer" src="https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white">
+</p>
+
+<p align="center">
+  <img src="output/figures/synthetic_replay.gif" alt="Animated synthetic gaze replay. Left: a gaze trajectory in degrees of visual angle is traced point by point. Right: the matching pupil-size proxy over six seconds with a moving time cursor." width="760">
+</p>
+
 A real, installable Python toolkit for the three webcam eye-tracking signals —
 **gaze trajectory, saccade direction & dynamics, and pupil diameter** — built as
 a pure NumPy/SciPy analysis core (algorithmically verified against synthetic
@@ -439,6 +450,48 @@ protocol, trials = experiments.load_experiment_manifest(experiment_manifest)
 samples = experiments.read_capture_records_csv(live_capture_records)
 empirical = experiments.experiment_report(samples, protocol, trials)
 print(empirical["heldout_target_error"], empirical["truth_boundary"])
+```
+
+### Package map
+
+Generated on 2026-11-12 from the `import` statements under `src/itrace/`. An arrow from A to B means code in A imports B; arrows already implied by a longer path are left out, so the picture shows layering rather than every edge. It shows 14 of the package's 34 top-level parts: the largest ones that import or are imported by others.
+
+```mermaid
+flowchart TB
+    accTitle: Internal dependency map of the itrace package
+    accDescr: Generated from import statements in src/itrace. Each box is a subpackage or module of the package; an arrow from A to B means code in A imports B; arrows already implied by a longer path are omitted. Most-imported: types, stats, experiments.
+    n_viz["viz/"]
+    n_stats["stats/"]
+    n_study["study/"]
+    n_live["live/"]
+    n_empirical["empirical.py"]
+    n_experiments["experiments.py"]
+    n_capture["capture.py"]
+    n_validation["validation.py"]
+    n_cli["cli.py"]
+    n_synthetic["synthetic.py"]
+    n_detection["detection.py"]
+    n_types["types.py"]
+    n_pupil["pupil.py"]
+    n_calibration["calibration.py"]
+    n_live --> n_study
+    n_viz --> n_empirical
+    n_study --> n_capture
+    n_validation --> n_calibration
+    n_validation --> n_stats
+    n_calibration --> n_types
+    n_capture --> n_types
+    n_cli --> n_viz
+    n_cli --> n_live
+    n_detection --> n_types
+    n_empirical --> n_experiments
+    n_experiments --> n_validation
+    n_experiments --> n_capture
+    n_live --> n_empirical
+    n_pupil --> n_types
+    n_stats --> n_pupil
+    n_synthetic --> n_types
+    n_validation --> n_synthetic
 ```
 
 ## Accuracy & limits (read before trusting a number)
