@@ -20,7 +20,7 @@ Coordinate & unit conventions
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import TypeAlias
 
 import numpy as np
@@ -46,7 +46,7 @@ def _snapshot(values: FloatArray) -> FloatArray:
     return result
 
 
-class EventType(str, Enum):
+class EventType(StrEnum):
     """Oculomotor event categories (REMoDNaV-compatible)."""
 
     FIXATION = "fixation"
@@ -56,7 +56,7 @@ class EventType(str, Enum):
     BLINK = "blink"
 
 
-class PupilUnit(str, Enum):
+class PupilUnit(StrEnum):
     """Unit attached to every pupil measurement."""
 
     MM = "mm"

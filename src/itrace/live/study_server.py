@@ -65,7 +65,7 @@ def create_study_app(
             while not stopped.is_set():
                 try:
                     await asyncio.wait_for(stopped.wait(), timeout=1)
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     await run_in_threadpool(controller.expire_connection)
 
         watcher = asyncio.create_task(watch_connection())
