@@ -7,18 +7,13 @@ import json
 import re
 import shutil
 import subprocess
-import sys
+import tomllib
 from datetime import date
 from pathlib import Path
 
 import pytest
 
 from itrace.version import RELEASE_DATE, VERSION_DOI, __version__
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 MANUSCRIPT = ROOT / "docs" / "manuscript"

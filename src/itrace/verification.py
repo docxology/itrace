@@ -6,7 +6,7 @@ import os
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from time import monotonic
 
@@ -107,7 +107,7 @@ def run_verification(root: Path, evidence_dir: Path) -> int:
     original = source_digest(root)
     receipt: dict[str, object] = {
         "kind": "itrace_verification",
-        "started_utc": datetime.now(timezone.utc).isoformat(),
+        "started_utc": datetime.now(UTC).isoformat(),
         "source_sha256": original,
         "python": sys.executable,
         "prefix": str(Path(sys.prefix).resolve()),
@@ -129,6 +129,6 @@ def run_verification(root: Path, evidence_dir: Path) -> int:
             return 1
     unchanged = original == source_digest(root)
     receipt["status"] = "passed" if unchanged else "source_changed_during_verification"
-    receipt["finished_utc"] = datetime.now(timezone.utc).isoformat()
+    receipt["finished_utc"] = datetime.now(UTC).isoformat()
     (evidence_dir / "summary.json").write_text(json.dumps(receipt, indent=2) + "\n")
     return 0 if unchanged else 1

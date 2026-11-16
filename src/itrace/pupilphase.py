@@ -9,10 +9,10 @@ only past samples -- so the detector is suitable for closed-loop, online use
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class Phase(str, Enum):
+class Phase(StrEnum):
     """Instantaneous pupil-phase label."""
 
     DILATION = "dilation"
