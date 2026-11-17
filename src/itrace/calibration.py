@@ -292,9 +292,9 @@ def interpolate_gaze_gaps(stream: GazeStream, *, max_gap_s: float) -> GazeStream
         if duration > max_gap_s:
             msg = f"bounded gaze gap {duration:.6g}s exceeds max_gap_s={max_gap_s:.6g}s"
             raise ValueError(msg)
-        left = start - 1
-        right = end + 1
-        idx = np.arange(start, end + 1)
+        left = int(start) - 1
+        right = int(end) + 1
+        idx = np.arange(left + 1, right, dtype=np.intp)
         x[idx] = np.interp(stream.t[idx], [stream.t[left], stream.t[right]], [x[left], x[right]])
         y[idx] = np.interp(stream.t[idx], [stream.t[left], stream.t[right]], [y[left], y[right]])
     return GazeStream(t=stream.t, x=x, y=y)

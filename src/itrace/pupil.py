@@ -8,8 +8,6 @@ pure function over a :class:`~itrace.types.PupilStream`.
 
 from __future__ import annotations
 
-from typing import cast
-
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
 
@@ -102,7 +100,7 @@ def mad_reject(stream: PupilStream, n_mad: float = 5.0) -> BoolArray:
         return flags
     scaled = 1.4826 * mad
     deviation = np.abs(size - med) / scaled
-    return cast(BoolArray, ~finite | (deviation > n_mad))
+    return ~finite | (deviation > n_mad)
 
 
 def smooth(
