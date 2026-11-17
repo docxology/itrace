@@ -8,7 +8,6 @@ could not have peeked at. Every generator takes an explicit ``seed``.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast
 
 import numpy as np
 
@@ -105,7 +104,7 @@ class SyntheticSessionTruth:
 def minimum_jerk_profile(n: int) -> FloatArray:
     """Normalised minimum-jerk displacement profile in [0, 1] over *n* samples."""
     tau = np.linspace(0.0, 1.0, n)
-    return cast(FloatArray, 10 * tau**3 - 15 * tau**4 + 6 * tau**5)
+    return 10 * tau**3 - 15 * tau**4 + 6 * tau**5
 
 
 def _minimum_jerk(n: int) -> FloatArray:

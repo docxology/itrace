@@ -294,7 +294,7 @@ def _ellipse_patch(x: FloatArray, y: FloatArray, *, probability: float = 0.68) -
         return None
     values, vectors = np.linalg.eigh(cov)
     values = np.maximum(values, 0.0)
-    if float(values.max()) <= 0.0:
+    if float(np.max(values)) <= 0.0:
         return None
     order = np.argsort(values)[::-1]
     values = values[order]
@@ -331,7 +331,7 @@ def _plot_spatial_stability(
 
     x, y = _fixation_xy(fixations)
     duration = np.array([max(fix.duration_s, 0.0) for fix in fixations], dtype=np.float64)
-    sizes = 45.0 + 240.0 * duration / max(float(duration.max()), 1e-9)
+    sizes = 45.0 + 240.0 * duration / max(float(np.max(duration)), 1e-9)
     ax.scatter(x, y, s=sizes, color=WONG[0], edgecolor="white", linewidth=0.8, zorder=3)
     if x.size > 1:
         ax.plot(x, y, color=WONG[5], lw=1.1, alpha=0.65, zorder=2)

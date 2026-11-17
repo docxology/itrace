@@ -10,7 +10,7 @@ uncertainty, spatial spread, and scanpath-transition structure.
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import Any, cast
+from typing import Any
 
 import numpy as np
 
@@ -32,7 +32,7 @@ DEFAULT_DIAGNOSTIC_FAMILIES: tuple[str, ...] = (
 def _positive_sample(values: FloatArray | list[float]) -> FloatArray:
     """Return finite positive values as a one-dimensional array."""
     arr = np.asarray(values, dtype=np.float64).ravel()
-    return cast(FloatArray, arr[np.isfinite(arr) & (arr > 0.0)])
+    return arr[np.isfinite(arr) & (arr > 0.0)]
 
 
 def _positive_pairs(
@@ -44,7 +44,7 @@ def _positive_pairs(
     if a.shape != b.shape:
         raise ValueError("statistical pairs must have equal lengths")
     mask = np.isfinite(a) & np.isfinite(b) & (a > 0.0) & (b > 0.0)
-    return cast(FloatArray, a[mask]), cast(FloatArray, b[mask])
+    return a[mask], b[mask]
 
 
 def _model_comparison_payload(

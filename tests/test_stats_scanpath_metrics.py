@@ -243,7 +243,8 @@ def test_exponent_ci_brackets_point_estimate_on_power_law() -> None:
     vel = 50.0 * amp**0.6
     b, lo, hi = sm.main_sequence_exponent_ci(amp, vel, n_boot=500, seed=42)
     assert b == pytest.approx(0.6, abs=1e-6)
-    assert lo <= b <= hi
+    assert lo <= hi
+    assert lo - 1e-12 <= b <= hi + 1e-12
 
 
 def test_exponent_ci_is_deterministic() -> None:

@@ -253,8 +253,8 @@ def fixation_position_entropy(
     xs = np.array([f.centroid_x for f in fixations], dtype=np.float64)
     ys = np.array([f.centroid_y for f in fixations], dtype=np.float64)
     if extent is None:
-        xmin, xmax = float(xs.min()), float(xs.max())
-        ymin, ymax = float(ys.min()), float(ys.max())
+        xmin, xmax = float(np.min(xs)), float(np.max(xs))
+        ymin, ymax = float(np.min(ys)), float(np.max(ys))
     else:
         xmin, xmax, ymin, ymax = extent
     # Degenerate range along an axis: pad so histogram2d gets a valid interval.

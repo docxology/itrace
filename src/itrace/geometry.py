@@ -57,7 +57,7 @@ def deg2pix(
         raise ValueError(msg)
     cm_per_px = screen_cm / screen_px
     offsets_cm = np.tan(np.radians(np.asarray(degrees, dtype=np.float64))) * viewing_distance_cm
-    return cast(FloatArray, offsets_cm / cm_per_px)
+    return offsets_cm / cm_per_px
 
 
 def iris_offset_to_gaze_angle(

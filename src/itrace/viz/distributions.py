@@ -21,7 +21,7 @@ Every plotting helper accepts an optional ``ax`` so panels can be composed; the
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import matplotlib
 
@@ -64,7 +64,7 @@ def _as_float_array(values: FloatArray | list[float]) -> FloatArray:
     """
     arr = np.asarray(values, dtype=np.float64).ravel()
     finite = arr[np.isfinite(arr) & (arr > 0.0)]
-    return cast(FloatArray, finite)
+    return finite
 
 
 def _fit_annotation(result: Any) -> str:
@@ -127,7 +127,7 @@ def _overlay_pdf(ax: Axes, sample: FloatArray, family: str, colour: str) -> bool
         return False
     result = dist.fit_distribution(sample, family=family)
     frozen = dist.frozen_from_result(result)
-    grid = np.linspace(float(sample.min()), float(sample.max()), 200)
+    grid = np.linspace(float(np.min(sample)), float(np.max(sample)), 200)
     ax.plot(grid, frozen.pdf(grid), color=colour, lw=2, label=_fit_annotation(result))
     return True
 
@@ -359,7 +359,7 @@ def plot_main_sequence(
 
     if a.size >= 3:
         fit = mainsequence.fit(a, v)
-        grid = np.linspace(float(a.min()), float(a.max()), 200)
+        grid = np.linspace(float(np.min(a)), float(np.max(a)), 200)
         ax.plot(
             grid,
             fit["power_a"] * grid ** fit["power_b"],
