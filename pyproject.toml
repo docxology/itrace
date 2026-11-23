@@ -37,14 +37,14 @@ dependencies = [
     "numpy>=2.4.6",
     "scipy>=1.17.1",
     "pandas>=3.1.1",
-    "typer>=0.29.1",
+    "typer>=0.29.2",
 ]
 
 [project.optional-dependencies]
 # Hardware capture backend. Deliberately separated: import itrace and the whole
 # test suite must succeed with NONE of these installed.
 capture = [
-    "opencv-python>=5.0.0.93",
+    "opencv-python>=5.1.0.95",
     "mediapipe>=1.2.3,<1.2.4",
 ]
 # Live dashboard + publication figures.
@@ -56,31 +56,31 @@ figures = [
     "matplotlib>=3.11.2",
 ]
 web = [
-    "fastapi>=0.162.7",
+    "fastapi>=0.165.0",
     "uvicorn[standard]>=0.54.0",
 ]
 all = [
-    "opencv-python>=5.0.0.93",
+    "opencv-python>=5.1.0.95",
     "mediapipe>=1.2.3,<1.2.4",
     "streamlit>=1.67.0",
     "plotly>=7.1.0",
     "matplotlib>=3.11.2",
-    "fastapi>=0.162.7",
+    "fastapi>=0.165.0",
     "uvicorn[standard]>=0.54.0",
 ]
 dev = [
     "pytest>=9.2.0",
     "pytest-cov>=7.1.0",
     "pytest-timeout>=2.4.0",
-    "ruff>=0.17.5",
+    "ruff>=0.17.6",
     "mypy>=2.4.1",
     "matplotlib>=3.11.2",
-    "fastapi>=0.162.7",
+    "fastapi>=0.165.0",
     # Starlette/FastAPI TestClient uses httpx2 in current releases. Keep this
     # in dev rather than the runtime web extra so local serving has a smaller
     # network-client dependency surface.
     "httpx>=0.28.1",
-    "httpx2>=2.16.0",
+    "httpx2>=2.16.2",
     "uvicorn[standard]>=0.54.0",
 ]
 
