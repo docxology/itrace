@@ -36,8 +36,11 @@ nor uncertainty in how well the noise model represents a real camera.
 
 ## Trial independence and determinism
 
-Each trial uses a distinct deterministic seed (`base_seed + level_index*1000 +
-trial`), and the bootstrap resampler is itself fixed-seeded. Pseudorandom draws
+Each trial uses a deterministic seed (`base_seed + level_index*1000 +
+trial`). The stride of 1,000 keeps seeds distinct across levels for up to
+1,000 trials per level. The retained sweep uses 25 trials per level. With
+more than 1,000 trials per level, adjacent levels can reuse seeds. The
+bootstrap resampler is itself fixed-seeded. Pseudorandom draws
 are treated as independent under the generator design; distinct integer seeds
 are a reproducibility policy, not a proof of independence. Reproduction is
 conditional on the recorded runtime and locked numerical dependencies.
