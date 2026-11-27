@@ -43,6 +43,7 @@ layout quality. The standalone renderer always emits these four formats; the
 See [Development and verification](../DEVELOPMENT.md) for runtime bindings,
 gate receipts, release-history separation, and empirical-source limitations.
 
-For current PDF and HTML verification, follow the [synthetic-only Template
-workflow](../SYNTHETIC_REVIEW.md). Its render marks participant-derived values
-and figure panels as withheld. The archived paper remains available above.
+The [offline published-reader render](../PUBLISHED_READER.md) builds the full
+canonical paper with the public edition's checksum-pinned values and figures.
+The [synthetic-only review](../SYNTHETIC_REVIEW.md) remains available for
+verification that excludes the participant-derived figures and values.
