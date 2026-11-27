@@ -42,6 +42,14 @@ outside public source; documentation examples must be generic.
 - Report N=1 session diagnostics only: no population, device-accuracy, physical
   pupil-diameter, or saccade-onset claims from this interface.
 
+## Manuscript verification
+
+Use the [synthetic review](docs/SYNTHETIC_REVIEW.md) for synthetic-only inputs.
+The [published-reader build](docs/PUBLISHED_READER.md) uses the retained
+publication and its pinned figures. Keep participant reports and recordings
+out of the published-reader checkout. Its render does not collect or replay
+participant data.
+
 ## Gates
 
 ```bash

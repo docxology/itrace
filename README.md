@@ -1,6 +1,9 @@
 # iTrace — open-source webcam eye-movement analysis
 
-[Documentation](docs/README.md) · [Synthetic-only review](docs/SYNTHETIC_REVIEW.md) · [Manuscript](docs/manuscript/README.md)
+[Documentation](docs/README.md) · [Manuscript](docs/manuscript/README.md)
+
+- [Synthetic review](docs/SYNTHETIC_REVIEW.md) for offline verification that excludes participant-derived values and figures.
+- [Published-reader render](docs/PUBLISHED_READER.md) for the full paper using checksum-pinned values and figures from the public edition.
 
 <p align="center">
   <a href="https://github.com/docxology/itrace/actions/workflows/ci.yml"><img alt="ci.yml workflow status on main" src="https://github.com/docxology/itrace/actions/workflows/ci.yml/badge.svg?branch=main"></a>
