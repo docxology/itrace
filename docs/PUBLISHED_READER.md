@@ -33,8 +33,9 @@ needed. Include the [synthetic-review inputs](SYNTHETIC_REVIEW.md) plus
 
 Use [Template at revision `87704feae0a4490ef7dad9c931d268e8c30273c2`](https://github.com/docxology/template/tree/87704feae0a4490ef7dad9c931d268e8c30273c2)
 with Pandoc, a matching pandoc-crossref, XeLaTeX, and BibTeX. Set
-`itrace_checkout` to the absolute path of the disposable project. Run from
-Template with an unused `projects/working/itrace` slot.
+`itrace_checkout` to the absolute path of a disposable checkout whose physical
+directory is named `itrace`. Run from Template with an unused
+`projects/working/itrace` slot.
 
 ```sh
 uv sync --locked --no-dev

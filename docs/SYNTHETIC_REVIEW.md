@@ -33,7 +33,8 @@ Use a clean, isolated project checkout with the locked environment above and
 [docxology/template at the pinned
 revision](https://github.com/docxology/template/tree/87704feae0a4490ef7dad9c931d268e8c30273c2).
 Install the Template environment and put Pandoc, a matching pandoc-crossref,
-XeLaTeX and BibTeX on PATH. Register the project from its checkout.
+XeLaTeX and BibTeX on PATH. Register it from a checkout whose physical directory
+is named `itrace`.
 
 ```bash
 export PROJECT_ROOT="$(pwd -P)"
