@@ -26,10 +26,10 @@
       "evidence": [
         "docs/verification_metrics.json",
         "docs/figure_manifest.json",
-        "docs/manuscript/_build.md",
-        "docs/manuscript/_build.txt",
-        "docs/manuscript/_build.tex",
-        "docs/manuscript/_build.pdf"
+        "docs/releases/retained-render/_build.md",
+        "docs/releases/retained-render/_build.txt",
+        "docs/releases/retained-render/_build.tex",
+        "docs/releases/retained-render/_build.pdf"
       ],
       "boundary": "Gate metrics are current only after the full gate is rerun and the JSON ledger is refreshed."
     },
