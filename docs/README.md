@@ -23,6 +23,7 @@ workflow; original scientific publications and historical evidence remain unchan
 
 - [Synthetic analysis and Template review](SYNTHETIC_REVIEW.md)
 - [Canonical manuscript](manuscript/README.md)
+- [Offline published-reader render](PUBLISHED_READER.md)
 - [Developer guides](developer/README.md)
 - [Design](DESIGN.md), [acceptance criteria](ISA.md), and [backlog](TODO.md)
 

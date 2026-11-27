@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Prepare a synthetic-only Template review from the canonical manuscript."""
+"""Prepare a synthetic review or checksum-pinned published reader for Template."""
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import shutil
@@ -22,6 +23,14 @@ from itrace.manuscript import (
     source_files,
     substitute_tokens,
 )
+from itrace.published_reader import (
+    EDITION_DOI,
+    FIGURES,
+    READER,
+    READER_SHA256,
+    TOKEN_SHA256,
+    load_published_reader,
+)
 from itrace.scene import EyeSceneSpec
 from itrace.stats.scanpath_metrics import bcea
 from itrace.synthetic import SyntheticSessionSpec
@@ -32,12 +41,6 @@ FIGURE_RE = re.compile(
     r"!\[(.*?)\]\(\.\./\.\./output/figures/([\w.-]+)\)\{#(fig:[\w-]+)([^}]*?)\}",
     re.DOTALL,
 )
-WITHHELD = {
-    "empirical_pilot_summary.png",
-    "empirical_sessions_summary.png",
-    "synthetic_empirical_range_bridge.png",
-    "statistical_interpretation_ledger.png",
-}
 CAPTION = "Historical participant-derived figure withheld from this synthetic-only review."
 REVIEW_NOTE = (
     "> This review omits participant-derived values and figures. "
@@ -64,9 +67,18 @@ def draw_notice(path: Path) -> None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--published-reader",
+        action="store_true",
+        help="Use only the checksum-pinned reader values and figures from the public edition",
+    )
+    args = parser.parse_args()
     manuscript = ROOT / "docs" / "manuscript"
     if audit_crossrefs(manuscript):
         return 1
+
+    published = load_published_reader(ROOT, manuscript) if args.published_reader else {}
 
     runtime = ROOT / "output"
     hydrated = runtime / "manuscript"
@@ -76,7 +88,21 @@ def main() -> int:
     data.mkdir(parents=True, exist_ok=True)
     values = load_metric_tokens(ROOT / "docs" / "verification_metrics.json")
     values.update(load_noise_tokens(figures / "noise_metrics.json"))
-    values.update(dict.fromkeys((*PILOT_TOKENS, *SESSION_TOKENS), "withheld in this review"))
+    if args.published_reader:
+        values.update(published)
+        write_json(
+            data / "published_reader_receipt.json",
+            {
+                "doi": EDITION_DOI,
+                "retained_reader_path": READER,
+                "retained_reader_sha256": READER_SHA256,
+                "reader_token_count": len(published),
+                "reader_token_sha256": TOKEN_SHA256,
+                "figure_sha256": FIGURES,
+            },
+        )
+    else:
+        values.update(dict.fromkeys((*PILOT_TOKENS, *SESSION_TOKENS), "withheld in this review"))
     write_json(data / "manuscript_variables.json", values)
     write_json(
         data / "synthetic_review_parameters.json",
@@ -95,19 +121,19 @@ def main() -> int:
     def project_figure(match: re.Match[str]) -> str:
         caption, filename, label, attributes = match.groups()
         caption = " ".join(caption.split())
-        if filename in WITHHELD:
+        if filename in FIGURES and not args.published_reader:
             filename = f"{Path(filename).stem}-withheld.png"
             draw_notice(figures / filename)
             caption = CAPTION
         if not (figures / filename).is_file():
-            raise FileNotFoundError(f"Required synthetic paper figure: {filename}")
+            raise FileNotFoundError(f"Required manuscript figure: {filename}")
         registry[label] = {"filename": filename, "caption": caption, "alt_text": caption}
         return f"![{caption}](../figures/{filename}){{#{label}{attributes}}}"
 
     for path in source_files(manuscript):
         text = substitute_tokens(path.read_text(encoding="utf-8"), values)
         text = FIGURE_RE.sub(project_figure, text)
-        if path.name == "03ez_empirical_pilot.md":
+        if path.name == "03ez_empirical_pilot.md" and not args.published_reader:
             heading, newline, body = text.partition("\n")
             text = heading + newline + "\n" + REVIEW_NOTE + body.lstrip("\n")
         (hydrated / path.name).write_text(text, encoding="utf-8")
