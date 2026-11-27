@@ -19,6 +19,13 @@ workflow; original scientific publications and historical evidence remain unchan
 | `output/` | Run outputs and reports (local working artifacts) |
 | `docs/` | This documentation tree (research ledgers and protocols) |
 
+## Offline setup and documentation
+
+- [Synthetic analysis and Template review](SYNTHETIC_REVIEW.md)
+- [Canonical manuscript](manuscript/README.md)
+- [Developer guides](developer/README.md)
+- [Design](DESIGN.md), [acceptance criteria](ISA.md), and [backlog](TODO.md)
+
 ## How to run
 
 Commands are documented in the root `README.md` and `pyproject.toml` (uv-managed;

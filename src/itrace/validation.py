@@ -22,6 +22,8 @@ from .stats.events import event_prf, interval_overlap_s
 from .synthetic import SyntheticSaccadeTruth, SyntheticSessionSpec, synthetic_session
 from .types import GazeStream, PupilStream, Saccade
 
+SYNTHETIC_MAX_GAP_S = 0.08
+
 
 @dataclass(frozen=True, slots=True)
 class SyntheticDomain:
@@ -266,7 +268,7 @@ def validate_synthetic_domain(
     config = AnalysisConfig(detection=domain.detection)
     finite_before = np.isfinite(gaze.t) & np.isfinite(gaze.x) & np.isfinite(gaze.y)
     if not np.all(finite_before):
-        analysis_gaze = interpolate_gaze_gaps(gaze, max_gap_s=0.08)
+        analysis_gaze = interpolate_gaze_gaps(gaze, max_gap_s=SYNTHETIC_MAX_GAP_S)
         finite_after = (
             np.isfinite(analysis_gaze.t)
             & np.isfinite(analysis_gaze.x)

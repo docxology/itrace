@@ -203,7 +203,7 @@ def validate_rendered_text(text: str) -> None:
 
 
 def _simple_config_value(manuscript_dir: Path, key: str) -> str | None:
-    pattern = re.compile(rf"^{re.escape(key)}:\s*[\"']?(.*?)[\"']?\s*$")
+    pattern = re.compile(rf"^\s*{re.escape(key)}:\s*[\"']?(.*?)[\"']?\s*$")
     for line in (manuscript_dir / "config.yaml").read_text(encoding="utf-8").splitlines():
         match = pattern.match(line)
         if match:
@@ -283,7 +283,7 @@ def render_manuscript(
     build_input = stage_dir / "input.md"
     build_input.write_text(hydrated, encoding="utf-8")
     base = _pandoc_base(build_input, manuscript_dir, root)
-    preamble = manuscript_dir / "_render_preamble.tex"
+    preamble = manuscript_dir / "assets" / "standalone_preamble.tex"
     commands = {
         "md": ["-t", "markdown"],
         "txt": ["-t", "plain"],

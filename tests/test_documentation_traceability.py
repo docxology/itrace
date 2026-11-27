@@ -132,8 +132,8 @@ def test_traceability_paths_and_symbols_exist() -> None:
 def test_public_docs_link_to_traceability_matrix() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     validation = (ROOT / "docs" / "VALIDATION_PROTOCOLS.md").read_text(encoding="utf-8")
-    todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
-    isa = (ROOT / "ISA.md").read_text(encoding="utf-8")
+    todo = (ROOT / "docs" / "TODO.md").read_text(encoding="utf-8")
+    isa = (ROOT / "docs" / "ISA.md").read_text(encoding="utf-8")
     for text in (readme, validation, todo, isa):
         assert "TRACEABILITY_MATRIX.json" in text
     assert "browser canvas/svg is display-only" in re.sub(r"\s+", " ", validation.lower())
@@ -160,8 +160,8 @@ def test_traceability_figures_are_referenced_or_documented() -> None:
         for path in [
             ROOT / "README.md",
             ROOT / "docs" / "VALIDATION_PROTOCOLS.md",
-            ROOT / "ISA.md",
-            ROOT / "docs" / "manuscript" / "_build.md",
+            ROOT / "docs" / "ISA.md",
+            ROOT / "docs" / "releases" / "retained-render" / "_build.md",
         ]
     )
     for figure in payload["figures"]:

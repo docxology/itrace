@@ -36,7 +36,7 @@ def release_issues(root: Path) -> list[str]:
         "README.md": (VERSION_DOI, CONCEPT_DOI),
         "docs/manuscript/config.yaml": (f'date: "{cover_date}"',),
         "docs/manuscript/00_abstract.md": (VERSION_DOI, CONCEPT_DOI),
-        "docs/manuscript/_build.md": (VERSION_DOI, CONCEPT_DOI),
+        "docs/releases/retained-render/_build.md": (VERSION_DOI, CONCEPT_DOI),
         f"docs/releases/v{__version__}.md": (f"iTrace v{__version__}", VERSION_DOI, CONCEPT_DOI),
     }
     for name, values in required.items():
@@ -66,8 +66,8 @@ def release_issues(root: Path) -> list[str]:
         content = path.read_bytes()
         if len(content) != item["bytes"] or hashlib.sha256(content).hexdigest() != item["sha256"]:
             issues.append(f"figure integrity differs: {item['path']}")
-    if not (root / "docs/manuscript/_build.pdf").read_bytes().startswith(b"%PDF-"):
-        issues.append("docs/manuscript/_build.pdf: invalid PDF header")
+    if not (root / "docs/releases/retained-render/_build.pdf").read_bytes().startswith(b"%PDF-"):
+        issues.append("docs/releases/retained-render/_build.pdf: invalid PDF header")
     return issues
 
 
