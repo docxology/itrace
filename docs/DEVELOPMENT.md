@@ -178,11 +178,11 @@ stages Markdown, text, LaTeX, and PDF before replacing reader outputs. Failed
 staging directories retain the input and intermediate files. Missing empirical
 ledgers yield explicit unavailable tokens; malformed existing ledgers fail.
 
-`docs/verification_metrics.json` describes the current development verification;
-`docs/releases/v0.4.1-verification.json` preserves the prior release ledger intact,
-including its historical summary discrepancies. Dated audit notes retain their
-original numbers. Updating the current ledger requires actual JUnit/coverage/gate
-receipts, followed by manuscript hydration and visual PDF inspection.
+The [manuscript verification ledger](verification_metrics.json) supplies the
+recorded software checks for the paper. Follow [Runtime and gates](#runtime-and-gates)
+for current source-bound results and their JUnit, coverage, and gate receipts.
+The [v0.4.1 release ledger](releases/v0.4.1-verification.json) preserves its original
+summaries, including their discrepancies. Dated audit notes retain their original numbers.
 
 Empirical summaries describe their recorded collection epoch. If local pilot
 exports are absent, do not regenerate those summaries as though new raw evidence

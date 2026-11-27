@@ -20,8 +20,8 @@ uv run python scripts/render_manuscript.py --metrics-json docs/verification_metr
 ```
 
 The standalone publication renderer hydrates `{{TEST_COUNT}}`, `{{COVERAGE_PCT}}`, and
-`{{DEMO_AMPLITUDE}}` from the current verification ledger and empirical tokens
-from their respective ledgers. An absent empirical ledger produces explicit
+`{{DEMO_AMPLITUDE}}` from the [retained manuscript verification ledger](../verification_metrics.json)
+and empirical tokens from their respective ledgers. An absent empirical ledger produces explicit
 unavailable fields. An existing malformed ledger, missing token, source audit
 failure, Pandoc warning, or unresolved rendered reference stops the build.
 
@@ -29,8 +29,9 @@ Noise thresholds and the complete noise table hydrate from
 `output/figures/noise_metrics.json` through `load_noise_tokens`. This deterministic
 ledger is required; a missing or incomplete one fails instead of inserting guessed
 thresholds. Regenerate it with the canonical figure pipeline after scoring changes.
-The archived v0.5.0 verification ledger is retained under `docs/releases/`;
-current development is identified by its own source digest and measured ledger.
+The archived v0.5.0 verification ledger is retained under `docs/releases/`.
+[Current development receipts](../DEVELOPMENT.md#runtime-and-gates) record the
+source digest and measured gate results.
 
 Markdown, plain text, LaTeX, and PDF are staged and validated before reader outputs
 are replaced. A failed `.itrace-render-*` directory retains the attempted input
