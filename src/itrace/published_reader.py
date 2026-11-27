@@ -77,7 +77,7 @@ def _edition_tokens(source: str, reader: str) -> dict[str, str]:
             continue
         if key not in TOKENS:
             raise ValueError(f"Unapproved published reader token: {key}")
-        candidates = set()
+        candidates: set[str] = set()
         for width in (8, 6, 4, 3, 2):
             left, right = " ".join(before[-width:]), " ".join(after[:width])
             pattern = re.escape(left) + r"(.{1,500}?)" + re.escape(right)

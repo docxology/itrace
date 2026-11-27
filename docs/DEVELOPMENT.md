@@ -11,12 +11,13 @@ a successful gate run. Fresh gate results belong in each verification receipt.
 
 ## Runtime and gates
 
-Use Python 3.10 or later and the committed `uv.lock`. On a GitVault workstation,
-source, environments, caches, and temporary files belong on the mounted GitVault
-volume. Select a GitVault interpreter and a separate environment before syncing;
-check both `sys.prefix` and `sys.base_prefix`, since a virtual environment on the
-SSD can still point to an internal interpreter. Preserve environments belonging
-to other active sessions.
+Use Python 3.11 or later, as declared in [pyproject.toml](../pyproject.toml), with
+the committed `uv.lock`. On a GitVault workstation, source, environments,
+caches, and temporary files belong on the mounted GitVault volume. Select a
+GitVault interpreter and a separate environment before syncing. Check both
+`sys.prefix` and `sys.base_prefix`, since a virtual environment on the SSD can
+still point to an internal interpreter. Preserve environments belonging to
+other active sessions.
 
 ```bash
 export UV_PROJECT_ENVIRONMENT="${GITVAULT_ROOT}/Local/envs/itrace-dev"
@@ -50,10 +51,11 @@ does not update manuscript metrics or publish a release.
 
 ## Core-only and installed-package checks
 
-CI runs the suite with core dependencies plus pytest infrastructure on Python
-3.10-3.13, separately from the development-extra job. Tests needing matplotlib or
-FastAPI skip when those extras are actually absent; numerical, I/O, configuration,
-and manuscript-source tests still run. The missing-web-extra control uses a real
+The [tracked CI workflow](../.github/workflows/ci.yml) configures core tests with
+pytest infrastructure on Python 3.11, 3.12, and 3.13. The separate
+development-extra job sets `UV_PYTHON=3.12`. Tests needing matplotlib or FastAPI
+skip when those extras are absent. Numerical, I/O, configuration, and
+manuscript-source tests still run. The missing-web-extra control uses a real
 missing dependency rather than replacing Python's import function.
 
 Build and test the installed wheel in a fresh environment. Keep that environment

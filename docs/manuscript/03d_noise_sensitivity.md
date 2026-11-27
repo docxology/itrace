@@ -38,7 +38,7 @@ makes it useful for bounding realistic live-demo and stress-test ranges, but it
 should not be back-solved into an iid landmark-noise $\sigma$ or treated as
 reference-device gaze accuracy.
 
-![Recovery vs idealised webcam observation noise. Each panel reports the Monte Carlo mean and pointwise approximate 95% percentile interval for one recovered signal. These are not simultaneous confidence bands. The manuscript criterion and interpolated crossing are shown in normalised sigma and approximate pixels at 640 px width. Colour, markers, and line styles distinguish signals. Saccade F1 uses greedy one-to-one positive overlap; it does not measure onset/offset accuracy. Pupil correlation depends on the separate pupil-noise assumption.](../../output/figures/noise_power.png){#fig:power width=100%}
+![Recovery vs idealised webcam observation noise. Each panel reports the Monte Carlo mean and pointwise approximate percentile interval for one recovered signal, using the bootstrap confidence level specified in [@sec:noisemodel]. These are not simultaneous confidence bands. The manuscript criterion and interpolated crossing are shown in normalised sigma and approximate pixels at 640 px width. Colour, markers, and line styles distinguish signals. Saccade F1 uses greedy one-to-one positive overlap; it does not measure onset/offset accuracy. Pupil correlation depends on the separate pupil-noise assumption.](../../output/figures/noise_power.png){#fig:power width=100%}
 
 The same numbers, with per-cell uncertainty, are the generated statistics table
 ([@tbl:noise]); it and the figure are generated from one sweep so they never
