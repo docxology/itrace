@@ -125,8 +125,8 @@ def run_noise_sweep(
 ) -> NoiseSweepResult:
     """Monte-Carlo sweep of recovery accuracy vs landmark noise.
 
-    Each (noise level, trial) runs one closed loop with a distinct deterministic
-    seed, so the whole sweep is reproducible.
+    Each closed-loop trial uses a deterministic seed. Across levels, seeds
+    are distinct for ``n_trials <= 1000`` and can repeat at higher counts.
     """
     if isinstance(n_trials, bool) or not isinstance(n_trials, int) or n_trials < 1:
         raise ValueError("n_trials must be a positive integer")
