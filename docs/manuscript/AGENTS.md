@@ -1,9 +1,7 @@
-# docs/manuscript/ — Agent Notes
+# Manuscript source guidance
 
-iTrace methods-paper manuscript source: numbered section markdown (abstract,
-introduction, architecture, geometry, velocity/events, dynamics, pupillometry,
-capture shell, forward/noise models, statistics, detection, results,
-limitations...), config, references, plus LaTeX intermediates (`_build.*`,
-`_render_preamble.tex`) which are GENERATED — regenerate via the render
-pipeline, do not edit `_build` files directly. Page previews land in
-`../output/pdf_preview/`.
+The numbered and supplemental Markdown files, configuration, BibTeX, and
+preambles here are the maintained paper sources. Use Pandoc citations and
+label-backed cross-references. Resolve numeric tokens through the documented
+evidence inputs, and keep scientific claims within the relevant validation
+scope. Read the [render guide](README.md) before changing paper inputs.

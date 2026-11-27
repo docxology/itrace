@@ -26,8 +26,8 @@ def release_tree(tmp_path: Path) -> Path:
         "docs/TRACEABILITY_MATRIX.json",
         "docs/manuscript/config.yaml",
         "docs/manuscript/00_abstract.md",
-        "docs/manuscript/_build.md",
-        "docs/manuscript/_build.pdf",
+        "docs/releases/retained-render/_build.md",
+        "docs/releases/retained-render/_build.pdf",
         f"docs/releases/v{__version__}.md",
     ):
         target = tmp_path / name
@@ -82,7 +82,7 @@ def test_release_gate_rejects_corruption(release_tree: Path, damage: str) -> Non
     elif damage == "artifact":
         (release_tree / "figure.bin").write_bytes(b"corrupted")
     elif damage == "pdf":
-        (release_tree / "docs/manuscript/_build.pdf").write_bytes(b"broken PDF")
+        (release_tree / "docs/releases/retained-render/_build.pdf").write_bytes(b"broken PDF")
     else:
         path = release_tree / "docs/figure_manifest.json"
         payload = json.loads(path.read_text())

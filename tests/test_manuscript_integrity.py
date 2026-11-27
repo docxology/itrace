@@ -17,6 +17,7 @@ from itrace.version import RELEASE_DATE, VERSION_DOI, __version__
 
 ROOT = Path(__file__).resolve().parents[1]
 MANUSCRIPT = ROOT / "docs" / "manuscript"
+ARCHIVE = ROOT / "docs" / "releases" / "retained-render"
 METRICS = ROOT / "docs" / "verification_metrics.json"
 NON_RENDERED_MARKDOWN = {"README.md", "preamble.md", "AGENTS.md", "MANUSCRIPT_STATUS.md"}
 
@@ -38,7 +39,7 @@ def _public_doc_haystack() -> str:
         [
             (ROOT / "README.md").read_text(),
             (MANUSCRIPT / "README.md").read_text(),
-            (MANUSCRIPT / "_build.md").read_text(),
+            (ARCHIVE / "_build.md").read_text(),
             *(path.read_text() for path in _source_markdown()),
         ]
     )
@@ -132,7 +133,7 @@ def test_abstract_is_citation_free_and_declares_availability() -> None:
     ):
         assert required in normalized_abstract
 
-    rendered = (MANUSCRIPT / "_build.md").read_text(encoding="utf-8")
+    rendered = (ARCHIVE / "_build.md").read_text(encoding="utf-8")
     rendered_abstract = rendered.split("# Abstract", 1)[1].split("# Introduction", 1)[0]
     normalized_rendered_abstract = re.sub(r"\s+", " ", rendered_abstract)
     assert "[@" not in rendered_abstract
@@ -148,7 +149,7 @@ def test_abstract_is_citation_free_and_declares_availability() -> None:
 
 def test_manuscript_cover_uses_release_date() -> None:
     config = (MANUSCRIPT / "config.yaml").read_text(encoding="utf-8")
-    tex = (MANUSCRIPT / "_build.tex").read_text(encoding="utf-8")
+    tex = (ARCHIVE / "_build.tex").read_text(encoding="utf-8")
     released = date.fromisoformat(RELEASE_DATE)
     cover_date = f"{released:%B} {released.day}, {released.year}"
     assert f'date: "{cover_date}"' in config
@@ -156,7 +157,7 @@ def test_manuscript_cover_uses_release_date() -> None:
     if not shutil.which("pdftotext"):
         pytest.skip("pdftotext is required for rendered cover-date verification")
     pdf_text = subprocess.run(
-        ["pdftotext", str(MANUSCRIPT / "_build.pdf"), "-"],
+        ["pdftotext", str(ARCHIVE / "_build.pdf"), "-"],
         check=True,
         capture_output=True,
         text=True,
@@ -205,7 +206,7 @@ def test_manuscript_cover_author_and_layout_contract() -> None:
     config = (MANUSCRIPT / "config.yaml").read_text()
     assert "0000-0001-6232-9096" in config
     assert "FractAI" not in config
-    assert "margin=0.42in" in config
+    assert "margin=0.42in" in (MANUSCRIPT / "preamble.md").read_text()
     assert (ROOT / "output" / "figures" / "cover_visual.png").exists()
     assert (ROOT / "output" / "figures" / "graphical_abstract.png").exists()
     assert (ROOT / "output" / "figures" / "statistical_diagnostics.png").exists()
@@ -218,17 +219,10 @@ def test_manuscript_cover_author_and_layout_contract() -> None:
 
 
 def test_rendered_latex_uses_red_hyperlink_contract() -> None:
-    config = (MANUSCRIPT / "config.yaml").read_text()
-    rendered_tex = (MANUSCRIPT / "_build.tex").read_text(errors="ignore")
+    preamble = (MANUSCRIPT / "preamble.md").read_text()
+    rendered_tex = (ARCHIVE / "_build.tex").read_text(errors="ignore")
     renderer = (ROOT / "src" / "itrace" / "manuscript.py").read_text()
-    for required in (
-        "colorlinks: true",
-        "linkcolor: red",
-        "citecolor: red",
-        "urlcolor: red",
-        "toccolor: red",
-    ):
-        assert required in config
+    assert r"\hypersetup{colorlinks=true,allcolors=red}" in preamble
     for required in (
         "colorlinks=true",
         "linkcolor={red}",
@@ -286,7 +280,7 @@ def test_public_claim_surfaces_reject_stale_or_overclaim_phrases() -> None:
     current_coverage = str(metrics["coverage_pct"])
     claim_paths = [
         ROOT / "README.md",
-        ROOT / "ISA.md",
+        ROOT / "docs" / "ISA.md",
         ROOT / "pyproject.toml",
         ROOT / "CITATION.cff",
         ROOT / ".zenodo.json",
@@ -296,7 +290,7 @@ def test_public_claim_surfaces_reject_stale_or_overclaim_phrases() -> None:
             if path.name != "SCHOLARSHIP_AUDIT.md"
         ),
         *sorted((ROOT / "docs" / "releases").glob("*.md")),
-        *(MANUSCRIPT / name for name in ("_build.md", "_build.txt", "_build.tex")),
+        *(ARCHIVE / name for name in ("_build.md", "_build.txt", "_build.tex")),
         *(path for path in _source_markdown()),
     ]
     haystack = "\n".join(path.read_text(errors="ignore") for path in claim_paths)
@@ -454,9 +448,9 @@ def test_prepublication_review_matches_its_archived_ledger() -> None:
 
 def test_rendered_manuscript_has_resolved_crossrefs_and_tokens() -> None:
     rendered = [
-        MANUSCRIPT / "_build.md",
-        MANUSCRIPT / "_build.txt",
-        MANUSCRIPT / "_build.tex",
+        ARCHIVE / "_build.md",
+        ARCHIVE / "_build.txt",
+        ARCHIVE / "_build.tex",
     ]
     missing = [path.name for path in rendered if not path.exists()]
     assert missing == []
@@ -464,7 +458,7 @@ def test_rendered_manuscript_has_resolved_crossrefs_and_tokens() -> None:
     assert re.search(r"\{\{[A-Z][A-Z0-9_]*\}\}", haystack) is None
     assert "{=tex}" not in haystack
     assert "at ~." not in haystack
-    assert r"\SI{" not in (MANUSCRIPT / "_build.md").read_text(errors="ignore")
+    assert r"\SI{" not in (ARCHIVE / "_build.md").read_text(errors="ignore")
     assert "0000-0001-6232-9096" in haystack
     assert "FractAI" not in haystack
     assert "margin=0.42in" in haystack
@@ -489,15 +483,15 @@ def test_rendered_artifacts_match_metric_ledgers() -> None:
     metrics = _verification_metrics()
     empirical = json.loads((ROOT / "docs" / "empirical_pilot_metrics.json").read_text())
     rendered_paths = [
-        MANUSCRIPT / "_build.md",
-        MANUSCRIPT / "_build.txt",
-        MANUSCRIPT / "_build.tex",
+        ARCHIVE / "_build.md",
+        ARCHIVE / "_build.txt",
+        ARCHIVE / "_build.tex",
     ]
     haystack = "\n".join(path.read_text(errors="ignore") for path in rendered_paths)
     pdf_text = ""
-    if shutil.which("pdftotext") and (MANUSCRIPT / "_build.pdf").exists():
+    if shutil.which("pdftotext") and (ARCHIVE / "_build.pdf").exists():
         pdf_text = subprocess.run(
-            ["pdftotext", str(MANUSCRIPT / "_build.pdf"), "-"],
+            ["pdftotext", str(ARCHIVE / "_build.pdf"), "-"],
             check=True,
             capture_output=True,
             text=True,
@@ -533,7 +527,7 @@ def test_rendered_artifacts_match_metric_ledgers() -> None:
 
 
 def test_rendered_pdf_smoke_matches_public_contract() -> None:
-    pdf = MANUSCRIPT / "_build.pdf"
+    pdf = ARCHIVE / "_build.pdf"
     if not shutil.which("pdfinfo") or not shutil.which("pdftotext"):
         pytest.skip("pdfinfo/pdftotext not installed")
     assert pdf.exists()
@@ -599,7 +593,7 @@ def test_pending_empirical_values_are_hydrated_honestly() -> None:
         return
     haystack = "\n".join(
         path.read_text(errors="ignore")
-        for path in (MANUSCRIPT / "_build.md", MANUSCRIPT / "_build.txt", MANUSCRIPT / "_build.tex")
+        for path in (ARCHIVE / "_build.md", ARCHIVE / "_build.txt", ARCHIVE / "_build.tex")
     )
     normalized = re.sub(r"[*\\{}]+", "", haystack)
     normalized = re.sub(r"\s+", " ", normalized)
@@ -615,9 +609,9 @@ def test_available_empirical_pilot_is_framed_as_n1_diagnostic() -> None:
     if not payload.get("available"):
         return
     rendered_paths = [
-        MANUSCRIPT / "_build.md",
-        MANUSCRIPT / "_build.txt",
-        MANUSCRIPT / "_build.tex",
+        ARCHIVE / "_build.md",
+        ARCHIVE / "_build.txt",
+        ARCHIVE / "_build.tex",
     ]
     haystack = "\n".join(path.read_text(errors="ignore") for path in rendered_paths)
     normalized = re.sub(r"\s+", " ", haystack)

@@ -15,7 +15,7 @@ updated: 2026-10-16T00:00:00Z
 
 ## Private visual-study interface (current development)
 
-The [private-study protocol](docs/PRIVATE_STUDY.md) documents a separate local
+The [private-study protocol](PRIVATE_STUDY.md) documents a separate local
 interface: `itrace study --manifest PRIVATE/study.json --output-dir PRIVATE/sessions`
 and offline `itrace study-report SESSION_DIR --out NEW_REPORT`. The existing
 `live-html` diagnostic workflow remains available. Original scientific publications,
@@ -449,7 +449,7 @@ Anonymous download verification matched all eight payloads, including the exact
 reviewed PDF. The previous v0.5.0 archive remains unchanged. Public source,
 artifact identities, checksums, acceptance evidence, and remaining scientific
 limits are documented in
-[the revision record](docs/releases/manuscript-2026-10-16.md).
+[the revision record](releases/manuscript-2026-10-16.md).
 
 Verification evidence for this refresh is recorded in `docs/DEVELOPMENT.md`,
 `docs/verification_metrics.json`, and the retained run at

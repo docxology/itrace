@@ -61,7 +61,8 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path]:
         'author:\n  - name: "Test Author"\n    orcid: "0000-0000-0000-0000"\n'
     )
     (manuscript / "references.bib").write_text("")
-    (manuscript / "_render_preamble.tex").write_text("")
+    (manuscript / "assets").mkdir()
+    (manuscript / "assets" / "standalone_preamble.tex").write_text("")
     (manuscript / "AGENTS.md").write_text("AGENT INSTRUCTIONS MUST NOT APPEAR")
     (manuscript / "MANUSCRIPT_STATUS.md").write_text("STATUS MUST NOT APPEAR")
     (manuscript / "00_section.md").write_text(

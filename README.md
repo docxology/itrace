@@ -1,5 +1,7 @@
 # iTrace — open-source webcam eye-movement analysis
 
+[Documentation](docs/README.md) · [Synthetic-only review](docs/SYNTHETIC_REVIEW.md) · [Manuscript](docs/manuscript/README.md)
+
 <p align="center">
   <a href="https://github.com/docxology/itrace/actions/workflows/ci.yml"><img alt="ci.yml workflow status on main" src="https://github.com/docxology/itrace/actions/workflows/ci.yml/badge.svg?branch=main"></a>
   <a href="https://doi.org/10.5281/zenodo.20614908"><img alt="Digital Object Identifier (DOI), concept record: 10.5281/zenodo.20614908" src="https://zenodo.org/badge/DOI/10.5281/zenodo.20614908.svg"></a>
@@ -631,7 +633,7 @@ accurately. Treat iTrace today as a **well-tested reference implementation of th
 estimation algorithms**, and add a reference-device or public-dataset comparison
 before reporting device-level accuracy. The ideal state, the criteria, and the
 verbatim verification evidence (including this disclosure) live in
-[`ISA.md`](ISA.md).
+[`ISA.md`](docs/ISA.md).
 
 Current gate metrics are recorded in
 [`docs/verification_metrics.json`](docs/verification_metrics.json) and hydrated
@@ -655,4 +657,4 @@ tests, coverage, `ruff`, `ruff format`, `mypy --strict`, lockfile, and render
 evidence are kept in that ledger. License and citation metadata are recorded in
 [`LICENSE`](LICENSE) and [`CITATION.cff`](CITATION.cff).
 Upcoming minor, medium, and large improvements are tracked in
-[`TODO.md`](TODO.md).
+[`TODO.md`](docs/TODO.md).

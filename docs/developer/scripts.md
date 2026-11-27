@@ -126,9 +126,9 @@ uv run python scripts/render_manuscript.py --metrics-json docs/verification_metr
 Module logic: `src/itrace/manuscript.py` owns source discovery, token loading,
 the source audit, staged Pandoc rendering, and output validation. The script
 only parses paths and explicit token overrides. See
-[`docs/DEVELOPMENT.md`](../docs/DEVELOPMENT.md) for the evidence contract.
+[`docs/DEVELOPMENT.md`](../DEVELOPMENT.md) for the evidence contract.
 
-Outputs: `docs/manuscript/_build.{md,tex,pdf,txt}`.
+Outputs: `output/manuscript-preview/_build.{md,tex,pdf,txt}`.
 
 ### `audit_crossrefs.py`
 
@@ -165,5 +165,5 @@ Malformed or missing inputs and contract violations exit nonzero.
 uv run --frozen python scripts/audit_release.py
 ```
 
-See [the release procedure](../docs/RELEASING.md) for distribution smoke checks,
+See [the release procedure](../RELEASING.md) for distribution smoke checks,
 commit-bound asset inventories, GitHub publication, and versioned Zenodo archival.

@@ -1,9 +1,11 @@
 # docs/manuscript/
 
 iTrace methods-paper sources are numbered Markdown sections, supplementary
-sections, `config.yaml`, and `references.bib`. Files beginning with `_` are
-generated. `README.md`, `AGENTS.md`, `MANUSCRIPT_STATUS.md`, and `preamble.md`
-are excluded from paper assembly.
+sections, `config.yaml`, and `references.bib`. The Markdown and TeX
+preambles support Template and the standalone renderer respectively. The
+standalone preamble is stored in `assets/` with the paper inputs.
+The [retained standalone build](../releases/retained-render/README.md)
+sits with the release documentation.
 
 The corrected 30-page manuscript from source commit `310be17` is published at
 [DOI 10.5281/zenodo.23419306](https://doi.org/10.5281/zenodo.23419306)
@@ -17,7 +19,7 @@ uv run python scripts/audit_crossrefs.py
 uv run python scripts/render_manuscript.py --metrics-json docs/verification_metrics.json
 ```
 
-The renderer hydrates `{{TEST_COUNT}}`, `{{COVERAGE_PCT}}`, and
+The standalone publication renderer hydrates `{{TEST_COUNT}}`, `{{COVERAGE_PCT}}`, and
 `{{DEMO_AMPLITUDE}}` from the current verification ledger and empirical tokens
 from their respective ledgers. An absent empirical ledger produces explicit
 unavailable fields. An existing malformed ledger, missing token, source audit
@@ -32,10 +34,15 @@ current development is identified by its own source digest and measured ledger.
 
 Markdown, plain text, LaTeX, and PDF are staged and validated before reader outputs
 are replaced. A failed `.itrace-render-*` directory retains the attempted input
-and intermediate artifacts. Use `--output-dir` for an isolated review render.
+and intermediate artifacts. Review builds default to `output/manuscript-preview/`. Use `--output-dir`
+for a different isolated destination.
 Inspect the resulting PDF after changing sources; text checks alone do not prove
 layout quality. The standalone renderer always emits these four formats; the
 `render.formats` block in `config.yaml` belongs to the sibling template workflow.
 
 See [Development and verification](../DEVELOPMENT.md) for runtime bindings,
 gate receipts, release-history separation, and empirical-source limitations.
+
+For current PDF and HTML verification, follow the [synthetic-only Template
+workflow](../SYNTHETIC_REVIEW.md). Its render marks participant-derived values
+and figure panels as withheld. The archived paper remains available above.

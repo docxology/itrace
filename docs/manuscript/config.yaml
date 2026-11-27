@@ -1,28 +1,30 @@
 # Pandoc / manuscript build configuration (template conventions).
-title: "iTrace: an algorithmically verified open-source core for webcam gaze, saccade, and pupil analysis"
-author:
+paper:
+  title: "iTrace: an algorithmically verified open-source core for webcam gaze, saccade, and pupil analysis"
+  date: "October 15, 2026"
+  version: "0.5.0"
+  cover:
+    image: "output/figures/cover_visual.png"
+    alt: "An illustrated eye links the local analysis core to gaze, saccade and pupil measurements."
+authors:
   - name: "Daniel Ari Friedman"
     orcid: "0000-0001-6232-9096"
     affiliations:
       - "Active Inference Institute"
-date: "October 15, 2026"
-abstract-from-file: 00_abstract.md
+publication:
+  repository_url: "https://github.com/docxology/itrace"
+  repository_label: "Source repository"
+metadata:
+  language: en
+  license: MIT
+render:
+  formats:
+    pdf: true
+    html: true
+    slides: false
+    docx: false
+    epub: false
 
 bibliography: references.bib
-fail_on_missing: true        # build fails on an unresolved citation key
+fail_on_missing: true
 link-citations: true
-number-sections: true
-citation-style: natbib
-
-# Page + link styling (template conventions): tight 0.42in margins and red
-# hyperlinks / citations / cross-references. render_manuscript.py mirrors these
-# as pandoc -V flags for the working standalone render.
-geometry:
-  - margin=0.42in
-colorlinks: true
-linkcolor: red
-citecolor: red
-urlcolor: red
-toccolor: red
-
-figures_dir: ../../output/figures

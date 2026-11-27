@@ -20,6 +20,7 @@ from itrace.manuscript import (
 
 ROOT = Path(__file__).resolve().parents[1]
 MANUSCRIPT = ROOT / "docs" / "manuscript"
+DEFAULT_OUTPUT = ROOT / "output" / "manuscript-preview"
 DEFAULT_METRICS = ROOT / "docs" / "verification_metrics.json"
 DEFAULT_EMPIRICAL_METRICS = ROOT / "docs" / "empirical_pilot_metrics.json"
 DEFAULT_EMPIRICAL_SESSIONS = ROOT / "docs" / "empirical_sessions_summary.json"
@@ -41,7 +42,7 @@ def load_empirical_session_tokens(path: Path = DEFAULT_EMPIRICAL_SESSIONS) -> di
     return _session_tokens(path)
 
 
-def render(values: dict[str, str], *, output_dir: Path = MANUSCRIPT) -> list[Path]:
+def render(values: dict[str, str], *, output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     return render_manuscript(values, manuscript_dir=MANUSCRIPT, root=ROOT, output_dir=output_dir)
 
 
@@ -50,7 +51,7 @@ def main() -> int:
     parser.add_argument("--metrics-json", type=Path, default=DEFAULT_METRICS)
     parser.add_argument("--empirical-json", type=Path, default=DEFAULT_EMPIRICAL_METRICS)
     parser.add_argument("--empirical-sessions-json", type=Path, default=DEFAULT_EMPIRICAL_SESSIONS)
-    parser.add_argument("--output-dir", type=Path, default=MANUSCRIPT)
+    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--demo-amplitude")
     parser.add_argument("--test-count")
     parser.add_argument("--coverage-pct")

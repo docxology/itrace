@@ -2,8 +2,8 @@
 
 ## Layout
 
-This directory holds research ledgers, protocols, and audits (Markdown + JSON),
-not software documentation. `docs/manuscript/` at the repo root holds the manuscript
+This directory holds the maintained guides, research ledgers, protocols,
+and audits. `docs/manuscript/` at the repo root holds the manuscript
 sources. `docs/README.md` is the index.
 
 ## Key artifacts
@@ -17,7 +17,7 @@ sources. `docs/README.md` is the index.
 - Numeric claims in the manuscript are injected at render time via `{{TOKEN}}`
   placeholders (documented in `docs/manuscript/README.md`); never hand-edit resolved
   values into section sources.
-- `_build.*` files under `docs/manuscript/` are render outputs, not sources.
+- The prior `_build.*` artifacts are retained under `docs/releases/retained-render/`.
 
 ## Maintenance
 

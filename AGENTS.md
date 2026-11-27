@@ -66,7 +66,7 @@ tests/           no-mocks suite; tests/fixtures/reference_impl.py = oracle
 scripts/         generate_figures.py, generate_loop_animation.py → output/figures/
 docs/manuscript/      Pandoc manuscript (template numbering/citation conventions)
 docs/            RESEARCH_BRIEF.md (the ecosystem survey behind the design)
-ISA.md           ideal-state articulation, criteria, and verification evidence
+docs/ISA.md      ideal-state articulation, criteria, and verification evidence
 ```
 
 The 3-D forward model (`eyemodel`) and closed loop (`scene`) must stay an
@@ -77,7 +77,7 @@ becomes a tautology — keep them distinct (see ISC-68).
 
 ## Source of truth
 
-`ISA.md` records the ideal state, acceptance criteria (ISCs), and dated verification
+`docs/ISA.md` records the ideal state, acceptance criteria (ISCs), and dated verification
 evidence. Extend it when behaviour changes; historical receipts do not certify a
 new interface. Preserve manuscript, release, and research ledgers unless the task
 explicitly owns their regeneration.
